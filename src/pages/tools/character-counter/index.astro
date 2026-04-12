@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="文字数カウンター - GlowPunch" description="入力したテキストの文字数、単語数、行数を瞬時にカウントします。">
+  <div class="flex flex-col gap-6">
+    <div class="mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">文字数<span class="text-sky-500">カウンター</span></h1>
+      <p class="text-slate-600 text-lg">入力エリアにテキストを貼り付けるだけで、文字数をサクッとカウントします。</p>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+      <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-slate-500 text-sm font-medium mb-1 tracking-wider">文字数</span>
+        <span class="text-4xl md:text-5xl font-black text-slate-800" id="stat-chars">0</span>
+      </div>
+      <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-slate-500 text-sm font-medium mb-1 tracking-wider">単語数</span>
+        <span class="text-4xl md:text-5xl font-black text-slate-800" id="stat-words">0</span>
+      </div>
+      <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-slate-500 text-sm font-medium mb-1 tracking-wider">行数</span>
+        <span class="text-4xl md:text-5xl font-black text-slate-800" id="stat-lines">0</span>
+      </div>
+      <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
+        <span class="text-slate-500 text-sm font-medium mb-1 tracking-wider">空白抜き文字数</span>
+        <span class="text-4xl md:text-5xl font-black text-slate-800" id="stat-nospaces">0</span>
+      </div>
+    </div>
+
+    <!-- Text Area -->
+    <div class="glass-panel p-1 rounded-2xl relative group focus-within:ring-2 focus-within:ring-sky-500/50 transition-all bg-white border border-slate-300 shadow-inner">
+      <textarea 
+        id="text-input"
+        class="w-full h-80 bg-transparent rounded-xl outline-none border-none p-6 text-slate-800 placeholder-slate-400 resize-y focus:outline-none focus:ring-0 font-sans text-lg appearance-none"
+        placeholder="ここに入力するか、テキストを貼り付けてください..."
+      ></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap gap-4 mt-2">
+      <button id="btn-copy" class="btn-primary flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        テキストをコピー
+      </button>
+      <button id="btn-clear" class="px-6 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-colors flex items-center gap-2 active:scale-95">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        クリア
+      </button>
+    </div>
+
+    <div class="mt-12">
+      <AdSensePlaceholder slotId="tool-bottom-banner" />
+    </div>
+
+    <!-- SEO content hidden below the fold -->
+    <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
+      <h2>文字数カウンターについて</h2>
+      <p>このツールは、レポート作成、ブログ執筆、SNS（Twitterなど）の投稿の際に、文章の長さをすばやく確認するためのシンプルで便利なツールです。</p>
+      <h3>このツールの特徴</h3>
+      <ul>
+        <li><strong>インストール不要で高速:</strong> お手持ちのブラウザだけでサクサク動くため、結果が待ち時間ゼロで表示されます。</li>
+        <li><strong>安心のプライバシー:</strong> 入力されたテキストはあなたの端末内で処理され、一切どこへも送信されません。機密情報の入力も安心です。</li>
+      </ul>
+      <p>ぜひブックマークして、毎日の作業にお役立てください！</p>
+    </article>
+  </div>
+</BaseLayout>
+
+<script>
+  // Vanilla JS logic for counting
+  const input = document.getElementById('text-input') as HTMLTextAreaElement | null;
+  const statChars = document.getElementById('stat-chars');
+  const statWords = document.getElementById('stat-words');
+  const statLines = document.getElementById('stat-lines');
+  const statNoSpaces = document.getElementById('stat-nospaces');
+  const btnCopy = document.getElementById('btn-copy');
+  const btnClear = document.getElementById('btn-clear');
+
+  function updateStats() {
+    if (!input || !statChars || !statWords || !statLines || !statNoSpaces) return;
+    
+    const text = input.value;
+    
+    // Characters
+    statChars.textContent = text.length.toLocaleString();
+    
+    // Words (basic regex split)
+    const wordsMatch = text.match(/\S+/g);
+    statWords.textContent = (wordsMatch ? wordsMatch.length : 0).toLocaleString();
+    
+    // Lines
+    const lines = text === '' ? 0 : text.split(/\r\n|\r|\n/).length;
+    statLines.textContent = lines.toLocaleString();
+    
+    // No Spaces
+    const noSpacesText = text.replace(/\s+/g, '');
+    statNoSpaces.textContent = noSpacesText.length.toLocaleString();
+  }
+
+  input?.addEventListener('input', updateStats);
+
+  btnCopy?.addEventListener('click', async () => {
+    if (input) {
+      try {
+        await navigator.clipboard.writeText(input.value);
+        const originalText = btnCopy.innerHTML;
+        btnCopy.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><polyline points="20 6 9 17 4 12"/></svg> コピーしました！`;
+        setTimeout(() => {
+          btnCopy.innerHTML = originalText;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+  });
+
+  btnClear?.addEventListener('click', () => {
+    if (input) {
+      input.value = '';
+      updateStats();
+      input.focus();
+    }
+  });
+  
+  // initialize state
+  updateStats();
+</script>

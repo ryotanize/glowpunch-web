@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import AdSensePlaceholder from '../../components/AdSensePlaceholder.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={`${post.data.title} - GlowPunch`} description={post.data.description}>
+  
+  <article class="glass-panel p-8 md:p-12 mt-8">
+    <header class="mb-10 text-center">
+      <time datetime={post.data.pubDate.toISOString()} class="text-sm text-sky-500 font-mono mb-4 block">
+        {post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric'})}
+      </time>
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
+        {post.data.title}
+      </h1>
+      <p class="text-lg text-slate-500 max-w-2xl mx-auto">
+        {post.data.description}
+      </p>
+    </header>
+
+    <div class="prose prose-slate prose-lg max-w-none prose-headings:text-slate-800 prose-a:text-sky-500 hover:prose-a:text-sky-600">
+      <Content />
+    </div>
+  </article>
+
+  <div class="mt-12">
+    <AdSensePlaceholder slotId="blog-bottom-banner" />
+  </div>
+  
+  <div class="mt-8 text-center">
+    <a href="/blog" class="text-slate-500 hover:text-sky-500 transition-colors">&larr; ブログ一覧へ戻る</a>
+  </div>
+
+</BaseLayout>

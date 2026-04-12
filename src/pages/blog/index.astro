@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="ブログ - GlowPunch" description="ツールの更新情報や、日常的な開発ブログです。">
+  <div class="flex flex-col gap-8">
+    <h1 class="text-4xl font-bold text-slate-800">ブログ</h1>
+    <p class="text-slate-600">ツールの更新情報や使い方、開発の裏話などをお届けします。</p>
+    
+    <div class="grid gap-6">
+      {posts.map((post) => (
+        <a href={`/blog/${post.id}`} class="glass-panel p-6 group hover:-translate-y-1 block transition-transform">
+          <div class="flex flex-col gap-2">
+            <time datetime={post.data.pubDate.toISOString()} class="text-xs text-sky-500 font-mono">
+              {post.data.pubDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric'})}
+            </time>
+            <h2 class="text-2xl font-bold text-slate-800 group-hover:text-sky-600 transition-colors">{post.data.title}</h2>
+            <p class="text-slate-600">{post.data.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
