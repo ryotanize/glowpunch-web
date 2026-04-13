@@ -1,0 +1,259 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="レトロシルエットメーカー - GlowPunch" description="画像をアップロードすると不要な背景を透過し、2000年代のMP3プレイヤーのCMのような、ビビッド背景×黒塗りシルエット画像を自動生成します。白いイヤホンも手書きで追加できます。">
+  <div class="flex flex-col gap-6">
+    <div class="mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">レトロシルエット<span class="text-green-500">メーカー</span></h1>
+      <p class="text-slate-600 text-lg">2000年代の「あのCM」風！画像をアップロードして、ビビッドな背景に映える黒いシルエット画像を生成しよう。</p>
+    </div>
+
+    <!-- UI Main Container -->
+    <div class="flex flex-col lg:flex-row gap-6">
+      
+      <!-- Left side: Upload & Preview -->
+      <div class="flex-grow flex flex-col gap-4">
+        <!-- Dropzone -->
+        <div id="dropzone" class="glass-panel p-8 rounded-2xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center cursor-pointer hover:border-green-400 hover:bg-green-50/50 transition-all min-h-[200px]">
+          <div class="w-16 h-16 rounded-full bg-green-100 text-green-500 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p class="text-slate-600 font-medium text-lg">画像をドロップするか、<span class="text-green-500 font-bold">クリックして選択</span></p>
+          <p class="text-slate-400 text-sm mt-1">※ 全身や上半身などの動きがあるポーズがおすすめです！</p>
+          <input type="file" id="file-input" class="hidden" accept="image/jpeg, image/png, image/webp" />
+        </div>
+
+        <!-- Processing UI -->
+        <div id="loading-ui" class="hidden glass-panel p-8 rounded-2xl flex-col items-center justify-center text-center min-h-[200px]">
+          <div class="animate-spin w-12 h-12 border-4 border-slate-200 border-t-green-500 rounded-full mb-4"></div>
+          <p class="text-lg font-bold text-slate-800" id="loading-text">AIに被写体を認識させています...</p>
+          <div class="w-full max-w-xs bg-slate-200 rounded-full h-2.5 mt-4 overflow-hidden">
+            <div class="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%" id="progress-bar"></div>
+          </div>
+        </div>
+
+        <!-- Preview Area -->
+        <div id="preview-container" class="hidden glass-panel p-4 rounded-2xl flex-col gap-4 bg-white relative">
+          <div class="flex justify-between items-center px-2">
+            <h3 class="text-slate-700 font-bold flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+              プレビュー
+            </h3>
+            <button id="btn-reset" class="text-sm px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors">別の画像を選ぶ</button>
+          </div>
+          
+          <div id="canvas-wrapper" class="relative rounded overflow-hidden w-full bg-slate-100 border border-slate-200 flex justify-center items-start group touch-none mx-auto select-none">
+             <!-- Background Color Layer -->
+             <div id="bg-color-layer" class="absolute inset-0 w-full h-full bg-[#3b82f6] transition-colors duration-300 pointer-events-none"></div>
+             
+             <!-- Silhouette Layer (Drawn via JS) -->
+             <canvas id="silhouette-canvas" class="block max-w-full h-auto opacity-100 relative z-10" style="max-height: 60vh;"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right side: Controls -->
+      <div id="controls-panel" class="w-full lg:w-80 flex flex-col gap-4 opacity-50 pointer-events-none transition-opacity">
+        <div class="glass-panel p-5 rounded-2xl flex flex-col gap-5">
+          <div>
+             <h3 class="text-slate-700 font-bold mb-3">1. 背景カラーを選ぶ</h3>
+             <div class="flex flex-wrap gap-3">
+               <button class="color-btn w-10 h-10 rounded-full bg-[#facc15] ring-2 ring-transparent ring-offset-2 hover:scale-110 transition-transform focus:outline-none" data-color="#facc15"></button>
+               <button class="color-btn w-10 h-10 rounded-full bg-[#ec4899] ring-2 ring-white ring-offset-2 hover:scale-110 transition-transform focus:outline-none" data-color="#ec4899"></button>
+               <button class="color-btn w-10 h-10 rounded-full bg-[#3b82f6] ring-2 ring-transparent ring-offset-2 hover:scale-110 transition-transform focus:outline-none shadow-[0_0_0_2px_#3b82f6]" data-color="#3b82f6"></button>
+               <button class="color-btn w-10 h-10 rounded-full bg-[#22c55e] ring-2 ring-transparent ring-offset-2 hover:scale-110 transition-transform focus:outline-none" data-color="#22c55e"></button>
+               <button class="color-btn w-10 h-10 rounded-full bg-[#a855f7] ring-2 ring-transparent ring-offset-2 hover:scale-110 transition-transform focus:outline-none" data-color="#a855f7"></button>
+             </div>
+          </div>
+
+          <hr class="border-slate-200" />
+
+          <button id="btn-download-image" class="w-full py-4 rounded-xl font-bold tracking-wide text-white bg-green-500 hover:bg-green-600 active:scale-95 transition-all shadow-lg shadow-green-500/30 flex justify-center items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            画像を保存
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO text -->
+    <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
+      <h2>レトロシルエットメーカーについて</h2>
+      <p>画像をアップロードするだけで、AIが自動で被写体を認識して切り抜き、ポップでビビッドな背景に真っ黒なシルエットを重ねた画像を生成します。あの2000年代を席巻した有名な音楽プレイヤーのCMのような、エモーショナルでかっこいい画像を作ることができます。</p>
+      <h3>こだわりの機能</h3>
+      <ul>
+        <li><strong>AIが自動で高精度に切り抜き：</strong> 髪の毛などの細かい部分もAIが自動認識して切り抜き、綺麗なシルエットにします。</li>
+        <li><strong>安心のローカル処理：</strong> AIの切り抜き処理はすべてブラウザの中で行われます。サーバーに送信されることはないため、プライベートな写真でも安全に加工できます。</li>
+      </ul>
+      <p>SNSのアイコンやヘッダー画像、友達とのシェアなどでぜひ遊んでみてください。</p>
+    </article>
+    
+    <div class="mt-4">
+      <AdSensePlaceholder slotId="retro-silhouette-bottom" />
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { removeBackground } from '@imgly/background-removal';
+
+  // Elements
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const loadingUi = document.getElementById('loading-ui');
+  const previewContainer = document.getElementById('preview-container');
+  const btnReset = document.getElementById('btn-reset');
+  const controlsPanel = document.getElementById('controls-panel');
+  const loadingText = document.getElementById('loading-text');
+  const progressBar = document.getElementById('progress-bar');
+  const bgColorLayer = document.getElementById('bg-color-layer');
+  const colorBtns = document.querySelectorAll('.color-btn');
+  const btnDownloadImage = document.getElementById('btn-download-image');
+  
+  const silhouetteCanvas = document.getElementById('silhouette-canvas') as HTMLCanvasElement;
+  const silhouetteCtx = silhouetteCanvas.getContext('2d');
+
+  let currentImageFile = null;
+  let currentColor = '#3b82f6'; // initial blue
+  let isProcessing = false;
+  
+  // Setup UI behaviors
+  colorBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+          const target = e.currentTarget as HTMLElement;
+          currentColor = target.getAttribute('data-color') || '#000';
+          bgColorLayer.style.backgroundColor = currentColor;
+          
+          // update ring outline for selected state
+          colorBtns.forEach(b => {
+              b.style.boxShadow = 'none';
+          });
+          target.style.boxShadow = `0 0 0 2px ${currentColor}`;
+      });
+  });
+
+  // Handle Drag & Drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropzone?.addEventListener(eventName, preventDefaults, false);
+  });
+  function preventDefaults(e: Event) {
+    e.preventDefault(); e.stopPropagation();
+  }
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone?.addEventListener(eventName, () => dropzone.classList.add('border-green-500', 'bg-green-50'), false);
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone?.addEventListener(eventName, () => dropzone.classList.remove('border-green-500', 'bg-green-50'), false);
+  });
+
+  dropzone?.addEventListener('drop', (e: DragEvent) => {
+    if (e.dataTransfer?.files.length) handleFiles(e.dataTransfer.files);
+  });
+  dropzone?.addEventListener('click', () => fileInput?.click());
+  fileInput?.addEventListener('change', function(this: HTMLInputElement) {
+    if (this.files?.length) handleFiles(this.files);
+  });
+
+  function handleFiles(files: FileList) {
+    const file = files[0];
+    if (!file.type.startsWith('image/')) return alert('画像ファイルを選択してください');
+    currentImageFile = file;
+    processImage(file);
+  }
+
+  async function processImage(file: File) {
+    isProcessing = true;
+    dropzone.classList.add('hidden');
+    loadingUi.classList.remove('hidden');
+    loadingUi.classList.add('flex');
+    progressBar.style.width = '0%';
+    
+    try {
+        const config = {
+          progress: (key: string, current: number, total: number) => {
+             const percent = Math.min(100, Math.round((current / total) * 100));
+             progressBar.style.width = `${percent}%`;
+             if (key.includes('model_')) loadingText.textContent = `AIモデルをロード中...`;
+             else if (key.includes('compute')) loadingText.textContent = `被写体を切り抜き中...`;
+          }
+        };
+
+        const fgBlob = await removeBackground(currentImageFile, config);
+        const fgUrl = URL.createObjectURL(fgBlob);
+        
+        const fgImg = new Image();
+        fgImg.onload = () => {
+            renderSilhouette(fgImg);
+            URL.revokeObjectURL(fgUrl);
+        };
+        fgImg.src = fgUrl;
+
+    } catch(err) {
+        alert('エラーが発生しました。別の画像で試すか、リロードしてください。');
+        resetLayer();
+    }
+  }
+
+  function renderSilhouette(fgImg: HTMLImageElement) {
+    loadingUi.classList.add('hidden');
+    loadingUi.classList.remove('flex');
+    previewContainer.classList.remove('hidden');
+    controlsPanel.classList.remove('opacity-50', 'pointer-events-none');
+    
+    silhouetteCanvas.width = fgImg.width;
+    silhouetteCanvas.height = fgImg.height;
+    
+    // Convert to silhouette
+    silhouetteCtx.drawImage(fgImg, 0, 0);
+    const imgData = silhouetteCtx.getImageData(0, 0, fgImg.width, fgImg.height);
+    for (let i = 0; i < imgData.data.length; i += 4) {
+        // imgData.data[i+3] is alpha. If alpha > 0, make pixel black.
+        // Smooth alpha edge is preserved.
+        imgData.data[i] = 0;     // R
+        imgData.data[i+1] = 0;   // G
+        imgData.data[i+2] = 0;   // B
+        // Alpha is kept as is
+    }
+    silhouetteCtx.putImageData(imgData, 0, 0);
+
+    isProcessing = false;
+  }
+
+  btnReset?.addEventListener('click', resetLayer);
+
+  function resetLayer() {
+      if(isProcessing) return;
+      currentImageFile = null;
+      previewContainer.classList.add('hidden');
+      controlsPanel.classList.add('opacity-50', 'pointer-events-none');
+      dropzone.classList.remove('hidden');
+      loadingUi.classList.add('hidden');
+      loadingUi.classList.remove('flex');
+      fileInput.value = '';
+  }
+
+  // Handle Download Image
+  btnDownloadImage?.addEventListener('click', () => {
+      // Create output canvas
+      const outCvs = document.createElement('canvas');
+      outCvs.width = silhouetteCanvas.width;
+      outCvs.height = silhouetteCanvas.height;
+      const oCtx = outCvs.getContext('2d');
+      
+      // Draw background color
+      oCtx.fillStyle = currentColor;
+      oCtx.fillRect(0, 0, outCvs.width, outCvs.height);
+      
+      // Draw Silhouette
+      oCtx.drawImage(silhouetteCanvas, 0, 0);
+      
+      // Export
+      const a = document.createElement('a');
+      a.href = outCvs.toDataURL('image/png');
+      a.download = `retro_silhouette_${Date.now()}.png`;
+      a.click();
+  });
+</script>

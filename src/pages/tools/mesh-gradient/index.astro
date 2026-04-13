@@ -1,0 +1,490 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="Glow Mesh Generator - メッシュグラデーション生成 - GlowPunch" description="直感的な操作で美しいメッシュグラデーションを作成・エクスポートできるWebツール。CSS, PNG, SVGに対応。">
+  <div class="flex flex-col gap-8 max-w-5xl mx-auto">
+    <div class="text-center md:text-left">
+      <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight mb-3">Glow <span class="text-sky-500 italic">Mesh</span> Generator</h1>
+      <p class="text-slate-600 text-lg">ポインターをドラッグするだけで、自分だけの「エモい」グラデーションが作れます。</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Preview Area -->
+      <div class="lg:col-span-2 space-y-4">
+        <div id="mesh-canvas-container" class="relative aspect-video md:aspect-square lg:aspect-video rounded-3xl overflow-hidden shadow-2xl bg-slate-900 cursor-crosshair border border-white/10 group select-none">
+          <!-- The Mesh Background -->
+          <div id="mesh-background" class="absolute inset-0 overflow-hidden pointer-events-none">
+             <!-- Blobs will be injected here -->
+          </div>
+          
+          <!-- Grain Overlay -->
+          <div id="grain-overlay" class="absolute inset-0 pointer-events-none opacity-20 contrast-125 brightness-100 hidden"></div>
+
+          <!-- Interaction Layer -->
+          <div id="handles-container" class="absolute inset-0">
+            <!-- Draggable handles will be injected here -->
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4">
+          <button id="btn-randomize" class="px-6 py-3 rounded-2xl font-bold bg-slate-800 text-white hover:bg-slate-700 transition-all active:scale-95 flex items-center gap-2 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3(0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg>
+            ランダマイズ
+          </button>
+          <button id="btn-add-point" class="px-6 py-3 rounded-2xl font-bold bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            ポイント追加
+          </button>
+          <div class="flex-grow"></div>
+          <button id="btn-reset" class="px-4 py-3 text-slate-400 hover:text-slate-600 transition-colors">リセット</button>
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="flex flex-col gap-6">
+        <div class="glass-panel p-6 space-y-6">
+          <h2 class="text-xl font-bold text-slate-800">カスタマイズ</h2>
+          
+          <!-- Global Controls -->
+          <div class="space-y-4">
+             <div class="flex items-center justify-between">
+               <label class="text-sm font-bold text-slate-500 uppercase tracking-wider">粒状感 (Grain)</label>
+               <input type="checkbox" id="check-grain" class="w-5 h-5 accent-sky-500 cursor-pointer" />
+             </div>
+             <div class="space-y-2">
+               <label class="text-sm font-bold text-slate-500 uppercase tracking-wider">ぼかし強度</label>
+               <input type="range" id="range-blur" min="50" max="400" value="150" class="w-full accent-sky-500" />
+             </div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-6">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">書き出し</h3>
+            <div class="grid grid-cols-1 gap-3">
+              <button id="btn-export-css" class="btn-primary w-full flex justify-center items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>
+                CSSをコピー
+              </button>
+              <button id="btn-export-svg" class="w-full px-6 py-3 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex justify-center items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                SVGをコピー
+              </button>
+              <button id="btn-export-png" class="w-full px-6 py-3 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex justify-center items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                PNGで保存
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Point Info (Conditional) -->
+        <div id="point-editor" class="glass-panel p-6 space-y-4 hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">ポイント編集</h3>
+            <button id="btn-delete-point" class="text-rose-500 hover:text-rose-600 text-sm font-bold">削除</button>
+          </div>
+          <div class="flex items-center gap-4">
+            <input type="color" id="input-point-color" class="w-12 h-12 rounded-lg border-2 border-white shadow-sm cursor-pointer" />
+            <div class="flex-grow">
+               <input type="text" id="text-point-color" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono uppercase" value="#000000" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO content -->
+    <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
+      <h2>Glow Mesh Generator とは？</h2>
+      <p>
+        最先端のWebデザインで欠かせない「メッシュグラデーション」を、ブラウザ上で直感的に作成できるツールです。
+        複数の色が液体のように溶け合う幻想的な背景を、ドラッグ操作だけで生み出すことができます。
+      </p>
+      <h3>主な用途</h3>
+      <ul>
+        <li><strong>Webサイトのヒーローセクション</strong>: 動きのあるモダンな背景として。</li>
+        <li><strong>プレゼン資料やバナー</strong>: スライドの背景を一瞬でプロ級の見た目に。</li>
+        <li><strong>SNSの投稿用画像</strong>: 独特なザラつき（Grain）を加えることで、よりエモい仕上がりに。</li>
+      </ul>
+      <p>
+        すべての処理はあなたのブラウザ内で行われるため、画像がサーバーに送信されることはありません。
+        プライバシーを守りながら、クリエイティブな作業をお楽しみください。
+      </p>
+    </article>
+  </div>
+
+  <!-- SVG Filter Definition for Noise -->
+  <svg class="hidden">
+    <filter id="noiseFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+  </svg>
+
+  <!-- Dummy Canvas for PNG export -->
+  <canvas id="export-canvas" class="hidden"></canvas>
+</BaseLayout>
+
+<style is:global>
+  #mesh-background {
+    background: #0f172a; /* Base dark background */
+    filter: blur(150px);
+    transform: scale(1.2); /* Prevents blur fringes */
+  }
+
+  #grain-overlay {
+    background: #fff;
+    filter: url(#noiseFilter);
+    mix-blend-mode: overlay;
+  }
+
+  .mesh-blob {
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+    mix-blend-mode: screen;
+  }
+
+  .mesh-handle {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 3px solid #1e293b;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    z-index: 50;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .mesh-handle:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+
+  .mesh-handle.active {
+    cursor: grabbing;
+    transform: translate(-50%, -50%) scale(1.3);
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3), 0 12px 24px rgba(0,0,0,0.3);
+  }
+
+  /* Custom range thumb for better look */
+  input[type=range]::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -8px;
+    border: 3px solid #0ea5e9;
+  }
+
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+  }
+</style>
+
+<script>
+  // Mesh Logic
+  interface MeshPoint {
+    id: string;
+    x: number; // 0-100
+    y: number; // 0-100
+    color: string;
+    element: HTMLElement | null;
+    handle: HTMLElement | null;
+  }
+
+  let points: MeshPoint[] = [];
+  let selectedPointId: string | null = null;
+  let isDragging = false;
+  let dragPointId: string | null = null;
+
+  const bgContainer = document.getElementById('mesh-background');
+  const handlesContainer = document.getElementById('handles-container');
+  const blurRange = document.getElementById('range-blur') as HTMLInputElement;
+  const grainCheck = document.getElementById('check-grain') as HTMLInputElement;
+  const grainOverlay = document.getElementById('grain-overlay');
+  const pointEditor = document.getElementById('point-editor');
+  const colorInput = document.getElementById('input-point-color') as HTMLInputElement;
+  const colorText = document.getElementById('text-point-color') as HTMLInputElement;
+  const btnDelete = document.getElementById('btn-delete-point');
+  const btnRandomize = document.getElementById('btn-randomize');
+  const btnAdd = document.getElementById('btn-add-point');
+  const btnReset = document.getElementById('btn-reset');
+  
+  const PALETTES = [
+    ['#00d2ff', '#3a7bd5', '#92fe9d', '#00c9ff'], // Marine
+    ['#833ab4', '#fd1d1d', '#fcb045', '#ff9a9e'], // Sunset
+    ['#00f2fe', '#4facfe', '#7028e4', '#e91e63'], // Vaporwave
+    ['#0ea5e9', '#8b5cf6', '#d946ef', '#f43f5e'], // GlowPunch Default
+    ['#111827', '#1f2937', '#374151', '#4b5563'], // Neutral
+  ];
+
+  function init() {
+    // Default points
+    const defaultPalette = PALETTES[3];
+    points = [
+      { id: '1', x: 20, y: 20, color: defaultPalette[0], element: null, handle: null },
+      { id: '2', x: 80, y: 30, color: defaultPalette[1], element: null, handle: null },
+      { id: '3', x: 30, y: 80, color: defaultPalette[2], element: null, handle: null },
+      { id: '4', x: 70, y: 70, color: defaultPalette[3], element: null, handle: null },
+    ];
+
+    renderPoints();
+    setupEventListeners();
+  }
+
+  function renderPoints() {
+    if (!bgContainer || !handlesContainer) return;
+    
+    bgContainer.innerHTML = '';
+    handlesContainer.innerHTML = '';
+
+    points.forEach(p => {
+      // Create Blob
+      const blob = document.createElement('div');
+      blob.className = 'mesh-blob';
+      blob.style.left = `${p.x}%`;
+      blob.style.top = `${p.y}%`;
+      blob.style.backgroundColor = p.color;
+      bgContainer.appendChild(blob);
+      p.element = blob;
+
+      // Create Handle
+      const handle = document.createElement('div');
+      handle.className = 'mesh-handle';
+      handle.style.left = `${p.x}%`;
+      handle.style.top = `${p.y}%`;
+      if (p.id === selectedPointId) handle.classList.add('active');
+      
+      handle.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        selectPoint(p.id);
+        dragPointId = p.id;
+        isDragging = true;
+        handle.setPointerCapture(e.pointerId);
+        handle.classList.add('active');
+      });
+
+      handlesContainer.appendChild(handle);
+      p.handle = handle;
+    });
+  }
+
+  function selectPoint(id: string | null) {
+    selectedPointId = id;
+    
+    // Update handles UI
+    points.forEach(p => {
+       if (p.handle) {
+         if (p.id === id) p.handle.classList.add('active');
+         else p.handle.classList.remove('active');
+       }
+    });
+
+    if (id) {
+      const point = points.find(p => p.id === id);
+      if (point && pointEditor && colorInput && colorText) {
+        pointEditor.classList.remove('hidden');
+        colorInput.value = point.color;
+        colorText.value = point.color;
+      }
+    } else {
+      pointEditor?.classList.add('hidden');
+    }
+  }
+
+  function setupEventListeners() {
+    // Global dragging on handles container
+    handlesContainer?.addEventListener('pointermove', (e) => {
+      if (!isDragging || !dragPointId || !handlesContainer) return;
+      
+      const rect = handlesContainer.getBoundingClientRect();
+      let x = ((e.clientX - rect.left) / rect.width) * 100;
+      let y = ((e.clientY - rect.top) / rect.height) * 100;
+      
+      // Clamp
+      x = Math.max(0, Math.min(100, x));
+      y = Math.max(0, Math.min(100, y));
+
+      const point = points.find(p => p.id === dragPointId);
+      if (point) {
+        point.x = x;
+        point.y = y;
+        if (point.element) {
+          point.element.style.left = `${x}%`;
+          point.element.style.top = `${y}%`;
+        }
+        if (point.handle) {
+          point.handle.style.left = `${x}%`;
+          point.handle.style.top = `${y}%`;
+        }
+      }
+    });
+
+    handlesContainer?.addEventListener('pointerup', (e) => {
+      isDragging = false;
+      dragPointId = null;
+    });
+
+    // Deselect
+    handlesContainer?.addEventListener('pointerdown', (e) => {
+      if (e.target === handlesContainer) {
+        selectPoint(null);
+      }
+    });
+
+    // Blur Control
+    blurRange?.addEventListener('input', () => {
+      if (bgContainer) bgContainer.style.filter = `blur(${blurRange.value}px)`;
+    });
+
+    // Grain Toggle
+    grainCheck?.addEventListener('change', () => {
+      if (grainOverlay) {
+        if (grainCheck.checked) grainOverlay.classList.remove('hidden');
+        else grainOverlay.classList.add('hidden');
+      }
+    });
+
+    // Color Inputs
+    colorInput?.addEventListener('input', () => {
+      if (selectedPointId) {
+        const point = points.find(p => p.id === selectedPointId);
+        if (point) {
+          point.color = colorInput.value;
+          colorText.value = colorInput.value;
+          if (point.element) point.element.style.backgroundColor = point.color;
+        }
+      }
+    });
+
+    colorText?.addEventListener('change', () => {
+       if (selectedPointId) {
+        const point = points.find(p => p.id === selectedPointId);
+        if (point) {
+          const val = colorText.value.startsWith('#') ? colorText.value : '#' + colorText.value;
+          if (/^#[0-9A-F]{6}$/i.test(val)) {
+            point.color = val;
+            colorInput.value = val;
+            if (point.element) point.element.style.backgroundColor = point.color;
+          }
+        }
+      }
+    });
+
+    // Randomize
+    btnRandomize?.addEventListener('click', () => {
+      const palette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+      points.forEach((p, i) => {
+        p.color = palette[i % palette.length];
+        p.x = Math.random() * 80 + 10;
+        p.y = Math.random() * 80 + 10;
+      });
+      renderPoints();
+    });
+
+    // Add Point
+    btnAdd?.addEventListener('click', () => {
+      const id = Date.now().toString();
+      const lastPoint = points[points.length - 1];
+      points.push({
+        id,
+        x: Math.random() * 60 + 20,
+        y: Math.random() * 60 + 20,
+        color: lastPoint ? lastPoint.color : '#ffffff',
+        element: null,
+        handle: null
+      });
+      renderPoints();
+      selectPoint(id);
+    });
+
+    // Delete Point
+    btnDelete?.addEventListener('click', () => {
+      if (selectedPointId && points.length > 2) {
+        points = points.filter(p => p.id !== selectedPointId);
+        selectPoint(null);
+        renderPoints();
+      }
+    });
+
+    // Reset
+    btnReset?.addEventListener('click', () => {
+       init();
+    });
+    
+    // Export CSS
+    document.getElementById('btn-export-css')?.addEventListener('click', () => {
+      let css = `background-color: #0f172a;\n`;
+      css += `position: relative;\n`;
+      css += `overflow: hidden;\n`;
+      css += `/* Note: This logic approximates the mesh with radial gradients. 
+          For a perfect match, keep child divs with blur filters or use the SVG export. */\n`;
+      css += `background-image: `;
+      const gradients = points.map(p => `radial-gradient(at ${p.x.toFixed(1)}% ${p.y.toFixed(1)}%, ${p.color} 0px, transparent 50%)`);
+      css += gradients.join(', ') + ';\n';
+      css += `background-blend-mode: screen;`;
+      
+      navigator.clipboard.writeText(css).then(() => {
+        alert('CSSをクリップボードにコピーしました！');
+      });
+    });
+  }
+
+  // PNG Export (Simplified)
+  document.getElementById('btn-export-png')?.addEventListener('click', () => {
+    const canvas = document.getElementById('export-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const width = 2000;
+    const height = 2000;
+    canvas.width = width;
+    canvas.height = height;
+    
+    // Background
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Points (This is a simplified version of CSS blur)
+    // For true 1:1, we'd need some serious blurring on canvas or using a shader
+    // Here we'll do soft radial gradients
+    points.forEach(p => {
+      const x = (p.x / 100) * width;
+      const y = (p.y / 100) * height;
+      const radius = width * 0.8;
+      
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      grad.addColorStop(0, p.color);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+    });
+    
+    // Save
+    const link = document.createElement('a');
+    link.download = 'glow-mesh.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  init();
+</script>
