@@ -1,0 +1,229 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="AI 背景透過ツール - GlowPunch" description="画像をアップロードするだけで、AIが被写体を認識し背景を自動で透過します。すべてブラウザ内で完結するので安全です。">
+  <div class="flex flex-col gap-6">
+    <div class="mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">AI 背景透過<span class="text-pink-500">ツール</span></h1>
+      <p class="text-slate-600 text-lg">画像をアップロードするだけで、被写体を切り抜き背景を透明なPNGに変換します。</p>
+    </div>
+
+    <!-- UI App -->
+    <div class="glass-panel p-6 flex flex-col items-center justify-center min-h-[400px] border-dashed border-2 border-slate-300 relative transition-colors" id="drop-zone">
+      <div id="initial-ui" class="text-center w-full flex flex-col items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p class="text-xl font-bold text-slate-800 mb-2">画像を選択 または ドラッグ＆ドロップ</p>
+        <p class="text-slate-500 text-sm mb-6">JPG, PNG などの画像ファイルに対応</p>
+        <button id="btn-select" class="btn-primary !bg-pink-500 hover:!bg-pink-600">ファイルを選択する</button>
+        <input type="file" id="file-input" class="hidden" accept="image/*" />
+      </div>
+
+      <div id="loading-ui" class="hidden flex-col items-center justify-center text-center">
+        <div class="animate-spin w-12 h-12 border-4 border-slate-200 border-t-pink-500 rounded-full mb-4"></div>
+        <p class="text-lg font-bold text-slate-800" id="loading-text">AIモデルを準備中...</p>
+        <p class="text-sm text-slate-500 mt-2 max-w-sm">初回はモデルのダウンロードに時間がかかる場合があります。<br/>すべてお使いの端末内で処理されます。</p>
+        <!-- progress bar -->
+        <div class="w-full max-w-xs bg-slate-200 rounded-full h-2.5 mt-4 overflow-hidden">
+          <div class="bg-gradient-to-r from-pink-400 to-pink-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <div id="result-ui" class="hidden flex-col items-center w-full">
+         <!-- checkerboard background logic to show transparency -->
+        <div class="relative w-full max-w-2xl aspect-video rounded-xl overflow-hidden mb-6 shadow-inner border border-slate-200" style="background-image: linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0), linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #f8fafc;">
+          <img id="result-image" class="w-full h-full object-contain drop-shadow-2xl" src="" alt="背景透過結果" />
+        </div>
+        
+        <div class="flex gap-4">
+          <button id="btn-download" class="btn-primary !bg-pink-500 hover:!bg-pink-600 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            透過PNGをダウンロード
+          </button>
+          <button id="btn-reset" class="px-6 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-colors flex items-center gap-2">
+            やり直す
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- License Context -->
+    <div class="glass-panel p-6 mt-4 opacity-90 text-sm text-slate-500 bg-slate-50/50">
+      <h3 class="font-bold text-slate-700 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-pink-500"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>ローカルで完結する安全な処理</h3>
+      <p class="mb-4 text-xs md:text-sm leading-relaxed">
+        ・すべての処理（写真からの被写体認識・切り抜き）は、お使いの端末（ブラウザ内）で完結します。画像が当サイトのサーバーに送信されることは一切ありませんのでご安心ください。<br/>
+        ・当ツールの処理はブラウザ内で完結するため、運営者は生成物を見ておらず、用途（商用含む）にも関知いたしません。元画像の権利・肖像権等はご自身でご確認ください。
+      </p>
+
+      <div class="border-t border-slate-200 pt-4 text-xs space-y-2">
+        <p class="font-bold text-slate-600">本ツールは以下のオープンソース・テクノロジーを使用しています。</p>
+        <p>
+          - <a href="https://github.com/imgly/background-removal-js" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:underline">@imgly/background-removal</a> — AGPL-3.0 License<br/> 
+          <span class="pl-3 text-[10px] text-slate-400">Copyright © IMG.LY GmbH.</span>
+        </p>
+        <p>
+          - <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:underline">ONNX Runtime Web</a> — MIT License<br/>
+          <span class="pl-3 text-[10px] text-slate-400">Copyright © Microsoft Corporation.</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <AdSensePlaceholder slotId="tool-bottom-banner" />
+    </div>
+
+  </div>
+</BaseLayout>
+
+<script>
+  import { removeBackground } from '@imgly/background-removal';
+
+  const dropZone = document.getElementById('drop-zone');
+  const btnSelect = document.getElementById('btn-select');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  
+  const initialUi = document.getElementById('initial-ui');
+  const loadingUi = document.getElementById('loading-ui');
+  const resultUi = document.getElementById('result-ui');
+  const loadingText = document.getElementById('loading-text');
+  const progressBar = document.getElementById('progress-bar');
+  const resultImage = document.getElementById('result-image') as HTMLImageElement;
+  
+  const btnDownload = document.getElementById('btn-download');
+  const btnReset = document.getElementById('btn-reset');
+
+  let currentBlobUrl = '';
+
+  // Handle Select Button
+  btnSelect?.addEventListener('click', () => {
+    fileInput?.click();
+  });
+
+  // Handle File Input Change
+  fileInput?.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      processImage(target.files[0]);
+    }
+  });
+
+  // Drag and drop setup
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, () => {
+      dropZone?.classList.add('bg-pink-50', 'border-pink-300');
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, () => {
+      dropZone?.classList.remove('bg-pink-50', 'border-pink-300');
+    }, false);
+  });
+
+  dropZone?.addEventListener('drop', (e: DragEvent) => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      const file = dt.files[0];
+      if (file.type.startsWith('image/')) {
+        processImage(file);
+      } else {
+        alert('画像ファイルを選択してください');
+      }
+    }
+  }, false);
+
+  async function processImage(file: File) {
+    if (!initialUi || !loadingUi || !resultUi || !loadingText) return;
+
+    // Switch UI
+    initialUi.classList.add('hidden');
+    loadingUi.classList.remove('hidden');
+    loadingUi.classList.add('flex');
+    
+    if (progressBar) progressBar.style.width = '10%';
+    loadingText.textContent = "AIを初期化中...";
+
+    try {
+      // Configuration for imgly
+      const config = {
+        progress: (key: string, current: number, total: number) => {
+          if (progressBar) {
+            const percent = Math.min(100, Math.round((current / total) * 100));
+            progressBar.style.width = `${percent}%`;
+          }
+          if (loadingText) {
+            if (key.includes('model_')) {
+              loadingText.textContent = `ONNXモデルをロード中...`;
+            } else if (key.includes('compute')) {
+              loadingText.textContent = `推論を実行中（少し時間がかかります）...`;
+            }
+          }
+        }
+      };
+
+      // Process
+      const imageBlob = await removeBackground(file, config);
+      
+      // Free old blob url if exists
+      if (currentBlobUrl) {
+        URL.revokeObjectURL(currentBlobUrl);
+      }
+      
+      currentBlobUrl = URL.createObjectURL(imageBlob);
+      
+      if (resultImage) {
+        resultImage.src = currentBlobUrl;
+      }
+
+      // Switch UI to result
+      loadingUi.classList.add('hidden');
+      loadingUi.classList.remove('flex');
+      resultUi.classList.remove('hidden');
+      resultUi.classList.add('flex');
+
+    } catch (err) {
+      console.error(err);
+      alert('エラーが発生しました。申し訳ありませんが、別の画像でお試しいただくか、ブラウザをリロードしてください。');
+      resetUI();
+    }
+  }
+
+  // Handle Download
+  btnDownload?.addEventListener('click', () => {
+    if (currentBlobUrl) {
+      const a = document.createElement('a');
+      a.href = currentBlobUrl;
+      a.download = `glowpunch_transparent_${Date.now()}.png`;
+      a.click();
+    }
+  });
+
+  // Handle Reset
+  btnReset?.addEventListener('click', resetUI);
+
+  function resetUI() {
+    if (fileInput) fileInput.value = '';
+    
+    if (initialUi && loadingUi && resultUi) {
+      resultUi.classList.add('hidden');
+      resultUi.classList.remove('flex');
+      loadingUi.classList.add('hidden');
+      loadingUi.classList.remove('flex');
+      initialUi.classList.remove('hidden');
+    }
+    
+    if (progressBar) progressBar.style.width = '0%';
+  }
+</script>

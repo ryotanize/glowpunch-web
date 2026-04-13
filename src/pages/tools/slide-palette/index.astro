@@ -1,0 +1,397 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="スライドパレット - 画像からGoogleスライド用配色を作成" description="お気に入りの画像から色を抽出し、GoogleスライドやPowerPointでそのまま使えるカラーパレット（テーマファイル）を生成します。一発でインポート可能です。">
+  <div class="flex flex-col gap-6">
+    <div class="mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">スライド<span class="text-sky-500">パレット</span></h1>
+      <p class="text-slate-600 text-lg">画像から色を抽出し、Googleスライドで使えるカラーパレットを一発作成します。</p>
+    </div>
+
+    <!-- UI App -->
+    <div class="glass-panel p-6 flex flex-col items-center justify-center min-h-[400px] border-dashed border-2 border-slate-300 relative transition-colors" id="drop-zone">
+      
+      <div id="initial-ui" class="text-center w-full flex flex-col items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-sky-100 text-sky-500 flex items-center justify-center mb-4 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="m20 17-1.086-1.086a2 2 0 0 0-2.828 0L12.5 19.5"/></svg>
+        </div>
+        <p class="text-xl font-bold text-slate-800 mb-2">画像を選択 または ドラッグ＆ドロップ</p>
+        <p class="text-slate-500 text-sm mb-6">ロゴや写真から配色を自動で抜き出します</p>
+        <button id="btn-select" class="btn-primary !bg-sky-500 hover:!bg-sky-600 shadow-lg shadow-sky-500/30">画像を選択する</button>
+        <input type="file" id="file-input" class="hidden" accept="image/*" />
+      </div>
+
+      <div id="loading-ui" class="hidden flex-col items-center justify-center text-center py-10 w-full">
+        <div class="relative w-16 h-16 mb-6">
+          <div class="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
+          <div class="absolute inset-0 border-4 border-sky-500 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p class="text-xl font-bold text-slate-800">パレットを作成中...</p>
+        <div class="w-full max-w-md bg-slate-200 rounded-full h-3 mt-6 overflow-hidden shadow-inner">
+          <div class="bg-sky-500 h-3 rounded-full transition-all duration-300" style="width: 0%" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <div id="result-ui" class="hidden flex-col items-center w-full">
+        <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl justify-center items-start mb-8">
+          
+          <!-- Image Preview -->
+          <div class="flex flex-col items-center w-full md:w-1/3">
+            <p class="text-xs font-bold text-slate-400 mb-2 tracking-widest uppercase text-center">Source Image</p>
+            <div class="w-full aspect-square rounded-xl overflow-hidden shadow-md border border-slate-200 bg-white flex items-center justify-center">
+              <img id="original-preview" class="max-w-full max-h-full object-contain" src="" alt="元画像" />
+            </div>
+          </div>
+
+          <!-- Palette Display -->
+          <div class="flex flex-col w-full md:w-2/3">
+            <p class="text-xs font-bold text-slate-400 mb-2 tracking-widest uppercase">Extracted Palette</p>
+            <div id="palette-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              <!-- Palette items will be injected here -->
+            </div>
+            
+            <div class="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-4">
+              <h3 class="text-sky-800 font-bold text-sm mb-1">Googleスライドで使う方法</h3>
+              <ol class="text-sky-700 text-xs space-y-1 list-decimal ml-4">
+                <li>「テンプレートをダウンロード」をクリック</li>
+                <li>Googleスライドを開き、「スライド」→「テーマを変更」を選択</li>
+                <li>右下の「テーマをインポート」からダウンロードしたファイルを選択</li>
+              </ol>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+              <button id="btn-download" class="btn-primary !bg-slate-800 hover:!bg-slate-900 flex items-center gap-2 flex-1 justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                テンプレートをダウンロード
+              </button>
+              <button id="btn-reset" class="px-4 py-2 rounded-lg font-bold text-slate-500 bg-white hover:bg-slate-50 border border-slate-200 transition-colors">
+                やり直す
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Context -->
+    <div class="glass-panel p-6 mt-4 opacity-90 text-sm text-slate-500 bg-slate-50/50">
+      <h3 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        このツールの特徴
+      </h3>
+      <p class="leading-relaxed">
+        ・アップロードした画像からK-means法を用いて支配的な配色を抽出し、GoogleスライドやPowerPointで使用可能なテーマ形式（.pptx）に書き出します。<br/>
+        ・すべての処理はブラウザ内で完結するため、画像データが外部サーバーに送信されることはありません。
+      </p>
+    </div>
+
+    <div class="mt-8">
+      <AdSensePlaceholder slotId="palette-bottom-banner" />
+    </div>
+
+  </div>
+</BaseLayout>
+
+<script>
+  import JSZip from 'jszip';
+
+  const dropZone = document.getElementById('drop-zone');
+  const btnSelect = document.getElementById('btn-select');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  
+  const initialUi = document.getElementById('initial-ui');
+  const loadingUi = document.getElementById('loading-ui');
+  const resultUi = document.getElementById('result-ui');
+  const progressBar = document.getElementById('progress-bar');
+  const paletteGrid = document.getElementById('palette-grid');
+  const originalPreview = document.getElementById('original-preview') as HTMLImageElement;
+  
+  const btnDownload = document.getElementById('btn-download');
+  const btnReset = document.getElementById('btn-reset');
+
+  let currentColors: { r: number; g: number; b: number; hex: string }[] = [];
+
+  // --- UI Event Listeners ---
+
+  btnSelect?.addEventListener('click', () => fileInput?.click());
+  
+  fileInput?.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      processImage(target.files[0]);
+    }
+  });
+
+  // Drag & Drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, e => {
+      e.preventDefault(); e.stopPropagation();
+    }, false);
+  });
+  
+  dropZone?.addEventListener('drop', (e: DragEvent) => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      if (dt.files[0].type.startsWith('image/')) {
+        processImage(dt.files[0]);
+      }
+    }
+  }, false);
+
+  btnReset?.addEventListener('click', () => {
+    if (fileInput) fileInput.value = '';
+    showUI('initial');
+  });
+
+  btnDownload?.addEventListener('click', async () => {
+    if (currentColors.length === 0) return;
+    
+    const zip = new JSZip();
+    
+    // Minimal PPTX Structure
+    // 1. [Content_Types].xml
+    zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+  <Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
+  <Override PartName="/ppt/slides/slide1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+  <Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>
+  <Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>
+</Types>`);
+
+    // 2. _rels/.rels
+    zip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+</Relationships>`);
+
+    // 3. ppt/presentation.xml
+    zip.file("ppt/presentation.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldMasterIdLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:presentation>
+    <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
+    <p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst>
+    <p:notesSz cx="6858000" cy="9144000"/><p:sldSz cx="12192000" cy="6858000"/>
+  </p:presentation>
+</p:sldMasterIdLst>`.replace('<p:sldMasterIdLst', '<p:presentation').replace('</p:sldMasterIdLst>', '</p:presentation>')); // Corrected slightly manually for brevity
+
+    // Simplified presentation.xml content
+    zip.file("ppt/presentation.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>
+  <p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst>
+  <p:notesSz cx="6858000" cy="9144000"/><p:sldSz cx="12192000" cy="6858000"/>
+</p:presentation>`);
+
+    // 4. ppt/_rels/presentation.xml.rels
+    zip.file("ppt/_rels/presentation.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
+</Relationships>`);
+
+    // 5. ppt/theme/theme1.xml (THE CORE)
+    const c = (idx: number) => {
+      if (idx < currentColors.length) return currentColors[idx].hex.replace('#', '');
+      return 'CCCCCC'; // Fallback
+    };
+    
+    zip.file("ppt/theme/theme1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="GlowPunch Theme">
+  <a:themeElements>
+    <a:clrScheme name="GlowPunch Palette">
+      <a:dk1><a:srgbClr val="000000"/></a:dk1>
+      <a:lt1><a:srgbClr val="FFFFFF"/></a:lt1>
+      <a:dk2><a:srgbClr val="${c(6)}"/></a:dk2>
+      <a:lt2><a:srgbClr val="${c(7)}"/></a:lt2>
+      <a:accent1><a:srgbClr val="${c(0)}"/></a:accent1>
+      <a:accent2><a:srgbClr val="${c(1)}"/></a:accent2>
+      <a:accent3><a:srgbClr val="${c(2)}"/></a:accent3>
+      <a:accent4><a:srgbClr val="${c(3)}"/></a:accent4>
+      <a:accent5><a:srgbClr val="${c(4)}"/></a:accent5>
+      <a:accent6><a:srgbClr val="${c(5)}"/></a:accent6>
+      <a:hlink><a:srgbClr val="${c(8)}"/></a:hlink>
+      <a:folHlink><a:srgbClr val="${c(9)}"/></a:folHlink>
+    </a:clrScheme>
+    <a:fontScheme name="Office">
+      <a:majorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>
+      <a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont>
+    </a:fontScheme>
+    <a:fmtScheme name="Office">
+      <a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst>
+      <a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst>
+      <a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst>
+      <a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst>
+    </a:fmtScheme>
+  </a:themeElements>
+</a:theme>`);
+
+    // 6. Minimal Slide/Master (needed for validity)
+    zip.file("ppt/slideMasters/slideMaster1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld><p:bg><p:bgRef idx="1001"><a:schemeClr val="lt1"/></p:bgRef></p:bg><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
+  <p:clrMap bg="lt1" tx="dk1" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>
+  <p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst>
+</p:sldMaster>`);
+    
+    zip.file("ppt/slideMasters/_rels/slideMaster1.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme1.xml"/>
+</Relationships>`);
+
+    zip.file("ppt/slideLayouts/slideLayout1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank">
+  <p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
+  <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+</p:sldLayout>`);
+    
+    zip.file("ppt/slideLayouts/_rels/slideLayout1.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/>
+</Relationships>`);
+
+    zip.file("ppt/slides/slide1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>
+  <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+</p:sld>`);
+    
+    zip.file("ppt/slides/_rels/slide1.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>
+</Relationships>`);
+
+
+    const content = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = `glowpunch_palette_${Date.now()}.pptx`;
+    link.click();
+  });
+
+
+  // --- Helper Functions ---
+
+  function showUI(state: 'initial' | 'loading' | 'result') {
+    initialUi?.classList.add('hidden');
+    loadingUi?.classList.add('hidden'); loadingUi?.classList.remove('flex');
+    resultUi?.classList.add('hidden'); resultUi?.classList.remove('flex');
+
+    if (state === 'initial') initialUi?.classList.remove('hidden');
+    if (state === 'loading') { loadingUi?.classList.remove('hidden'); loadingUi?.classList.add('flex'); }
+    if (state === 'result') { resultUi?.classList.remove('hidden'); resultUi?.classList.add('flex'); }
+  }
+
+  async function processImage(file: File) {
+    showUI('loading');
+    if (progressBar) progressBar.style.width = '10%';
+    
+    const objectUrl = URL.createObjectURL(file);
+    if (originalPreview) originalPreview.src = objectUrl;
+
+    try {
+      if (progressBar) progressBar.style.width = '30%';
+      const pixels = await extractPixels(file);
+      
+      if (progressBar) progressBar.style.width = '50%';
+      currentColors = await performKMeans(pixels, 10);
+      
+      if (progressBar) progressBar.style.width = '100%';
+      renderPalette();
+      showUI('result');
+    } catch (e) {
+      console.error(e);
+      alert('エラーが発生しました。別の画像をお試しください。');
+      showUI('initial');
+    }
+  }
+
+  function extractPixels(file: File): Promise<{r:number, g:number, b:number}[]> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const scale = Math.min(100 / img.width, 100 / img.height, 1);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const data = ctx?.getImageData(0, 0, canvas.width, canvas.height).data;
+        const pixels = [];
+        if (data) {
+          for (let i = 0; i < data.length; i += 4) {
+             pixels.push({ r: data[i], g: data[i+1], b: data[i+2] });
+          }
+        }
+        resolve(pixels);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  async function performKMeans(pixels: {r:number, g:number, b:number}[], k: number) {
+    let centroids = [];
+    for (let i = 0; i < k; i++) {
+      centroids.push(pixels[Math.floor(Math.random() * pixels.length)]);
+    }
+
+    for (let iter = 0; iter < 10; iter++) {
+      const clusters: {r:number, g:number, b:number}[][] = Array.from({length: k}, () => []);
+      for (const p of pixels) {
+        let minDist = Infinity;
+        let bestK = 0;
+        for (let i = 0; i < k; i++) {
+          const d = Math.pow(p.r - centroids[i].r, 2) + Math.pow(p.g - centroids[i].g, 2) + Math.pow(p.b - centroids[i].b, 2);
+          if (d < minDist) { minDist = d; bestK = i; }
+        }
+        clusters[bestK].push(p);
+      }
+
+      for (let i = 0; i < k; i++) {
+        if (clusters[i].length === 0) continue;
+        const avg = clusters[i].reduce((acc, p) => ({r: acc.r + p.r, g: acc.g + p.g, b: acc.b + p.b}), {r:0, g:0, b:0});
+        centroids[i] = {r: avg.r / clusters[i].length, g: avg.g / clusters[i].length, b: avg.b / clusters[i].length};
+      }
+    }
+
+    return centroids.map(c => {
+      const r = Math.round(c.r);
+      const g = Math.round(c.g);
+      const b = Math.round(c.b);
+      return { r, g, b, hex: '#' + [r,g,b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase() };
+    });
+  }
+
+  function renderPalette() {
+    if (!paletteGrid) return;
+    paletteGrid.innerHTML = '';
+    currentColors.forEach((c) => {
+      const div = document.createElement('div');
+      div.className = 'group relative flex flex-col items-center bg-white rounded-xl p-2 border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer';
+      div.innerHTML = `
+        <div class="w-full aspect-square rounded-lg mb-2 shadow-inner border border-black/5" style="background-color: ${c.hex}"></div>
+        <span class="text-[10px] font-mono font-bold text-slate-500 tracking-tight">${c.hex}</span>
+        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 rounded-xl">
+          <span class="text-[10px] font-bold text-sky-600">Copy</span>
+        </div>
+      `;
+      div.onclick = () => {
+        navigator.clipboard.writeText(c.hex);
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-full text-xs font-bold animate-bounce z-50';
+        toast.textContent = 'Copied: ' + c.hex;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+      };
+      paletteGrid.appendChild(div);
+    });
+  }
+</script>
