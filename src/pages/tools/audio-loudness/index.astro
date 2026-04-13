@@ -1,0 +1,284 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout
+  title="動画ラウドネスチェッカー＆ノーマライザー - GlowPunch"
+  description="動画音声のラウドネス値（LKFS/LUFS）を測定し、TVer等の入稿規定に合わせた-24.0 LKFSに自動調整します。ブラウザ完結で安全・高速。"
+>
+  <div class="flex flex-col gap-6">
+
+    <!-- Header -->
+    <div class="mb-2">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">
+        動画ラウドネス<span class="text-indigo-500">チェッカー＆調整</span>
+      </h1>
+      <p class="text-slate-600 text-lg">
+        動画音声のラウドネス値（LKFS/LUFS）を測定し、TVer等の入稿規定に合わせた-24.0 LKFSへ自動調整します。
+      </p>
+    </div>
+
+    <!-- Drop Zone -->
+    <div
+      id="drop-zone"
+      class="glass-panel p-10 flex flex-col items-center justify-center gap-4 border-2 border-dashed border-indigo-300 bg-indigo-50/30 rounded-2xl cursor-pointer transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50/60 min-h-48"
+    >
+      <div id="drop-icon" class="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-500 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v10"/>
+          <path d="m16 8-4-4-4 4"/>
+          <path d="M2 13a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2"/>
+          <circle cx="12" cy="17" r="1"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <p class="text-slate-700 font-semibold text-lg">動画ファイルをドロップして測定開始</p>
+        <p class="text-slate-500 text-sm mt-1">MP4, MOV, WebMに対応（最大100MB推奨）</p>
+      </div>
+      <input id="file-input" type="file" accept="video/*" class="hidden" />
+    </div>
+
+    <!-- Status / Progress -->
+    <div id="status-container" class="hidden glass-panel p-6 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="status-spinner" class="w-5 h-5 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin"></div>
+          <span id="status-label" class="text-slate-700 font-medium">音声をスキャン中...</span>
+        </div>
+        <span id="status-pct" class="text-indigo-600 font-bold">0%</span>
+      </div>
+      <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div id="status-bar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" class="hidden flex flex-col gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Integrated Loudness Card -->
+        <div class="glass-panel p-6 border-l-4 border-indigo-500 bg-white/50 relative overflow-hidden">
+          <div class="relative z-10">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">現在のラウドネス (Integrated)</h3>
+            <div class="flex items-baseline gap-2">
+              <span id="res-loudness" class="text-5xl font-black text-slate-800">--.-</span>
+              <span class="text-xl font-bold text-slate-400 font-mono">LKFS</span>
+            </div>
+            <p id="res-status-text" class="mt-2 text-sm font-medium"></p>
+          </div>
+          <!-- Background decoration -->
+          <div class="absolute right-[-20px] bottom-[-20px] opacity-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3v18M12 3l-4 4M12 3l4 4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Target Info -->
+        <div class="glass-panel p-6 bg-slate-800 text-white">
+          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-1">入稿規定（TVer/主要プラットフォーム）</h3>
+          <div class="flex items-baseline gap-2 text-indigo-300">
+            <span class="text-4xl font-black">-24.0</span>
+            <span class="text-lg font-bold font-mono">LKFS</span>
+          </div>
+          <p class="mt-2 text-slate-300 text-xs leading-relaxed">
+            平均的な聴感上の音量を一定に保つための国際規格（EBU R128）に基づく目標値です。±1dB 以内が推奨されます。
+          </p>
+        </div>
+      </div>
+
+      <!-- Adjustment Box -->
+      <div id="adjustment-box" class="glass-panel p-6 flex flex-col gap-5">
+        <div class="flex items-center gap-3">
+          <div class="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
+          <h2 class="text-xl font-bold text-slate-800">ラウドネス調整（ノーマライズ）</h2>
+        </div>
+        
+        <div class="flex flex-col gap-2">
+          <p class="text-slate-600 text-sm leading-relaxed">
+            測定されたラウドネス値を元に、音質を損なうことなく全体のゲインを増減させ、入稿目標値の <span class="font-bold text-indigo-600">-24.0 LKFS</span> に自動調整します。
+          </p>
+        </div>
+
+        <button
+          id="btn-normalize"
+          class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-indigo-200/50 hover:-translate-y-0.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          ターゲット値に合わせて調整・保存
+        </button>
+      </div>
+    </div>
+
+    <!-- Error container -->
+    <div id="error-container" class="hidden glass-panel p-4 border-l-4 border-red-500 bg-red-50/80">
+      <p id="error-msg" class="text-red-700 text-sm font-medium"></p>
+    </div>
+
+    <!-- Info Section -->
+    <div class="mt-4">
+      <AdSensePlaceholder slotId="audio-loudness-banner" />
+    </div>
+
+    <article class="prose prose-slate mt-8 max-w-none border-t border-slate-200 pt-10">
+      <h2>動画広告入稿に欠かせない「ラウドネス調整」をブラウザで</h2>
+      <p>
+        TVerやYouTubeなどの動画広告入稿時に「ラウドネス値が規定を超えています」というエラーで差し戻されたことはありませんか？
+        デジタル放送やインターネット動画配信の世界では、番組や広告の間で音量差が生じないよう、聴感上の音量を測る「ラウドネス値（LKFS/LUFS）」という基準が設けられています。
+      </p>
+      <h3>主な特徴</h3>
+      <ul>
+        <li><strong>EBU R128準拠の測定</strong>：国際規格に基づいた正確な Integrated Loudness（統合ラウドネス）を算出します。</li>
+        <li><strong>自動ノーマライズ</strong>：目標値（-24.0 LKFS）までの差分を計算し、一括で音量を調整して再出力します。</li>
+        <li><strong>プライバシー保護</strong>：解析・調整処理はすべてあなたのブラウザ上で行われます。動画データが外部のサーバーに送信されることはありません。</li>
+      </ul>
+      <p>
+        ※本ツールは全体の音量（ゲイン）を一定比率で変更するノーマライズ処理を行います。極端に音量の起伏が激しい動画の場合、ラウドネスは適合してもピーク音量（True Peak）が 0dB を超えて歪む可能性があるため、歪みが発生する場合は元の動画でのコンプレッサー処理をお勧めします。
+      </p>
+    </article>
+
+  </div>
+</BaseLayout>
+
+<script>
+  // DOM References
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const statusContainer = document.getElementById('status-container');
+  const statusBar = document.getElementById('status-bar');
+  const statusPct = document.getElementById('status-pct');
+  const statusLabel = document.getElementById('status-label');
+  const resultsSection = document.getElementById('results-section');
+  const resLoudness = document.getElementById('res-loudness');
+  const resStatusText = document.getElementById('res-status-text');
+  const btnNormalize = document.getElementById('btn-normalize');
+  const errorContainer = document.getElementById('error-container');
+  const errorMsg = document.getElementById('error-msg');
+
+  let currentFile = null;
+  let worker = null;
+  let measuredLoudness = null;
+
+  // Drag & Drop
+  dropZone.onclick = () => fileInput.click();
+  dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('bg-indigo-100/50'); };
+  dropZone.ondragleave = () => { dropZone.classList.remove('bg-indigo-100/50'); };
+  dropZone.ondrop = (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('bg-indigo-100/50');
+    if (e.dataTransfer.files?.[0]) handleFile(e.dataTransfer.files[0]);
+  };
+
+  fileInput.onchange = () => {
+    if (fileInput.files?.[0]) handleFile(fileInput.files[0]);
+  };
+
+  function handleFile(file) {
+    if (!file.type.startsWith('video/')) {
+      showError('動画ファイルを指定してください（MP4, MOV, WebMなど）');
+      return;
+    }
+    currentFile = file;
+    startAnalysis();
+  }
+
+  function startAnalysis() {
+    resetUI();
+    statusContainer.classList.remove('hidden');
+    
+    initWorker();
+    worker.postMessage({ type: 'analyze', file: currentFile });
+  }
+
+  function initWorker() {
+    if (worker) worker.terminate();
+    worker = new Worker(new URL('../../../workers/loudness-worker.js', import.meta.url), { type: 'module' });
+    
+    worker.onmessage = (e) => {
+      const { type, value, label, results, buffer, message } = e.data;
+      
+      if (type === 'progress') {
+        const pct = Math.round(value * 100);
+        statusBar.style.width = pct + '%';
+        statusPct.textContent = pct + '%';
+        if (label) statusLabel.textContent = label;
+      } else if (type === 'analysis_done') {
+        onAnalysisComplete(results);
+      } else if (type === 'done') {
+        onNormalizationComplete(buffer);
+      } else if (type === 'error') {
+        showError(message);
+      }
+    };
+
+    worker.onerror = (err) => {
+      showError('内部エラーが発生しました。ブラウザを更新して再度お試しください。');
+      console.error(err);
+    };
+  }
+
+  function onAnalysisComplete(results) {
+    statusContainer.classList.add('hidden');
+    resultsSection.classList.remove('hidden');
+    
+    measuredLoudness = results.integrated;
+    resLoudness.textContent = measuredLoudness.toFixed(1);
+    
+    const diff = -24.0 - measuredLoudness;
+    if (Math.abs(diff) <= 1.0) {
+      resStatusText.innerHTML = '<span class="text-emerald-600">✓ 合格範囲内です。</span> そのまま入稿可能です。';
+    } else {
+      resStatusText.innerHTML = `<span class="text-amber-600">⚠ 規定値から ${Math.abs(diff).toFixed(1)}dB 外れています。</span> 下記ボタンで調整を推奨します。`;
+    }
+  }
+
+  btnNormalize.onclick = () => {
+    if (!currentFile || measuredLoudness === null) return;
+    
+    statusContainer.classList.remove('hidden');
+    resultsSection.classList.add('hidden');
+    statusLabel.textContent = '正規化中...';
+    statusBar.style.width = '0%';
+    
+    worker.postMessage({ 
+      type: 'normalize', 
+      file: currentFile, 
+      settings: {
+        currentLoudness: measuredLoudness,
+        targetLoudness: -24.0
+      }
+    });
+  };
+
+  function onNormalizationComplete(buffer) {
+    statusContainer.classList.add('hidden');
+    resultsSection.classList.remove('hidden');
+    
+    const blob = new Blob([buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = currentFile.name.replace(/\.[^/.]+$/, "") + "_L24.mp4";
+    a.click();
+    
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+
+  function resetUI() {
+    statusContainer.classList.add('hidden');
+    resultsSection.classList.add('hidden');
+    errorContainer.classList.add('hidden');
+    measuredLoudness = null;
+  }
+
+  function showError(msg) {
+    statusContainer.classList.add('hidden');
+    resultsSection.classList.add('hidden');
+    errorContainer.classList.remove('hidden');
+    errorMsg.textContent = msg;
+  }
+</script>
