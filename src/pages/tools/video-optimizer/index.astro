@@ -1,0 +1,598 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout
+  title="動画スペックチェッカー＆コンバーター - GlowPunch"
+  description="TVer等の動画広告入稿規定に合わせてMP4を変換。解像度・FPS・ビットレートをブラウザ上で素早く確認・変換できます。インストール不要。"
+>
+  <div class="flex flex-col gap-6">
+
+    <!-- Header -->
+    <div class="mb-2">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">
+        動画スペック<span class="text-sky-500">チェッカー＆コンバーター</span>
+      </h1>
+      <p class="text-slate-600 text-lg">
+        TVer等の動画広告入稿規定に合わせてMP4を変換。解像度・FPS・ビットレートをブラウザ内で素早くチェック・変換できます。
+      </p>
+    </div>
+
+    <!-- Support Check Banner (shown if unsupported) -->
+    <div id="unsupported-banner" class="hidden glass-panel p-4 border-l-4 border-amber-400 bg-amber-50/80">
+      <p class="text-amber-800 font-medium text-sm">
+        ⚠️ お使いのブラウザはWebCodecs APIに対応していないため、変換機能が利用できません。Chrome 94以降またはEdgeをご利用ください。（メタデータの確認は引き続きご利用いただけます。）
+      </p>
+    </div>
+
+    <!-- Drop Zone -->
+    <div
+      id="drop-zone"
+      class="glass-panel p-10 flex flex-col items-center justify-center gap-4 border-2 border-dashed border-sky-300 bg-sky-50/30 rounded-2xl cursor-pointer transition-all duration-200 hover:border-sky-400 hover:bg-sky-50/60 min-h-48"
+    >
+      <div id="drop-icon" class="w-16 h-16 rounded-2xl bg-sky-100 text-sky-500 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m22 8-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <polygon points="11 12.5 8 15.5 11 18.5" fill="currentColor" stroke="none"/>
+          <polygon points="13 12.5 16 15.5 13 18.5" fill="currentColor" stroke="none"/>
+          <line x1="11" y1="15.5" x2="13" y2="15.5"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <p class="text-slate-700 font-semibold text-lg">MP4・MOV・WebMファイルをドロップ</p>
+        <p class="text-slate-500 text-sm mt-1">またはクリックしてファイルを選択</p>
+      </div>
+      <input id="file-input" type="file" accept="video/*" class="hidden" />
+    </div>
+
+    <!-- Inspector Section (hidden until file is loaded) -->
+    <div id="inspector-section" class="hidden flex flex-col gap-4">
+      <!-- File name -->
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-6 bg-sky-500 rounded-full"></div>
+        <h2 class="text-xl font-bold text-slate-800">インスペクター</h2>
+        <span id="file-name" class="text-slate-500 text-sm font-normal truncate max-w-xs"></span>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="stats-grid">
+        <!-- Stat Card: Resolution -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">解像度</span>
+          <span id="stat-resolution" class="text-xl font-black text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: FPS -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">FPS</span>
+          <span id="stat-fps" class="text-xl font-black text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: Duration -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">再生時間</span>
+          <span id="stat-duration" class="text-xl font-black text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: File Size -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ファイルサイズ</span>
+          <span id="stat-filesize" class="text-xl font-black text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: Video Codec -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">映像コーデック</span>
+          <span id="stat-vcodec" class="text-lg font-bold text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: Video Bitrate -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">映像ビットレート</span>
+          <span id="stat-vbitrate" class="text-lg font-bold text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: Audio Codec -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">音声コーデック</span>
+          <span id="stat-acodec" class="text-lg font-bold text-slate-800">--</span>
+        </div>
+        <!-- Stat Card: Audio Sample Rate -->
+        <div class="glass-panel p-4 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">音声サンプリングレート</span>
+          <span id="stat-samplerate" class="text-lg font-bold text-slate-800">--</span>
+        </div>
+      </div>
+
+      <!-- Loading state for inspector -->
+      <div id="inspector-loading" class="hidden glass-panel p-6 flex items-center gap-4">
+        <div class="w-6 h-6 border-2 border-sky-300 border-t-sky-600 rounded-full animate-spin flex-shrink-0"></div>
+        <span class="text-slate-600">メタデータを解析中...</span>
+      </div>
+    </div>
+
+    <!-- Converter Section (hidden until file is loaded) -->
+    <div id="converter-section" class="hidden">
+      <div class="glass-panel p-6 flex flex-col gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-6 bg-indigo-500 rounded-full"></div>
+          <h2 class="text-xl font-bold text-slate-800">コンバーター</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <!-- Resolution -->
+          <div class="flex flex-col gap-2">
+            <label for="conv-resolution" class="text-sm font-semibold text-slate-600">解像度</label>
+            <select id="conv-resolution" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
+              <option value="original">元の解像度を維持</option>
+              <option value="1920x1080">1920×1080（16:9 フルHD）</option>
+              <option value="1080x1920">1080×1920（9:16 縦型）</option>
+              <option value="1280x720">1280×720（16:9 HD）</option>
+              <option value="1080x1080">1080×1080（1:1 正方形）</option>
+              <option value="720x1280">720×1280（9:16 縦型HD）</option>
+            </select>
+          </div>
+
+          <!-- FPS -->
+          <div class="flex flex-col gap-2">
+            <label for="conv-fps" class="text-sm font-semibold text-slate-600">フレームレート（FPS）</label>
+            <select id="conv-fps" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
+              <option value="original">元のFPSを維持</option>
+              <option value="29.97" selected>29.97 fps（TVer推奨）</option>
+              <option value="30">30 fps</option>
+              <option value="25">25 fps</option>
+              <option value="24">24 fps</option>
+              <option value="60">60 fps</option>
+            </select>
+          </div>
+
+          <!-- Bitrate -->
+          <div class="flex flex-col gap-2">
+            <label for="conv-bitrate" class="text-sm font-semibold text-slate-600">
+              映像ビットレート: <span id="bitrate-display" class="text-sky-600 font-bold">3,000 kbps</span>
+            </label>
+            <input
+              id="conv-bitrate"
+              type="range"
+              min="500"
+              max="10000"
+              step="100"
+              value="3000"
+              class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-sky-500"
+            />
+            <div class="flex justify-between text-xs text-slate-400">
+              <span>500 kbps</span>
+              <span>10,000 kbps</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <p class="text-xs text-slate-500 leading-relaxed">
+            ※当ツールは映像・音声の基本スペックを入稿規定に合わせて変換します。音声の平均ラウドネス値（LKFS）の調整や、参照フレーム数の厳密な指定には対応していません。これらでエラーが出る場合は、Premiere Pro等の専用ソフトウェアでの最終書き出しをお願いいたします。
+          </p>
+        </div>
+
+        <!-- Convert Button + Progress -->
+        <div class="flex flex-col gap-3">
+          <button
+            id="btn-convert"
+            class="btn-primary flex items-center justify-center gap-2 py-4 text-base w-full sm:w-auto sm:self-start"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v9"/>
+              <path d="m16 7-4-4-4 4"/>
+              <rect width="20" height="8" x="2" y="14" rx="2"/>
+              <path d="M6 18h.01"/>
+              <path d="M10 18h.01"/>
+            </svg>
+            規定に合わせて変換する
+          </button>
+
+          <!-- Progress bar (hidden during idle) -->
+          <div id="progress-container" class="hidden flex flex-col gap-2">
+            <div class="flex items-center justify-between text-sm">
+              <span id="progress-label" class="text-slate-600 font-medium">変換処理中...</span>
+              <span id="progress-pct" class="text-sky-600 font-bold">0%</span>
+            </div>
+            <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+              <div id="progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Done message -->
+          <div id="done-message" class="hidden flex items-center gap-2 text-emerald-600 font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            変換が完了しました！ダウンロードが開始されます。
+          </div>
+
+          <!-- Error message -->
+          <div id="error-message" class="hidden glass-panel p-4 border-l-4 border-red-400 bg-red-50/80">
+            <p id="error-text" class="text-red-700 text-sm font-medium"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <AdSensePlaceholder slotId="video-optimizer-banner" />
+    </div>
+
+    <!-- SEO Article -->
+    <article class="prose prose-slate mt-8 max-w-none border-t border-slate-200 pt-10">
+      <h2>動画広告の入稿規定エラーをブラウザで解決</h2>
+      <p>
+        TVerやYouTube広告などに動画を入稿する際、「解像度が規定外」「フレームレートが非対応」「ビットレートが高すぎる」といったエラーに悩んだことはありませんか？
+        このツールは、そんな動画広告制作者・Webディレクター向けに開発した、完全無料のブラウザ完結型の動画変換ツールです。
+      </p>
+      <h3>主な機能</h3>
+      <ul>
+        <li><strong>インスペクター</strong>：動画ファイルの解像度・FPS・コーデック・ビットレートを瞬時に確認</li>
+        <li><strong>コンバーター</strong>：入稿規定に合わせた解像度・FPS・ビットレートに変換してMP4を出力</li>
+        <li><strong>完全ローカル処理</strong>：動画データは一切サーバーに送信されません。機密性の高い素材でも安全にご利用いただけます</li>
+      </ul>
+      <h3>対応している動画フォーマット</h3>
+      <p>MP4、MOV、WebMなど主要な動画形式に対応しています。出力はMP4（H.264）形式です。</p>
+      <h3>ご注意</h3>
+      <p>
+        当ツールは基本的なスペック変換を目的としています。音声のラウドネス値（LKFS）の調整や参照フレーム数の細かな制御が必要な場合は、Adobe Premiere ProなどのプロフェッショナルなNLEソフトウェアをご利用ください。
+      </p>
+    </article>
+
+  </div>
+</BaseLayout>
+
+<script>
+  import {
+    Input,
+    ALL_FORMATS,
+    BlobSource,
+  } from 'mediabunny';
+
+  // ===========================================================
+  // DOM References
+  // ===========================================================
+  const dropZone = document.getElementById('drop-zone') as HTMLElement;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const inspectorSection = document.getElementById('inspector-section') as HTMLElement;
+  const converterSection = document.getElementById('converter-section') as HTMLElement;
+  const inspectorLoading = document.getElementById('inspector-loading') as HTMLElement;
+  const statsGrid = document.getElementById('stats-grid') as HTMLElement;
+  const fileNameEl = document.getElementById('file-name') as HTMLElement;
+
+  // Stat elements
+  const statResolution = document.getElementById('stat-resolution') as HTMLElement;
+  const statFps = document.getElementById('stat-fps') as HTMLElement;
+  const statDuration = document.getElementById('stat-duration') as HTMLElement;
+  const statFilesize = document.getElementById('stat-filesize') as HTMLElement;
+  const statVcodec = document.getElementById('stat-vcodec') as HTMLElement;
+  const statVbitrate = document.getElementById('stat-vbitrate') as HTMLElement;
+  const statAcodec = document.getElementById('stat-acodec') as HTMLElement;
+  const statSamplerate = document.getElementById('stat-samplerate') as HTMLElement;
+
+  // Converter elements
+  const convResolution = document.getElementById('conv-resolution') as HTMLSelectElement;
+  const convFps = document.getElementById('conv-fps') as HTMLSelectElement;
+  const convBitrate = document.getElementById('conv-bitrate') as HTMLInputElement;
+  const bitrateDisplay = document.getElementById('bitrate-display') as HTMLElement;
+  const btnConvert = document.getElementById('btn-convert') as HTMLButtonElement;
+  const progressContainer = document.getElementById('progress-container') as HTMLElement;
+  const progressBar = document.getElementById('progress-bar') as HTMLElement;
+  const progressPct = document.getElementById('progress-pct') as HTMLElement;
+  const progressLabel = document.getElementById('progress-label') as HTMLElement;
+  const doneMessage = document.getElementById('done-message') as HTMLElement;
+  const errorMessage = document.getElementById('error-message') as HTMLElement;
+  const errorText = document.getElementById('error-text') as HTMLElement;
+  const unsupportedBanner = document.getElementById('unsupported-banner') as HTMLElement;
+
+  let currentFile: File | null = null;
+  let worker: Worker | null = null;
+
+  // ===========================================================
+  // Browser Support Check
+  // ===========================================================
+  function checkSupport() {
+    if (typeof VideoEncoder === 'undefined' || typeof VideoDecoder === 'undefined') {
+      unsupportedBanner.classList.remove('hidden');
+      btnConvert.disabled = true;
+      btnConvert.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+  }
+  checkSupport();
+
+  // ===========================================================
+  // Bitrate slider display
+  // ===========================================================
+  convBitrate.addEventListener('input', () => {
+    const val = parseInt(convBitrate.value);
+    bitrateDisplay.textContent = val.toLocaleString() + ' kbps';
+  });
+
+  // ===========================================================
+  // Drag & Drop / Click
+  // ===========================================================
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-sky-500', 'bg-sky-100/50');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-sky-500', 'bg-sky-100/50');
+  });
+
+  dropZone.addEventListener('drop', (e: DragEvent) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-sky-500', 'bg-sky-100/50');
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith('video/')) {
+      handleFile(file);
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (file) handleFile(file);
+  });
+
+  // ===========================================================
+  // File Handling & Inspection
+  // ===========================================================
+  async function handleFile(file: File) {
+    currentFile = file;
+    fileNameEl.textContent = file.name;
+
+    // Show sections, hide loading states
+    inspectorSection.classList.remove('hidden');
+    converterSection.classList.remove('hidden');
+    inspectorLoading.classList.remove('hidden');
+    statsGrid.classList.add('opacity-0');
+    resetConverterState();
+
+    try {
+      await inspectFile(file);
+    } catch (err) {
+      console.error('Inspection error:', err);
+      inspectorLoading.classList.add('hidden');
+      statsGrid.classList.remove('opacity-0');
+      setStatError();
+    }
+  }
+
+  function setStatError() {
+    const dash = '取得失敗';
+    statResolution.textContent = dash;
+    statFps.textContent = dash;
+    statDuration.textContent = dash;
+    statFilesize.textContent = formatFileSize(currentFile?.size ?? 0);
+    statVcodec.textContent = dash;
+    statVbitrate.textContent = dash;
+    statAcodec.textContent = dash;
+    statSamplerate.textContent = dash;
+  }
+
+  async function inspectFile(file: File) {
+    const input = new Input({
+      formats: ALL_FORMATS,
+      source: new BlobSource(file),
+    });
+
+    // File size (always available)
+    statFilesize.textContent = formatFileSize(file.size);
+
+    // Duration
+    try {
+      const duration = await input.computeDuration();
+      statDuration.textContent = formatDuration(duration);
+    } catch {
+      statDuration.textContent = '--';
+    }
+
+    // Video track
+    try {
+      const videoTrack = await input.getPrimaryVideoTrack();
+      if (videoTrack) {
+        statResolution.textContent = `${videoTrack.displayWidth}×${videoTrack.displayHeight}`;
+
+        // FPS estimation
+        try {
+          const packetStats = await videoTrack.computePacketStats(60);
+          const fps = packetStats.averagePacketRate;
+          statFps.textContent = fps ? fps.toFixed(2) + ' fps' : '--';
+        } catch {
+          statFps.textContent = '--';
+        }
+
+        // Codec
+        try {
+          const decoderConfig = await videoTrack.getDecoderConfig();
+          statVcodec.textContent = decoderConfig.codec || '--';
+        } catch {
+          statVcodec.textContent = '--';
+        }
+
+        // Bitrate estimation from file size and duration
+        try {
+          const duration = await input.computeDuration();
+          if (duration > 0) {
+            const bitrate = Math.round((file.size * 8) / duration / 1000);
+            statVbitrate.textContent = `~${bitrate.toLocaleString()} kbps`;
+          } else {
+            statVbitrate.textContent = '--';
+          }
+        } catch {
+          statVbitrate.textContent = '--';
+        }
+      } else {
+        statResolution.textContent = '映像なし';
+        statFps.textContent = '--';
+        statVcodec.textContent = '--';
+        statVbitrate.textContent = '--';
+      }
+    } catch {
+      statResolution.textContent = '--';
+      statFps.textContent = '--';
+      statVcodec.textContent = '--';
+      statVbitrate.textContent = '--';
+    }
+
+    // Audio track
+    try {
+      const audioTrack = await input.getPrimaryAudioTrack();
+      if (audioTrack) {
+        try {
+          const decoderConfig = await audioTrack.getDecoderConfig();
+          statAcodec.textContent = decoderConfig.codec || '--';
+        } catch {
+          statAcodec.textContent = '--';
+        }
+        statSamplerate.textContent = audioTrack.sampleRate
+          ? audioTrack.sampleRate.toLocaleString() + ' Hz'
+          : '--';
+      } else {
+        statAcodec.textContent = '音声なし';
+        statSamplerate.textContent = '--';
+      }
+    } catch {
+      statAcodec.textContent = '--';
+      statSamplerate.textContent = '--';
+    }
+
+    // Hide loading, show stats
+    inspectorLoading.classList.add('hidden');
+    statsGrid.classList.remove('opacity-0');
+  }
+
+  // ===========================================================
+  // Converter
+  // ===========================================================
+  btnConvert.addEventListener('click', () => {
+    if (!currentFile) return;
+    startConversion(currentFile);
+  });
+
+  function resetConverterState() {
+    progressContainer.classList.add('hidden');
+    doneMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+    progressBar.style.width = '0%';
+    progressPct.textContent = '0%';
+    progressLabel.textContent = '変換処理中...';
+    btnConvert.disabled = false;
+    btnConvert.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+
+  function startConversion(file: File) {
+    if (worker) {
+      worker.terminate();
+      worker = null;
+    }
+
+    // Get settings
+    const resolutionVal = convResolution.value;
+    const fpsVal = convFps.value;
+    const bitrateKbps = parseInt(convBitrate.value);
+
+    let width: number | undefined;
+    let height: number | undefined;
+    if (resolutionVal !== 'original') {
+      const parts = resolutionVal.split('x');
+      width = parseInt(parts[0]);
+      height = parseInt(parts[1]);
+    }
+
+    const frameRate = fpsVal !== 'original' ? parseFloat(fpsVal) : undefined;
+    const bitrate = bitrateKbps * 1000; // bps
+
+    // Show progress
+    progressContainer.classList.remove('hidden');
+    doneMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+    btnConvert.disabled = true;
+    btnConvert.classList.add('opacity-50', 'cursor-not-allowed');
+
+    // Launch worker - use Vite's bundled worker via new URL() pattern
+    worker = new Worker(
+      new URL('../../../workers/video-optimizer-worker.js', import.meta.url),
+      { type: 'module' }
+    );
+
+    worker.onmessage = (e: MessageEvent) => {
+      const { type, value, buffer, message } = e.data;
+
+      if (type === 'progress') {
+        const pct = Math.round(value * 100);
+        progressBar.style.width = `${pct}%`;
+        progressPct.textContent = `${pct}%`;
+      } else if (type === 'done') {
+        onConversionDone(buffer as ArrayBuffer, file.name);
+      } else if (type === 'error') {
+        onConversionError(message as string);
+      }
+    };
+
+    worker.onerror = (e: ErrorEvent) => {
+      onConversionError('変換中に予期せぬエラーが発生しました: ' + e.message);
+    };
+
+    worker.postMessage({
+      type: 'start',
+      file,
+      settings: { width, height, frameRate, bitrate },
+    });
+  }
+
+  function onConversionDone(buffer: ArrayBuffer, originalName: string) {
+    progressBar.style.width = '100%';
+    progressPct.textContent = '100%';
+    progressLabel.textContent = '完了！';
+
+    setTimeout(() => {
+      progressContainer.classList.add('hidden');
+      doneMessage.classList.remove('hidden');
+      btnConvert.disabled = false;
+      btnConvert.classList.remove('opacity-50', 'cursor-not-allowed');
+    }, 800);
+
+    // Download
+    const blob = new Blob([buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(blob);
+    const baseName = originalName.replace(/\.[^/.]+$/, '');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${baseName}_converted.mp4`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+    worker?.terminate();
+    worker = null;
+  }
+
+  function onConversionError(message: string) {
+    progressContainer.classList.add('hidden');
+    errorMessage.classList.remove('hidden');
+    errorText.textContent = `エラー: ${message}`;
+    btnConvert.disabled = false;
+    btnConvert.classList.remove('opacity-50', 'cursor-not-allowed');
+
+    worker?.terminate();
+    worker = null;
+  }
+
+  // ===========================================================
+  // Utility Functions
+  // ===========================================================
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
+
+  function formatDuration(seconds: number): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+</script>
