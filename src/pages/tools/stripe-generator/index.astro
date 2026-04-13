@@ -1,0 +1,474 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="AI ストライプジェネレーター - GlowPunch" description="画像をアップロードすると、AIが被写体の色を抽出し、ポールスミス風のおしゃれなストライプ画像を自動生成します。">
+  <div class="flex flex-col gap-6">
+    <div class="mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">AI ストライプ<span class="text-pink-500">ジェネレーター</span></h1>
+      <p class="text-slate-600 text-lg">アップロードした画像から色を抽出し、ハイブランド風のストライプ画像を自動生成します。</p>
+    </div>
+
+    <!-- UI App -->
+    <div class="glass-panel p-6 flex flex-col items-center justify-center min-h-[500px] border-dashed border-2 border-slate-300 relative transition-colors" id="drop-zone">
+      
+      <!-- Settings Panel -->
+      <div class="w-full flex justify-end mb-6">
+        <label class="flex items-center cursor-pointer bg-white/50 px-4 py-2 rounded-full border border-pink-200 hover:bg-pink-50 transition-colors shadow-sm">
+          <div class="relative">
+            <input type="checkbox" id="ai-mode-toggle" class="sr-only peer" checked>
+            <div class="block bg-slate-200 peer-checked:bg-pink-500 peer-checked:border-pink-500 w-10 h-6 rounded-full transition-colors border-2 border-transparent"></div>
+            <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-4 shadow"></div>
+          </div>
+          <div class="ml-3 text-slate-700 font-medium text-sm flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-pink-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            AIで被写体のみ抽出 (背景色を除外)
+          </div>
+        </label>
+      </div>
+
+      <div id="initial-ui" class="text-center w-full flex flex-col items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center mb-4 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        </div>
+        <p class="text-xl font-bold text-slate-800 mb-2">画像を選択 または ドラッグ＆ドロップ</p>
+        <p class="text-slate-500 text-sm mb-6">JPG, PNG などの画像ファイルに対応</p>
+        <button id="btn-select" class="btn-primary !bg-pink-500 hover:!bg-pink-600 shadow-lg shadow-pink-500/30">画像を選択してストライプ生成</button>
+        <input type="file" id="file-input" class="hidden" accept="image/*" />
+      </div>
+
+      <div id="loading-ui" class="hidden flex-col items-center justify-center text-center py-10 w-full">
+        <div class="relative w-16 h-16 mb-6">
+          <div class="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
+          <div class="absolute inset-0 border-4 border-pink-500 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p class="text-xl font-bold text-slate-800" id="loading-text">色を抽出中...</p>
+        <p class="text-sm text-slate-500 mt-3 max-w-sm" id="loading-subtext">AIが画像の色構成を分析しています。<br/>※AIモードONの場合、初回はモデル準備に時間がかかる場合があります。</p>
+        <div class="w-full max-w-md bg-slate-200 rounded-full h-3 mt-6 overflow-hidden shadow-inner">
+          <div class="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-500 h-3 rounded-full transition-all duration-300 relative" style="width: 0%" id="progress-bar">
+            <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="result-ui" class="hidden flex-col items-center w-full">
+        <div class="flex flex-col md:flex-row gap-6 w-full justify-center items-center mb-8">
+          
+          <div class="flex flex-col items-center w-full max-w-[200px]">
+            <p class="text-xs font-bold text-slate-400 mb-2 tracking-widest uppercase">Original</p>
+            <div class="w-full aspect-square rounded-xl overflow-hidden shadow-md border border-slate-200 bg-white flex items-center justify-center">
+              <img id="original-preview" class="max-w-full max-h-full object-contain" src="" alt="元画像" />
+            </div>
+          </div>
+
+          <div class="hidden md:flex flex-col justify-center items-center text-pink-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+
+          <div class="flex flex-col items-center w-full max-w-[400px]">
+            <p class="text-xs font-bold text-pink-500 mb-2 tracking-widest uppercase flex items-center gap-1">
+              Generated Stripe
+            </p>
+            <div class="w-full aspect-[4/3] md:aspect-video rounded-xl overflow-hidden shadow-2xl border border-slate-200 bg-white flex items-center justify-center">
+              <canvas id="result-canvas" class="max-w-full max-h-full object-contain"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Color Palette Display -->
+        <div class="w-full max-w-2xl bg-white/50 rounded-2xl p-4 border border-slate-200 mb-8 border-t-4 border-t-pink-400">
+          <p class="text-xs font-bold text-slate-500 mb-3 text-center">抽出されたカラーパレット (<span id="palette-count">0</span>色)</p>
+          <div id="palette-container" class="flex h-10 w-full rounded-xl overflow-hidden shadow-inner bg-slate-100">
+            <!-- Palette colors will be injected here -->
+          </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-4 justify-center">
+          <button id="btn-download" class="btn-primary !bg-slate-800 hover:!bg-slate-900 flex items-center gap-2 shadow-xl shadow-slate-900/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            高画質で保存する (1080p)
+          </button>
+          
+          <button id="btn-regenerate" class="px-6 py-3 rounded-xl font-bold text-white bg-pink-500 hover:bg-pink-600 shadow-xl shadow-pink-500/20 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            別のパターンを生成
+          </button>
+
+          <button id="btn-reset" class="px-6 py-3 rounded-xl font-bold text-slate-500 bg-white hover:bg-slate-50 border border-slate-300 transition-colors flex items-center gap-2">
+            画像を選び直す
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- License & Info Context -->
+    <div class="glass-panel p-6 mt-4 opacity-90 text-sm text-slate-500 bg-slate-50/50">
+      <h3 class="font-bold text-slate-700 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-pink-500"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>ローカルで完結する安全で高度な処理</h3>
+      <p class="mb-4 text-xs md:text-sm leading-relaxed">
+        ・すべての処理（被写体認識・K-means法による代表色抽出・ストライプ生成）は、お使いの端末（ブラウザ内）で完全に完結します。画像が当サイトのサーバーにアップロードされることは一切ありません。<br/>
+        ・当ツールはGlowPunchの「ゼロコスト・プライバシーファースト」方針に基づいて作成されています。通信量やサーバーコストを気にせず、何度でもプレビューをお楽しみいただけます。
+      </p>
+
+      <div class="border-t border-slate-200 pt-4 text-xs space-y-2">
+        <p class="font-bold text-slate-600">本ツールは以下のオープンソース・テクノロジー等を使用しています。</p>
+        <p>
+          - <a href="https://github.com/imgly/background-removal-js" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:underline">@imgly/background-removal</a> — AGPL-3.0 License<br/> 
+          <span class="pl-3 text-[10px] text-slate-400">Copyright © IMG.LY GmbH.</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <AdSensePlaceholder slotId="stripe-bottom-banner" />
+    </div>
+
+  </div>
+</BaseLayout>
+
+<script>
+  import { removeBackground } from '@imgly/background-removal';
+
+  const dropZone = document.getElementById('drop-zone');
+  const btnSelect = document.getElementById('btn-select');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const aiModeToggle = document.getElementById('ai-mode-toggle') as HTMLInputElement;
+  
+  const initialUi = document.getElementById('initial-ui');
+  const loadingUi = document.getElementById('loading-ui');
+  const resultUi = document.getElementById('result-ui');
+  const loadingText = document.getElementById('loading-text');
+  const progressBar = document.getElementById('progress-bar');
+  
+  const originalPreview = document.getElementById('original-preview') as HTMLImageElement;
+  const resultCanvas = document.getElementById('result-canvas') as HTMLCanvasElement;
+  const paletteContainer = document.getElementById('palette-container');
+  const paletteCount = document.getElementById('palette-count');
+  
+  const btnDownload = document.getElementById('btn-download');
+  const btnRegenerate = document.getElementById('btn-regenerate');
+  const btnReset = document.getElementById('btn-reset');
+
+  let currentColors: { r: number; g: number; b: number; weight: number }[] = [];
+
+  // Constants
+  const NUM_COLORS_TO_EXTRACT = 7; 
+  const CHUNK_SIZE = 5000;      // Pixels to process in k-means per frame to avoid freezing
+  const DOWNLOAD_WIDTH = 1920;  // 1080p width
+  const DOWNLOAD_HEIGHT = 1080; // 1080p height
+  const PREVIEW_WIDTH = 1200;
+  const PREVIEW_HEIGHT = 800;
+
+  // --- UI Event Listeners ---
+
+  btnSelect?.addEventListener('click', () => fileInput?.click());
+  
+  fileInput?.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      processImageFlow(target.files[0]);
+    }
+  });
+
+  // Drag & Drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, e => {
+      e.preventDefault(); e.stopPropagation();
+    }, false);
+  });
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, () => dropZone?.classList.add('bg-pink-50', 'border-pink-300'), false);
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone?.addEventListener(eventName, () => dropZone?.classList.remove('bg-pink-50', 'border-pink-300'), false);
+  });
+  dropZone?.addEventListener('drop', (e: DragEvent) => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      if (dt.files[0].type.startsWith('image/')) {
+        processImageFlow(dt.files[0]);
+      } else {
+        alert('画像ファイルを選択してください');
+      }
+    }
+  }, false);
+
+  btnReset?.addEventListener('click', () => {
+    if (fileInput) fileInput.value = '';
+    showUI('initial');
+  });
+
+  btnRegenerate?.addEventListener('click', () => {
+    if (currentColors.length > 0 && resultCanvas) {
+      drawStripes(resultCanvas, currentColors, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+    }
+  });
+
+  btnDownload?.addEventListener('click', () => {
+    if (currentColors.length > 0) {
+      // Create a large offscreen canvas for high-quality download
+      const dlCanvas = document.createElement('canvas');
+      drawStripes(dlCanvas, currentColors, DOWNLOAD_WIDTH, DOWNLOAD_HEIGHT);
+      
+      const link = document.createElement('a');
+      link.download = `glowpunch_stripe_${Date.now()}.png`;
+      link.href = dlCanvas.toDataURL('image/png');
+      link.click();
+    }
+  });
+
+  function showUI(state: 'initial' | 'loading' | 'result') {
+    initialUi?.classList.add('hidden');
+    loadingUi?.classList.add('hidden'); loadingUi?.classList.remove('flex');
+    resultUi?.classList.add('hidden'); resultUi?.classList.remove('flex');
+
+    if (state === 'initial') initialUi?.classList.remove('hidden');
+    if (state === 'loading') { loadingUi?.classList.remove('hidden'); loadingUi?.classList.add('flex'); }
+    if (state === 'result') { resultUi?.classList.remove('hidden'); resultUi?.classList.add('flex'); }
+  }
+
+
+  // --- Core Processing Logic ---
+
+  async function processImageFlow(file: File) {
+    if (!file) return;
+    showUI('loading');
+    
+    // 1. Show original in preview
+    const objectUrl = URL.createObjectURL(file);
+    if (originalPreview) originalPreview.src = objectUrl;
+
+    try {
+      const useAI = aiModeToggle?.checked;
+      let targetImageBlob: Blob | File = file;
+
+      // 2. Optional: use imgly background removal to extract main subject only
+      if (useAI) {
+        if (loadingText) loadingText.textContent = "被写体を抽出中 (AI)...";
+        if (progressBar) progressBar.style.width = '10%';
+        const config = {
+          progress: (key: string, current: number, total: number) => {
+            if (progressBar) {
+              const percent = 10 + Math.round((current / total) * 30); // scale to 40% of total bar
+              progressBar.style.width = `${percent}%`;
+            }
+          }
+        };
+        targetImageBlob = await removeBackground(file, config);
+      }
+
+      // 3. Load image into Canvas to parse pixels
+      if (loadingText) loadingText.textContent = "画像の色を分析中...";
+      if (progressBar) progressBar.style.width = '50%';
+      
+      const parsedPixels = await extractPixelsFromBlob(targetImageBlob, useAI);
+
+      if (parsedPixels.length === 0) {
+        throw new Error("色データが抽出できませんでした");
+      }
+
+      // 4. K-means clustering to find dominant colors
+      if (loadingText) loadingText.textContent = "カラーパレットを作成中...";
+      if (progressBar) progressBar.style.width = '70%';
+      
+      currentColors = await performKMeans(parsedPixels, NUM_COLORS_TO_EXTRACT, 10, (progress) => {
+         if (progressBar) progressBar.style.width = `${70 + (progress * 30)}%`;
+      });
+
+      // Show Palette
+      renderPalette(currentColors);
+
+      // 5. Draw Paul Smith style stripes
+      if (resultCanvas) {
+        drawStripes(resultCanvas, currentColors, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+      }
+
+      showUI('result');
+
+    } catch (err) {
+      console.error(err);
+      alert('エラーが発生しました。申し訳ありませんが、別の画像でお試しいただくかAIモードをオフにしてください。');
+      showUI('initial');
+    }
+  }
+
+  // Extracts pixel values {r,g,b} from an image Blob. Ignores transparent regions.
+  function extractPixelsFromBlob(blob: Blob | File, ignoreTransparent: boolean): Promise<{r:number, g:number, b:number}[]> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject("Canvas context error");
+        
+        // Resize down to speed up extraction (max 200px longest side)
+        const scale = Math.min(200 / img.naturalWidth, 200 / img.naturalHeight, 1);
+        canvas.width = Math.floor(img.naturalWidth * scale);
+        canvas.height = Math.floor(img.naturalHeight * scale);
+        
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = ctx.getImageData(0,0, canvas.width, canvas.height).data;
+        const pixels: {r:number, g:number, b:number}[] = [];
+        
+        // Skip factor to speed up if still too many pixels. (e.g. sample every 2nd or 3rd pixel)
+        const step = 4 * 2; 
+
+        for (let i = 0; i < imageData.length; i += step) {
+          const a = imageData[i+3];
+          // If extracted via imgly, the background gets transparent. We ignore alpha < 128
+          if (ignoreTransparent && a < 128) continue; 
+          // Check for pure white/black which often appear near cutouts, optional.
+          pixels.push({ r: imageData[i], g: imageData[i+1], b: imageData[i+2] });
+        }
+        
+        resolve(pixels);
+      };
+      img.onerror = () => reject("Image load error");
+      img.src = url;
+    });
+  }
+
+  // Non-blocking K-means utilizing requestAnimationFrame/setTimeout
+  // to avoid blocking the main thread for too long.
+  async function performKMeans(pixels: {r:number,g:number,b:number}[], k: number, maxIterations: number, onProgress: (p:number)=>void) {
+    // 1. Init Random Centroids
+    let centroids = [];
+    for (let i = 0; i < k; i++) {
+       const randP = pixels[Math.floor(Math.random() * pixels.length)];
+       centroids.push({r: randP.r, g: randP.g, b: randP.b});
+    }
+
+    let clusters: {r:number,g:number,b:number}[][] = [];
+
+    // Helper to sleep and yield to main thread
+    const yieldMain = () => new Promise(r => setTimeout(r, 0));
+
+    for (let iter = 0; iter < maxIterations; iter++) {
+      onProgress(iter / maxIterations);
+      clusters = new Array(k).fill(0).map(() => []);
+      
+      // Assign phase
+      for (let i = 0; i < pixels.length; i++) {
+        const p = pixels[i];
+        let minDist = Infinity;
+        let clusterIdx = 0;
+        for (let j = 0; j < k; j++) {
+          const c = centroids[j];
+          const distSq = (p.r - c.r)**2 + (p.g - c.g)**2 + (p.b - c.b)**2;
+          if (distSq < minDist) { minDist = distSq; clusterIdx = j; }
+        }
+        clusters[clusterIdx].push(p);
+
+        // Yield occasionally to prevent UI freezing
+        if (i > 0 && i % CHUNK_SIZE === 0) await yieldMain();
+      }
+
+      // Update Phase
+      let moved = false;
+      for (let j = 0; j < k; j++) {
+        if (clusters[j].length === 0) continue;
+        let sumR = 0, sumG = 0, sumB = 0;
+        for (const p of clusters[j]) { sumR += p.r; sumG += p.g; sumB += p.b; }
+        const newR = sumR / clusters[j].length;
+        const newG = sumG / clusters[j].length;
+        const newB = sumB / clusters[j].length;
+        
+        const diff = Math.abs(centroids[j].r - newR) + Math.abs(centroids[j].g - newG) + Math.abs(centroids[j].b - newB);
+        if (diff > 1) moved = true;
+        centroids[j] = { r: newR, g: newG, b: newB };
+      }
+      
+      if (!moved) break;
+      await yieldMain();
+    }
+    
+    // Finish: map to weights, filter out empty, sort by weight desc
+    return centroids.map((c, i) => ({
+      r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b),
+      weight: clusters[i].length / pixels.length
+    }))
+    .filter(c => c.weight > 0.01) // ignore under 1% weight colors
+    .sort((a,b) => b.weight - a.weight);
+  }
+
+  // Draw palette preview
+  function renderPalette(colors: {r:number,g:number,b:number,weight:number}[]) {
+    if (!paletteContainer) return;
+    if (paletteCount) paletteCount.textContent = colors.length.toString();
+    paletteContainer.innerHTML = '';
+    colors.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'h-full transition-all flex items-center justify-center text-[10px] font-mono text-white/50 opacity-90 hover:opacity-100';
+      div.style.backgroundColor = `rgb(${c.r},${c.g},${c.b})`;
+      div.style.width = `${c.weight * 100}%`;
+      div.title = `rgb(${c.r},${c.g},${c.b}) (${(c.weight*100).toFixed(1)}%)`;
+      paletteContainer.appendChild(div);
+    });
+  }
+
+  // Paul Smith Style Stripe Generator
+  function drawStripes(canvas: HTMLCanvasElement, colors: {r:number,g:number,b:number,weight:number}[], w: number, h: number) {
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d', { alpha: false }); // Optimize
+    if (!ctx) return;
+    
+    // Fill background with most dominant color just in case
+    ctx.fillStyle = `rgb(${colors[0].r},${colors[0].g},${colors[0].b})`;
+    ctx.fillRect(0,0,w,h);
+
+    const minWidth = Math.max(2, Math.floor(w * 0.002));
+    const maxWidth = Math.max(10, Math.floor(w * 0.06));  // 6% of width max
+    
+    let currentX = 0;
+    
+    // Helper to get random item based on weights
+    const getWeightedColor = () => {
+      let r = Math.random();
+      for (const c of colors) {
+        r -= c.weight;
+        if (r <= 0) return c;
+      }
+      return colors[colors.length - 1]; // fallback
+    };
+
+    while (currentX < w) {
+      // Create a pattern block
+      const c1 = getWeightedColor();
+      
+      // Determine width for this exact stripe.
+      // Often, luxury stripes have varying widths, sometimes very thin lines clustered.
+      const isThin = Math.random() > 0.6; 
+      let stripeW = isThin ? 
+        minWidth + Math.random() * (maxWidth * 0.2) : 
+        minWidth + Math.random() * (maxWidth - minWidth);
+        
+      // Override: chance of a massive anchor block
+      if (Math.random() > 0.95) {
+         stripeW = maxWidth * (1.2 + Math.random());
+      }
+      
+      stripeW = Math.ceil(stripeW);
+
+      // Draw 
+      ctx.fillStyle = `rgb(${c1.r},${c1.g},${c1.b})`;
+      ctx.fillRect(currentX, 0, stripeW + 1 /* overlap to prevent anti-aliasing gaps*/, h);
+      
+      currentX += stripeW;
+      
+      // Introduce thin separator lines occasionally
+      if (Math.random() > 0.5) {
+         const sepColor = colors[Math.floor(Math.random() * colors.length)];
+         const sepW = minWidth;
+         ctx.fillStyle = `rgb(${sepColor.r},${sepColor.g},${sepColor.b})`;
+         ctx.fillRect(currentX, 0, sepW + 1, h);
+         currentX += sepW;
+      }
+    }
+  }
+
+</script>
