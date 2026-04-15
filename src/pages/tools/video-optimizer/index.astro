@@ -57,46 +57,62 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       </div>
 
       <!-- Stats grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="stats-grid">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="stats-grid">
         <!-- Stat Card: Resolution -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">解像度</span>
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">解像度 / 比率</span>
           <span id="stat-resolution" class="text-xl font-black text-slate-800">--</span>
+          <span id="badge-resolution" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Stat Card: FPS -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">FPS</span>
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">フレームレート</span>
           <span id="stat-fps" class="text-xl font-black text-slate-800">--</span>
+          <span id="badge-fps" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Stat Card: Duration -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">再生時間</span>
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">素材尺</span>
           <span id="stat-duration" class="text-xl font-black text-slate-800">--</span>
+          <span id="badge-duration" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Stat Card: File Size -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ファイルサイズ</span>
           <span id="stat-filesize" class="text-xl font-black text-slate-800">--</span>
+          <span id="badge-filesize" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
-        <!-- Stat Card: Video Codec -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">映像コーデック</span>
-          <span id="stat-vcodec" class="text-lg font-bold text-slate-800">--</span>
+
+        <!-- Row 2 -->
+        <!-- Video Profile -->
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">プロファイル / レベル</span>
+          <span id="stat-profile" class="text-lg font-bold text-slate-800">--</span>
+          <span id="badge-profile" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
-        <!-- Stat Card: Video Bitrate -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
+        <!-- Video Bitrate -->
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">映像ビットレート</span>
           <span id="stat-vbitrate" class="text-lg font-bold text-slate-800">--</span>
+          <span id="badge-vbitrate" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
-        <!-- Stat Card: Audio Codec -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">音声コーデック</span>
-          <span id="stat-acodec" class="text-lg font-bold text-slate-800">--</span>
+        <!-- Audio Channels -->
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">音声タイプ</span>
+          <span id="stat-channels" class="text-lg font-bold text-slate-800">--</span>
+          <span id="badge-channels" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
-        <!-- Stat Card: Audio Sample Rate -->
-        <div class="glass-panel p-4 flex flex-col gap-1">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">音声サンプリングレート</span>
-          <span id="stat-samplerate" class="text-lg font-bold text-slate-800">--</span>
+        <!-- Fast Start -->
+        <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">高速起動 (moov)</span>
+          <span id="stat-faststart" class="text-lg font-bold text-slate-800">--</span>
+          <span id="badge-faststart" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
+        </div>
+
+        <!-- Codecs Hidden by default but useful -->
+        <div class="col-span-2 md:col-span-4 flex gap-4 mt-1">
+          <div class="text-[10px] text-slate-400 font-mono">CODEC: <span id="stat-vcodec">--</span> / <span id="stat-acodec">--</span></div>
+          <div class="text-[10px] text-slate-400 font-mono">SAMPLERATE: <span id="stat-samplerate">--</span></div>
         </div>
       </div>
 
@@ -134,12 +150,22 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
             <label for="conv-fps" class="text-sm font-semibold text-slate-600">フレームレート（FPS）</label>
             <select id="conv-fps" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
               <option value="original">元のFPSを維持</option>
-              <option value="29.97" selected>29.97 fps（動画広告推奨）</option>
+              <option value="29.97" selected>29.97 fps（推奨）</option>
               <option value="30">30 fps</option>
               <option value="25">25 fps</option>
-              <option value="24">24 fps</option>
-              <option value="60">60 fps</option>
+              <option value="23.976">23.976 fps</option>
             </select>
+          </div>
+
+          <!-- Audio Bitrate -->
+          <div class="flex flex-col gap-2">
+            <label for="conv-audio-bitrate" class="text-sm font-semibold text-slate-600">音声ビットレート</label>
+            <select id="conv-audio-bitrate" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
+              <option value="192000" selected>192 kbps（推奨）</option>
+              <option value="128000">128 kbps</option>
+              <option value="64000">64 kbps</option>
+            </select>
+            <p class="text-[10px] text-slate-400">※音声は自動的に 48kHz / 2ch(ステレオ) に変換されます。</p>
           </div>
 
           <!-- Bitrate -->
@@ -268,10 +294,24 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
   const statVbitrate = document.getElementById('stat-vbitrate') as HTMLElement;
   const statAcodec = document.getElementById('stat-acodec') as HTMLElement;
   const statSamplerate = document.getElementById('stat-samplerate') as HTMLElement;
+  const statChannels = document.getElementById('stat-channels') as HTMLElement;
+  const statProfile = document.getElementById('stat-profile') as HTMLElement;
+  const statFaststart = document.getElementById('stat-faststart') as HTMLElement;
+
+  // Badges
+  const badgeResolution = document.getElementById('badge-resolution') as HTMLElement;
+  const badgeFps = document.getElementById('badge-fps') as HTMLElement;
+  const badgeDuration = document.getElementById('badge-duration') as HTMLElement;
+  const badgeFilesize = document.getElementById('badge-filesize') as HTMLElement;
+  const badgeProfile = document.getElementById('badge-profile') as HTMLElement;
+  const badgeVbitrate = document.getElementById('badge-vbitrate') as HTMLElement;
+  const badgeChannels = document.getElementById('badge-channels') as HTMLElement;
+  const badgeFaststart = document.getElementById('badge-faststart') as HTMLElement;
 
   // Converter elements
   const convResolution = document.getElementById('conv-resolution') as HTMLSelectElement;
   const convFps = document.getElementById('conv-fps') as HTMLSelectElement;
+  const convAudioBitrate = document.getElementById('conv-audio-bitrate') as HTMLSelectElement;
   const convBitrate = document.getElementById('conv-bitrate') as HTMLInputElement;
   const bitrateDisplay = document.getElementById('bitrate-display') as HTMLElement;
   const btnConvert = document.getElementById('btn-convert') as HTMLButtonElement;
@@ -360,7 +400,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
   }
 
   function setStatError() {
-    const dash = '取得失敗';
+    const dash = '--';
     statResolution.textContent = dash;
     statFps.textContent = dash;
     statDuration.textContent = dash;
@@ -369,98 +409,88 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     statVbitrate.textContent = dash;
     statAcodec.textContent = dash;
     statSamplerate.textContent = dash;
+    statChannels.textContent = dash;
+    statProfile.textContent = dash;
+    statFaststart.textContent = dash;
+    
+    [badgeResolution, badgeFps, badgeDuration, badgeFilesize, badgeProfile, badgeVbitrate, badgeChannels, badgeFaststart].forEach(b => b.classList.add('hidden'));
   }
 
   async function inspectFile(file: File) {
-    const input = new Input({
-      formats: ALL_FORMATS,
-      source: new BlobSource(file),
-    });
+    if (worker) worker.terminate();
+    
+    worker = new Worker(
+      new URL('../../../workers/video-optimizer-worker.js', import.meta.url),
+      { type: 'module' }
+    );
 
-    // File size (always available)
-    statFilesize.textContent = formatFileSize(file.size);
-
-    // Duration
-    try {
-      const duration = await input.computeDuration();
-      statDuration.textContent = formatDuration(duration);
-    } catch {
-      statDuration.textContent = '--';
-    }
-
-    // Video track
-    try {
-      const videoTrack = await input.getPrimaryVideoTrack();
-      if (videoTrack) {
-        statResolution.textContent = `${videoTrack.displayWidth}×${videoTrack.displayHeight}`;
-
-        // FPS estimation
-        try {
-          const packetStats = await videoTrack.computePacketStats(60);
-          const fps = packetStats.averagePacketRate;
-          statFps.textContent = fps ? fps.toFixed(2) + ' fps' : '--';
-        } catch {
-          statFps.textContent = '--';
-        }
-
-        // Codec
-        try {
-          const decoderConfig = await videoTrack.getDecoderConfig();
-          statVcodec.textContent = decoderConfig.codec || '--';
-        } catch {
-          statVcodec.textContent = '--';
-        }
-
-        // Bitrate estimation from file size and duration
-        try {
-          const duration = await input.computeDuration();
-          if (duration > 0) {
-            const bitrate = Math.round((file.size * 8) / duration / 1000);
-            statVbitrate.textContent = `~${bitrate.toLocaleString()} kbps`;
-          } else {
-            statVbitrate.textContent = '--';
-          }
-        } catch {
-          statVbitrate.textContent = '--';
-        }
-      } else {
-        statResolution.textContent = '映像なし';
-        statFps.textContent = '--';
-        statVcodec.textContent = '--';
-        statVbitrate.textContent = '--';
+    worker.onmessage = (e: MessageEvent) => {
+      const { type, metadata, message } = e.data;
+      if (type === 'inspected') {
+        renderMetadata(metadata);
+        inspectorLoading.classList.add('hidden');
+        statsGrid.classList.remove('opacity-0');
+      } else if (type === 'error') {
+        console.error('Worker inspection error:', message);
+        setStatError();
+        inspectorLoading.classList.add('hidden');
+        statsGrid.classList.remove('opacity-0');
       }
-    } catch {
-      statResolution.textContent = '--';
-      statFps.textContent = '--';
-      statVcodec.textContent = '--';
-      statVbitrate.textContent = '--';
+    };
+
+    worker.postMessage({ type: 'inspect', file });
+  }
+
+  function renderMetadata(data: any) {
+    const { video, audio, duration, fileSize, fastStart } = data;
+
+    // File Size & Duration
+    statFilesize.textContent = formatFileSize(fileSize);
+    updateBadge(badgeFilesize, fileSize <= 9 * 1024 * 1024, '9MB以下', '規定超え');
+
+    statDuration.textContent = formatDuration(duration);
+
+    statFaststart.textContent = fastStart ? '有効 (moov先頭)' : '無効 (後方配置)';
+    updateBadge(badgeFaststart, fastStart, 'OK', '要変換');
+
+    if (video) {
+      statResolution.textContent = `${video.width}×${video.height} (${getAspectRatio(video.width, video.height)})`;
+      updateBadge(badgeResolution, video.width === 1920 && video.height === 1080, '1080p', '要調整');
+
+      statFps.textContent = video.fps + ' fps';
+      updateBadge(badgeFps, Math.abs(video.fps - 29.97) < 0.1, '29.97fps', '要調整');
+
+      statVbitrate.textContent = Math.round(video.bitrate / 1000).toLocaleString() + ' kbps';
+      const bitrateOk = video.bitrate >= 2500000 && video.bitrate <= 3500000;
+      updateBadge(badgeVbitrate, bitrateOk, '規定内', '調整推奨');
+
+      statProfile.textContent = `${video.profile} / L${video.level}`;
+      updateBadge(badgeProfile, video.profile === 'High' && video.level === '4.0', 'High L4', '要調整');
+
+      statVcodec.textContent = video.codec;
     }
 
-    // Audio track
-    try {
-      const audioTrack = await input.getPrimaryAudioTrack();
-      if (audioTrack) {
-        try {
-          const decoderConfig = await audioTrack.getDecoderConfig();
-          statAcodec.textContent = decoderConfig.codec || '--';
-        } catch {
-          statAcodec.textContent = '--';
-        }
-        statSamplerate.textContent = audioTrack.sampleRate
-          ? audioTrack.sampleRate.toLocaleString() + ' Hz'
-          : '--';
-      } else {
-        statAcodec.textContent = '音声なし';
-        statSamplerate.textContent = '--';
-      }
-    } catch {
-      statAcodec.textContent = '--';
-      statSamplerate.textContent = '--';
+    if (audio) {
+      statChannels.textContent = audio.channels === 2 ? 'ステレオ (2ch)' : `モノラル (${audio.channels}ch)`;
+      updateBadge(badgeChannels, audio.channels === 2, '2ch', '要2ch化');
+      
+      statAcodec.textContent = audio.codec;
+      statSamplerate.textContent = audio.sampleRate.toLocaleString() + ' Hz';
     }
+  }
 
-    // Hide loading, show stats
-    inspectorLoading.classList.add('hidden');
-    statsGrid.classList.remove('opacity-0');
+  function updateBadge(el: HTMLElement, isOk: boolean, okText: string, failText: string) {
+    el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-amber-100', 'text-amber-700');
+    el.innerText = isOk ? okText : failText;
+    el.classList.add(isOk ? 'bg-emerald-100' : 'bg-amber-100');
+    el.classList.add(isOk ? 'text-emerald-700' : 'text-amber-700');
+    el.classList.remove('hidden');
+  }
+
+  function getAspectRatio(w: number, h: number): string {
+    const gcd = (a: number, b: number): number => b ? gcd(b, a % b) : a;
+    const r = gcd(w, h);
+    return `${w / r}:${h / r}`;
   }
 
   // ===========================================================
@@ -503,6 +533,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
 
     const frameRate = fpsVal !== 'original' ? parseFloat(fpsVal) : undefined;
     const bitrate = bitrateKbps * 1000; // bps
+    const audioBitrate = parseInt(convAudioBitrate.value);
 
     // Show progress
     progressContainer.classList.remove('hidden');
@@ -511,7 +542,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     btnConvert.disabled = true;
     btnConvert.classList.add('opacity-50', 'cursor-not-allowed');
 
-    // Launch worker - use Vite's bundled worker via new URL() pattern
+    // Launch worker
     worker = new Worker(
       new URL('../../../workers/video-optimizer-worker.js', import.meta.url),
       { type: 'module' }
@@ -538,7 +569,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     worker.postMessage({
       type: 'start',
       file,
-      settings: { width, height, frameRate, bitrate },
+      settings: { width, height, frameRate, bitrate, audioBitrate },
     });
   }
 
@@ -592,7 +623,12 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
-    if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    return `${m}:${String(s).padStart(2, '0')}`;
+    const ms = Math.floor((seconds % 1) * 1000);
+    
+    const timeStr = h > 0 
+      ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+      : `${m}:${String(s).padStart(2, '0')}`;
+    
+    return `${timeStr}.${String(ms).padStart(3, '0')}`;
   }
 </script>
