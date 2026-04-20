@@ -5,7 +5,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
 
 <BaseLayout
   title="動画スペックチェッカー＆コンバーター - GlowPunch"
-  description="動画広告の入稿規定に合わせてMP4を変換。解像度・FPS・ビットレートをブラウザ上で素早く確認・変換できます。インストール不要。"
+  description="動画の解像度・FPS・ビットレートをブラウザ上で素早く確認し、お好みのスペックに変換。インストール不要で、自由な動画書き出しをサポートします。"
 >
   <div class="flex flex-col gap-6">
 
@@ -15,7 +15,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
         動画スペック<span class="text-sky-500">チェッカー＆コンバーター</span>
       </h1>
       <p class="text-slate-600 text-lg">
-        動画広告の入稿規定に合わせてMP4を変換。解像度・FPS・ビットレートをブラウザ内で素早くチェック・変換できます。
+        お好みの解像度・FPS・ビットレートにMP4を自由変換。ブラウザ内で素早くスペックを確認し、用途に合わせた最適なファイルへコンバートできます。
       </p>
     </div>
 
@@ -62,25 +62,21 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">解像度 / 比率</span>
           <span id="stat-resolution" class="text-xl font-black text-slate-800">--</span>
-          <span id="badge-resolution" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Stat Card: FPS -->
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">フレームレート</span>
           <span id="stat-fps" class="text-xl font-black text-slate-800">--</span>
-          <span id="badge-fps" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Stat Card: Duration -->
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">素材尺</span>
           <span id="stat-duration" class="text-xl font-black text-slate-800">--</span>
-          <span id="badge-duration" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Stat Card: File Size -->
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ファイルサイズ</span>
           <span id="stat-filesize" class="text-xl font-black text-slate-800">--</span>
-          <span id="badge-filesize" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
 
         <!-- Row 2 -->
@@ -88,25 +84,21 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">プロファイル / レベル</span>
           <span id="stat-profile" class="text-lg font-bold text-slate-800">--</span>
-          <span id="badge-profile" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Video Bitrate -->
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">映像ビットレート</span>
           <span id="stat-vbitrate" class="text-lg font-bold text-slate-800">--</span>
-          <span id="badge-vbitrate" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Audio Channels -->
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">音声タイプ</span>
           <span id="stat-channels" class="text-lg font-bold text-slate-800">--</span>
-          <span id="badge-channels" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
         <!-- Fast Start -->
         <div class="glass-panel p-4 flex flex-col gap-1 relative overflow-hidden group">
           <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">高速起動 (moov)</span>
           <span id="stat-faststart" class="text-lg font-bold text-slate-800">--</span>
-          <span id="badge-faststart" class="hidden absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter"></span>
         </div>
 
         <!-- Codecs Hidden by default but useful -->
@@ -150,7 +142,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
             <label for="conv-fps" class="text-sm font-semibold text-slate-600">フレームレート（FPS）</label>
             <select id="conv-fps" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
               <option value="original">元のFPSを維持</option>
-              <option value="29.97" selected>29.97 fps（推奨）</option>
+              <option value="29.97" selected>29.97 fps</option>
               <option value="30">30 fps</option>
               <option value="25">25 fps</option>
               <option value="23.976">23.976 fps</option>
@@ -161,7 +153,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
           <div class="flex flex-col gap-2">
             <label for="conv-audio-bitrate" class="text-sm font-semibold text-slate-600">音声ビットレート</label>
             <select id="conv-audio-bitrate" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
-              <option value="192000" selected>192 kbps（推奨）</option>
+              <option value="192000" selected>192 kbps</option>
               <option value="128000">128 kbps</option>
               <option value="64000">64 kbps</option>
             </select>
@@ -192,7 +184,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
         <!-- Disclaimer -->
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
           <p class="text-xs text-slate-500 leading-relaxed">
-            ※当ツールは映像・音声の基本スペックを入稿規定に合わせて変換します。音声の平均ラウドネス値（LKFS）の調整や、参照フレーム数の厳密な指定には対応していません。これらでエラーが出る場合は、Premiere Pro等の専用ソフトウェアでの最終書き出しをお願いいたします。
+            ※当ツールは映像・音声の基本スペックを変換します。音声の平均ラウドネス値（LKFS）の調整や、参照フレーム数の厳密な指定には対応していません。これらでエラーが出る場合は、Premiere Pro等の専用ソフトウェアでの最終書き出しをお願いいたします。
           </p>
         </div>
 
@@ -209,7 +201,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
               <path d="M6 18h.01"/>
               <path d="M10 18h.01"/>
             </svg>
-            規定に合わせて変換する
+            変換する
           </button>
 
           <!-- Progress bar (hidden during idle) -->
@@ -253,7 +245,7 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <h3>主な機能</h3>
       <ul>
         <li><strong>インスペクター</strong>：動画ファイルの解像度・FPS・コーデック・ビットレートを瞬時に確認</li>
-        <li><strong>コンバーター</strong>：入稿規定に合わせた解像度・FPS・ビットレートに変換してMP4を出力</li>
+        <li><strong>コンバーター</strong>：用途に合わせた解像度・FPS・ビットレートに変換してMP4を出力</li>
         <li><strong>完全ローカル処理</strong>：動画データは一切サーバーに送信されません。機密性の高い素材でも安全にご利用いただけます</li>
       </ul>
       <h3>対応している動画フォーマット</h3>
@@ -298,15 +290,6 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
   const statProfile = document.getElementById('stat-profile') as HTMLElement;
   const statFaststart = document.getElementById('stat-faststart') as HTMLElement;
 
-  // Badges
-  const badgeResolution = document.getElementById('badge-resolution') as HTMLElement;
-  const badgeFps = document.getElementById('badge-fps') as HTMLElement;
-  const badgeDuration = document.getElementById('badge-duration') as HTMLElement;
-  const badgeFilesize = document.getElementById('badge-filesize') as HTMLElement;
-  const badgeProfile = document.getElementById('badge-profile') as HTMLElement;
-  const badgeVbitrate = document.getElementById('badge-vbitrate') as HTMLElement;
-  const badgeChannels = document.getElementById('badge-channels') as HTMLElement;
-  const badgeFaststart = document.getElementById('badge-faststart') as HTMLElement;
 
   // Converter elements
   const convResolution = document.getElementById('conv-resolution') as HTMLSelectElement;
@@ -413,7 +396,6 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     statProfile.textContent = dash;
     statFaststart.textContent = dash;
     
-    [badgeResolution, badgeFps, badgeDuration, badgeFilesize, badgeProfile, badgeVbitrate, badgeChannels, badgeFaststart].forEach(b => b.classList.add('hidden'));
   }
 
   async function inspectFile(file: File) {
@@ -444,48 +426,32 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
   function renderMetadata(data: any) {
     const { video, audio, duration, fileSize, fastStart } = data;
 
-    // File Size & Duration
     statFilesize.textContent = formatFileSize(fileSize);
-    updateBadge(badgeFilesize, fileSize <= 9 * 1024 * 1024, '9MB以下', '規定超え');
 
     statDuration.textContent = formatDuration(duration);
 
     statFaststart.textContent = fastStart ? '有効 (moov先頭)' : '無効 (後方配置)';
-    updateBadge(badgeFaststart, fastStart, 'OK', '要変換');
 
     if (video) {
       statResolution.textContent = `${video.width}×${video.height} (${getAspectRatio(video.width, video.height)})`;
-      updateBadge(badgeResolution, video.width === 1920 && video.height === 1080, '1080p', '要調整');
 
       statFps.textContent = video.fps + ' fps';
-      updateBadge(badgeFps, Math.abs(video.fps - 29.97) < 0.1, '29.97fps', '要調整');
 
       statVbitrate.textContent = Math.round(video.bitrate / 1000).toLocaleString() + ' kbps';
-      const bitrateOk = video.bitrate >= 2500000 && video.bitrate <= 3500000;
-      updateBadge(badgeVbitrate, bitrateOk, '規定内', '調整推奨');
 
       statProfile.textContent = `${video.profile} / L${video.level}`;
-      updateBadge(badgeProfile, video.profile === 'High' && video.level === '4.0', 'High L4', '要調整');
 
       statVcodec.textContent = video.codec;
     }
 
     if (audio) {
       statChannels.textContent = audio.channels === 2 ? 'ステレオ (2ch)' : `モノラル (${audio.channels}ch)`;
-      updateBadge(badgeChannels, audio.channels === 2, '2ch', '要2ch化');
       
       statAcodec.textContent = audio.codec;
       statSamplerate.textContent = audio.sampleRate.toLocaleString() + ' Hz';
     }
   }
 
-  function updateBadge(el: HTMLElement, isOk: boolean, okText: string, failText: string) {
-    el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-amber-100', 'text-amber-700');
-    el.innerText = isOk ? okText : failText;
-    el.classList.add(isOk ? 'bg-emerald-100' : 'bg-amber-100');
-    el.classList.add(isOk ? 'text-emerald-700' : 'text-amber-700');
-    el.classList.remove('hidden');
-  }
 
   function getAspectRatio(w: number, h: number): string {
     const gcd = (a: number, b: number): number => b ? gcd(b, a % b) : a;
