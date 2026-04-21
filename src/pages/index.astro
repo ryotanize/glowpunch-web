@@ -21,6 +21,62 @@ import AdSensePlaceholder from '../components/AdSensePlaceholder.astro';
   </div>
 
   <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+    <!-- PDF Editor Card -->
+    <a href="/tools/pdf-editor" class="glass-panel p-8 group hover:-translate-y-1 block border-2 border-red-400/30 bg-red-50/30">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-400 to-rose-600 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 group-hover:text-red-500 transition-colors">PDF結合・並べ替え</h2>
+        </div>
+      </div>
+      <p class="text-slate-600 leading-relaxed text-sm">複数のPDFファイルをブラウザ上で一つのファイルに結合・並べ替え。サーバーへのアップロードがないため機密書類でも安心です。</p>
+    </a>
+
+
+    <!-- Frame Extractor Card -->
+    <a href="/tools/frame-extractor" class="glass-panel p-8 group hover:-translate-y-1 block border-2 border-amber-400/30 bg-amber-50/30">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 group-hover:text-amber-600 transition-colors">動画フレーム抽出</h2>
+        </div>
+      </div>
+      <p class="text-slate-600 leading-relaxed text-sm">動画から特定のシーンを高画質画像として切り出します。サムネイル用や、1秒ごとの連続画像抽出(ZIP)も可能です。</p>
+    </a>
+
+
+    <!-- Video Trimmer Card -->
+    <a href="/tools/video-trimmer" class="glass-panel p-8 group hover:-translate-y-1 block border-2 border-teal-400/30 bg-teal-50/30">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-400 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V2M2 4h20M20 2v20M22 20H2"/></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 group-hover:text-teal-600 transition-colors">スマート動画トリマー</h2>
+        </div>
+      </div>
+      <p class="text-slate-600 leading-relaxed text-sm">動画の不要な部分を時間でカットしたり、スマホ向け(9:16)などに画面を切り抜く処理をブラウザ内で完結させます。</p>
+    </a>
+
+
+    <!-- Audio Extractor Card -->
+    <a href="/tools/audio-extractor" class="glass-panel p-8 group hover:-translate-y-1 block border-2 border-rose-400/30 bg-rose-50/30">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-400 to-orange-400 flex items-center justify-center shadow-lg transform group-hover:-rotate-12 transition-transform">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="m16 8-4-4-4 4"/><path d="M2 13a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2"/></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 group-hover:text-rose-600 transition-colors">動画の音声抽出ツール</h2>
+        </div>
+      </div>
+      <p class="text-slate-600 leading-relaxed text-sm">動画から音声情報を抽出し、MP3 / WAV / AAC形式で高速に保存します。アップロード不要で安全です。</p>
+    </a>
+
+
     <!-- Video Optimizer Card -->
     <a href="/tools/video-optimizer" class="glass-panel p-8 group hover:-translate-y-1 block border-2 border-sky-400/30 bg-sky-50/30">
       <div class="flex items-center gap-4 mb-4">
@@ -29,7 +85,6 @@ import AdSensePlaceholder from '../components/AdSensePlaceholder.astro';
         </div>
         <div>
           <h2 class="text-2xl font-bold text-slate-800 group-hover:text-sky-600 transition-colors">動画スペックチェッカー</h2>
-          <span class="text-xs font-bold text-sky-500 uppercase tracking-wider">New Tool 🎬</span>
         </div>
       </div>
       <p class="text-slate-600 leading-relaxed text-sm">解像度・FPS・ビットレートをブラウザ上で素早く確認・変換。入稿規定のチェックに。</p>
