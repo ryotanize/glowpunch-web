@@ -1,0 +1,315 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout
+  title="動画からの音声抽出ツール - GlowPunch"
+  description="ブラウザ上で動画から音声（MP3, WAV, AAC）を安全・高速に抽出。サーバーへのアップロード不要で機密データも安心です。"
+>
+  <div class="flex flex-col gap-6">
+
+    <!-- Header -->
+    <div class="mb-2">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">
+        動画の<span class="text-rose-500">音声抽出</span>ツール
+      </h1>
+      <p class="text-slate-600 text-lg">
+        動画ファイルから音声だけを抜き出してダウンロード。MP3・WAV・AACに対応し、すべてブラウザ内で安全に処理されます。
+      </p>
+    </div>
+
+    <!-- Drop Zone -->
+    <div
+      id="drop-zone"
+      class="glass-panel p-10 flex flex-col items-center justify-center gap-4 border-2 border-dashed border-rose-300 bg-rose-50/30 rounded-2xl cursor-pointer transition-all duration-200 hover:border-rose-400 hover:bg-rose-50/60 min-h-48"
+    >
+      <div id="drop-icon" class="w-16 h-16 rounded-2xl bg-rose-100 text-rose-500 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v10"/>
+          <path d="m16 8-4-4-4 4"/>
+          <path d="M2 13a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2"/>
+          <path d="M6 17h.01"/>
+          <path d="M10 17h.01"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <p class="text-slate-700 font-semibold text-lg">動画ファイルをドロップ</p>
+        <p class="text-slate-500 text-sm mt-1">MP4, MOV, WebMなどに対応</p>
+      </div>
+      <input id="file-input" type="file" accept="video/*" class="hidden" />
+    </div>
+
+    <!-- Extraction Settings (hidden initially) -->
+    <div id="settings-section" class="hidden glass-panel p-6 flex flex-col gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-6 bg-rose-500 rounded-full"></div>
+        <h2 class="text-xl font-bold text-slate-800">抽出設定</h2>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
+        <div class="text-slate-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div class="flex-grow min-w-0">
+          <p class="text-xs font-semibold text-slate-500 uppercase">対象ファイル</p>
+          <p id="selected-file-name" class="font-medium text-slate-800 truncate"></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-2">
+          <label for="out-format" class="text-sm font-semibold text-slate-600">出力フォーマット</label>
+          <select id="out-format" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 transition">
+            <option value="mp3" selected>MP3（最もポピュラーで軽量）</option>
+            <option value="wav">WAV（無圧縮・高音質）</option>
+            <option value="aac">AAC（高効率・動画向け音質）</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-2" id="bitrate-container">
+          <label for="out-bitrate" class="text-sm font-semibold text-slate-600">音声ビットレート</label>
+          <select id="out-bitrate" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 transition">
+            <option value="320000">320 kbps（最高音質）</option>
+            <option value="192000" selected>192 kbps（標準）</option>
+            <option value="128000">128 kbps（軽量）</option>
+          </select>
+          <p class="text-[10px] text-slate-400">WAV形式の場合は無圧縮のためビットレート設定は引き継がれません。</p>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="flex flex-col gap-3 mt-2">
+        <button
+          id="btn-extract"
+          class="inline-flex flex-1 items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-rose-200/50 hover:-translate-y-0.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          音声を抽出して保存
+        </button>
+
+        <!-- Progress bar -->
+        <div id="progress-container" class="hidden flex flex-col gap-2 mt-2">
+          <div class="flex items-center justify-between text-sm">
+            <span id="progress-label" class="text-slate-600 font-medium">音声を抽出中...</span>
+            <span id="progress-pct" class="text-rose-600 font-bold">0%</span>
+          </div>
+          <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-rose-400 to-orange-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div id="done-message" class="hidden flex items-center gap-2 text-emerald-600 font-semibold mt-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          抽出が完了しました！ダウンロードが開始されます。
+        </div>
+
+        <div id="error-message" class="hidden glass-panel p-4 border-l-4 border-red-400 bg-red-50/80 mt-2">
+          <p id="error-text" class="text-red-700 text-sm font-medium"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unsupported Warning -->
+    <div id="unsupported-banner" class="hidden glass-panel p-4 border-l-4 border-amber-400 bg-amber-50/80">
+      <p class="text-amber-800 font-medium text-sm">
+        ⚠️ お使いのブラウザはWebCodecs APIに対応していないため、当ツールをご利用いただけません。最新版のChrome、Edge等をご利用ください。
+      </p>
+    </div>
+
+    <div class="mt-4">
+      <AdSensePlaceholder slotId="audio-extractor-banner" />
+    </div>
+
+    <article class="prose prose-slate mt-8 max-w-none border-t border-slate-200 pt-10">
+      <h2>動画から音声だけを安全に取り出す</h2>
+      <p>
+        「ライブ動画のBGMだけを作業用に保存したい」「会議の録画データから文字起こし用に音声ファイルだけを作りたい」といった場合に、手軽に音声を抽出できるツールです。
+      </p>
+      <h3>このツールの特徴</h3>
+      <ul>
+        <li><strong>完全ローカル処理で安全</strong>：あなたのブラウザ上で直接処理を行うため、ファイルが外部サーバーに送信されることは一切ありません。会議や家族の動画など、プライベートなデータでも安心です。</li>
+        <li><strong>人気のフォーマットに対応</strong>：汎用性が高い「MP3」、音質劣化のない「WAV」、動画での利用に適した「AAC」から選べます。</li>
+        <li><strong>アップロード待ち時間ゼロ</strong>：サーバーにアップロードしないため、数GBあるような長時間の大きな動画ファイルでも一瞬で読み込みが完了します。</li>
+      </ul>
+      <p>
+        ※抽出処理の速度は、お使いの端末（PCやスマートフォン）の処理能力に依存します。
+      </p>
+    </article>
+
+  </div>
+</BaseLayout>
+
+<script>
+  const dropZone = document.getElementById('drop-zone') as HTMLElement;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const settingsSection = document.getElementById('settings-section') as HTMLElement;
+  const fileNameEl = document.getElementById('selected-file-name') as HTMLElement;
+  const outFormat = document.getElementById('out-format') as HTMLSelectElement;
+  const outBitrate = document.getElementById('out-bitrate') as HTMLSelectElement;
+  const bitrateContainer = document.getElementById('bitrate-container') as HTMLElement;
+  const btnExtract = document.getElementById('btn-extract') as HTMLButtonElement;
+  
+  const progressContainer = document.getElementById('progress-container') as HTMLElement;
+  const progressBar = document.getElementById('progress-bar') as HTMLElement;
+  const progressPct = document.getElementById('progress-pct') as HTMLElement;
+  const doneMessage = document.getElementById('done-message') as HTMLElement;
+  const errorMessage = document.getElementById('error-message') as HTMLElement;
+  const errorText = document.getElementById('error-text') as HTMLElement;
+  const unsupportedBanner = document.getElementById('unsupported-banner') as HTMLElement;
+
+  let currentFile: File | null = null;
+  let worker: Worker | null = null;
+
+  // Check WebCodecs Support
+  if (typeof VideoEncoder === 'undefined' || typeof VideoDecoder === 'undefined') {
+    unsupportedBanner.classList.remove('hidden');
+    dropZone.classList.add('opacity-50', 'pointer-events-none');
+  }
+
+  // Format selection logic (hide bitrate for WAV)
+  outFormat.addEventListener('change', () => {
+    if (outFormat.value === 'wav') {
+      bitrateContainer.classList.add('opacity-50', 'pointer-events-none');
+    } else {
+      bitrateContainer.classList.remove('opacity-50', 'pointer-events-none');
+    }
+  });
+
+  // Drag & Drop Handling
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-rose-500', 'bg-rose-100/50');
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-rose-500', 'bg-rose-100/50');
+  });
+  dropZone.addEventListener('drop', (e: DragEvent) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-rose-500', 'bg-rose-100/50');
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith('video/')) {
+      handleFile(file);
+    } else {
+      showError('動画ファイル（MP4, MOV等）を選択してください。');
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (file) handleFile(file);
+  });
+
+  function handleFile(file: File) {
+    currentFile = file;
+    fileNameEl.textContent = file.name;
+    settingsSection.classList.remove('hidden');
+    resetState();
+  }
+
+  function resetState() {
+    progressContainer.classList.add('hidden');
+    doneMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+    progressBar.style.width = '0%';
+    progressPct.textContent = '0%';
+    btnExtract.disabled = false;
+    btnExtract.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+
+  function showError(msg: string) {
+    progressContainer.classList.add('hidden');
+    errorMessage.classList.remove('hidden');
+    errorText.textContent = msg;
+    btnExtract.disabled = false;
+    btnExtract.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+
+  btnExtract.addEventListener('click', () => {
+    if (!currentFile) return;
+
+    resetState();
+    btnExtract.disabled = true;
+    btnExtract.classList.add('opacity-50', 'cursor-not-allowed');
+    progressContainer.classList.remove('hidden');
+
+    if (worker) {
+      worker.terminate();
+    }
+
+    worker = new Worker(
+      new URL('../../../workers/audio-extractor-worker.js', import.meta.url),
+      { type: 'module' }
+    );
+
+    worker.onmessage = (e: MessageEvent) => {
+      const { type, value, buffer, format, message } = e.data;
+
+      if (type === 'progress') {
+        const pct = Math.round(value * 100);
+        progressBar.style.width = `${pct}%`;
+        progressPct.textContent = `${pct}%`;
+      } else if (type === 'done') {
+        onExtractionDone(buffer, format);
+      } else if (type === 'error') {
+        showError(message);
+        worker?.terminate();
+      }
+    };
+
+    worker.onerror = (e) => {
+      showError('予期せぬエラーが発生しました: ' + e.message);
+      worker?.terminate();
+    };
+
+    worker.postMessage({
+      type: 'extract',
+      file: currentFile,
+      format: outFormat.value,
+      settings: {
+        bitrate: parseInt(outBitrate.value, 10)
+      }
+    });
+  });
+
+  function onExtractionDone(buffer: ArrayBuffer, format: string) {
+    progressBar.style.width = '100%';
+    progressPct.textContent = '100%';
+
+    setTimeout(() => {
+      progressContainer.classList.add('hidden');
+      doneMessage.classList.remove('hidden');
+      btnExtract.disabled = false;
+      btnExtract.classList.remove('opacity-50', 'cursor-not-allowed');
+    }, 800);
+
+    // Provide mime type mappings
+    const mimeTypes: Record<string, string> = {
+      'mp3': 'audio/mpeg',
+      'wav': 'audio/wav',
+      'aac': 'audio/aac'
+    };
+
+    const blob = new Blob([buffer], { type: mimeTypes[format] || 'audio/mpeg' });
+    const url = URL.createObjectURL(blob);
+    const baseName = currentFile!.name.replace(/\.[^/.]+$/, "");
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${baseName}_extracted.${format}`;
+    a.click();
+    
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    worker?.terminate();
+    worker = null;
+  }
+</script>

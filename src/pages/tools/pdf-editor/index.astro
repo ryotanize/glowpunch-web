@@ -1,0 +1,340 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout
+  title="PDF分割・結合・編集ツール - GlowPunch"
+  description="PDF内の全ページを見ながら、不要なページを削除したり、順番を並べ替えて一つに結合できるブラウザ完結型の安全なツールです。"
+>
+  <div class="flex flex-col gap-6">
+
+    <!-- Header -->
+    <div class="mb-2">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">
+        PDFの<span class="text-red-500">ページ編集・結合</span>ツール
+      </h1>
+      <p class="text-slate-600 text-lg">
+        複数のPDFを読み込み、ページ単位で表示します。ドラッグ＆ドロップでの並べ替えや不要なページの削除を行い、1つのPDFとしてエクスポートできます。すべてブラウザ内で完結するため安全です。
+      </p>
+    </div>
+
+    <!-- Drop Zone -->
+    <div
+      id="drop-zone"
+      class="glass-panel p-10 flex flex-col items-center justify-center gap-4 border-2 border-dashed border-red-300 bg-red-50/30 rounded-2xl cursor-pointer transition-all duration-200 hover:border-red-400 hover:bg-red-50/60 min-h-48"
+    >
+      <div id="drop-icon" class="w-16 h-16 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <p class="text-slate-700 font-semibold text-lg">複数のPDFファイルをドロップ</p>
+        <p class="text-slate-500 text-sm mt-1">追加していくことができます</p>
+      </div>
+      <input id="file-input" type="file" accept="application/pdf" multiple class="hidden" />
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-indicator" class="hidden glass-panel p-6 items-center justify-center gap-3">
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-red-500"></div>
+      <p class="text-slate-600 font-bold">PDFを解析中...</p>
+    </div>
+
+    <!-- Editor Section -->
+    <div id="editor-section" class="hidden flex flex-col gap-6">
+      
+      <div class="glass-panel p-6 flex flex-col gap-4 bg-slate-50">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              ページのプレビューと並び替え
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">「◀」「▶」で移動、ゴミ箱で削除できます。</p>
+          </div>
+          <span class="text-sm font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg" id="page-count">0 ページ</span>
+        </div>
+
+        <!-- Pages Grid -->
+        <div id="pages-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <!-- Page cards will be injected here -->
+        </div>
+
+        <!-- Action Button -->
+        <button
+          id="btn-merge"
+          class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-red-200/50 hover:-translate-y-0.5 mt-4"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          この順序でPDFを生成する
+        </button>
+
+        <!-- Status -->
+        <div id="status-message" class="hidden text-sm font-bold text-center mt-2 rounded p-3"></div>
+      </div>
+    </div>
+
+    <!-- Hidden canvas for rendering PDF pages -->
+    <canvas id="pdf-render-canvas" class="hidden"></canvas>
+
+    <div class="mt-4">
+      <AdSensePlaceholder slotId="pdf-editor-banner" />
+    </div>
+
+  </div>
+</BaseLayout>
+
+<script>
+  import { PDFDocument } from 'pdf-lib';
+  import * as pdfjsLib from 'pdfjs-dist';
+  import pdfWorkerURL from 'pdfjs-dist/build/pdf.worker.mjs?url';
+  
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerURL;
+
+  interface PdfPage {
+    id: string;
+    fileId: string;
+    sourceName: string;
+    pageIndex: number;
+    thumbnailUrl: string;
+    fileBytes: ArrayBuffer;
+  }
+
+  const dropZone = document.getElementById('drop-zone') as HTMLElement;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const editorSection = document.getElementById('editor-section') as HTMLElement;
+  const loadingIndicator = document.getElementById('loading-indicator') as HTMLElement;
+  const pagesGrid = document.getElementById('pages-grid') as HTMLElement;
+  const pageCount = document.getElementById('page-count') as HTMLElement;
+  const btnMerge = document.getElementById('btn-merge') as HTMLButtonElement;
+  const statusMessage = document.getElementById('status-message') as HTMLElement;
+  const canvas = document.getElementById('pdf-render-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d');
+
+  let pages: PdfPage[] = [];
+
+  // Drag & drop setup
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-red-500', 'bg-red-100/50'); });
+  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-red-500', 'bg-red-100/50'); });
+  dropZone.addEventListener('drop', (e: DragEvent) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-red-500', 'bg-red-100/50');
+    const droppedFiles = Array.from(e.dataTransfer?.files || []);
+    handleFiles(droppedFiles);
+  });
+  fileInput.addEventListener('change', () => {
+    const selectedFiles = Array.from(fileInput.files || []);
+    handleFiles(selectedFiles);
+    fileInput.value = '';
+  });
+
+  async function handleFiles(newFiles: File[]) {
+    const pdfs = newFiles.filter(f => f.type === 'application/pdf');
+    if (pdfs.length === 0) return;
+    
+    loadingIndicator.classList.remove('hidden');
+    loadingIndicator.classList.add('flex');
+    btnMerge.disabled = true;
+
+    try {
+      for (const file of pdfs) {
+        const fileBytes = await file.arrayBuffer();
+        const fileId = Math.random().toString(36).substr(2, 9);
+        
+        // Load with pdf.js to render thumbnails
+        const loadingTask = pdfjsLib.getDocument({ data: fileBytes.slice(0) }); // duplicate ArrayBuffer
+        const pdf = await loadingTask.promise;
+        const totalPages = pdf.numPages;
+
+        for (let i = 1; i <= totalPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.0 });
+          
+          // scale down for thumbnail
+          const scale = 200 / viewport.width;
+          const scaledViewport = page.getViewport({ scale: scale });
+
+          canvas.width = scaledViewport.width;
+          canvas.height = scaledViewport.height;
+
+          await page.render({
+            canvasContext: ctx!,
+            viewport: scaledViewport
+          }).promise;
+
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          
+          pages.push({
+            id: Math.random().toString(36).substr(2, 9),
+            fileId,
+            sourceName: file.name,
+            pageIndex: i - 1, // 0-indexed for pdf-lib
+            thumbnailUrl: dataUrl,
+            fileBytes
+          });
+        }
+      }
+      
+      editorSection.classList.remove('hidden');
+      renderPages();
+    } catch (err) {
+      console.error(err);
+      alert('PDFの読み込みに失敗しました。');
+    }
+
+    loadingIndicator.classList.add('hidden');
+    loadingIndicator.classList.remove('flex');
+    btnMerge.disabled = pages.length === 0;
+  }
+
+  function movePageRank(index: number, direction: 'left' | 'right') {
+    if (direction === 'left' && index > 0) {
+      const temp = pages[index];
+      pages[index] = pages[index - 1];
+      pages[index - 1] = temp;
+    } else if (direction === 'right' && index < pages.length - 1) {
+      const temp = pages[index];
+      pages[index] = pages[index + 1];
+      pages[index + 1] = temp;
+    }
+    renderPages();
+  }
+
+  function removePage(index: number) {
+    if (confirm('このページを削除してよろしいですか？')) {
+      pages.splice(index, 1);
+      renderPages();
+      if (pages.length === 0) {
+         editorSection.classList.add('hidden');
+      }
+      btnMerge.disabled = pages.length === 0;
+    }
+  }
+
+  function renderPages() {
+    pagesGrid.innerHTML = '';
+    pageCount.textContent = `${pages.length} ページ`;
+
+    pages.forEach((p, idx) => {
+      const card = document.createElement('div');
+      card.className = "flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden group";
+
+      // Thumbnail wrapper
+      const thumbWrap = document.createElement('div');
+      thumbWrap.className = "relative aspect-[1/1.414] bg-slate-100 flex items-center justify-center p-2 border-b border-slate-200 group-hover:bg-slate-200 transition-colors";
+      
+      const img = document.createElement('img');
+      img.src = p.thumbnailUrl;
+      img.className = "max-w-full max-h-full object-contain shadow-sm bg-white";
+      
+      // Top overlay controls (delete)
+      const topOverlay = document.createElement('div');
+      topOverlay.className = "absolute top-2 right-2 flex opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 rounded shadow-sm";
+      const btnDel = document.createElement('button');
+      btnDel.className = "p-1.5 text-red-500 hover:bg-red-50 rounded";
+      btnDel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
+      btnDel.onclick = () => removePage(idx);
+      topOverlay.appendChild(btnDel);
+
+      // Bottom overlay controls (move)
+      const botOverlay = document.createElement('div');
+      botOverlay.className = "absolute bottom-2 left-2 right-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity";
+      
+      const btnLeft = document.createElement('button');
+      btnLeft.className = `p-1 bg-white/90 text-slate-700 rounded shadow hover:bg-slate-100 ${idx === 0 ? 'invisible' : ''}`;
+      btnLeft.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+      btnLeft.onclick = () => movePageRank(idx, 'left');
+
+      const btnRight = document.createElement('button');
+      btnRight.className = `p-1 bg-white/90 text-slate-700 rounded shadow hover:bg-slate-100 ${idx === pages.length - 1 ? 'invisible' : ''}`;
+      btnRight.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+      btnRight.onclick = () => movePageRank(idx, 'right');
+
+      botOverlay.appendChild(btnLeft);
+      botOverlay.appendChild(btnRight);
+
+      thumbWrap.appendChild(img);
+      thumbWrap.appendChild(topOverlay);
+      thumbWrap.appendChild(botOverlay);
+
+      // Label info
+      const infoDiv = document.createElement('div');
+      infoDiv.className = "p-2 flex flex-col gap-0.5 bg-white";
+      
+      const badge = document.createElement('div');
+      badge.className = "text-[10px] uppercase font-bold text-slate-400";
+      badge.textContent = `Page ${idx + 1}`;
+
+      const name = document.createElement('div');
+      name.className = "text-[10px] text-slate-600 truncate";
+      name.textContent = p.sourceName;
+
+      infoDiv.appendChild(badge);
+      infoDiv.appendChild(name);
+
+      card.appendChild(thumbWrap);
+      card.appendChild(infoDiv);
+      pagesGrid.appendChild(card);
+    });
+  }
+
+  btnMerge.addEventListener('click', async () => {
+    if (pages.length === 0) return;
+
+    btnMerge.disabled = true;
+    btnMerge.classList.add('opacity-50');
+    showStatus('PDFを生成しています...', 'info');
+
+    try {
+      const mergedPdf = await PDFDocument.create();
+      // Cache loaded docs to avoid parsing the same ArrayBuffer multiple times
+      const docCache = new Map<string, any>();
+
+      for (const p of pages) {
+        let pdfDoc = docCache.get(p.fileId);
+        if (!pdfDoc) {
+          pdfDoc = await PDFDocument.load(p.fileBytes);
+          docCache.set(p.fileId, pdfDoc);
+        }
+        
+        const copied = await mergedPdf.copyPages(pdfDoc, [p.pageIndex]);
+        mergedPdf.addPage(copied[0]);
+      }
+
+      const pdfBytes = await mergedPdf.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `combined_pdf_${Date.now()}.pdf`;
+      a.click();
+      
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      showStatus('処理が完了しました！ダウンロードを開始しました。', 'success');
+
+    } catch (error) {
+      console.error(error);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      showStatus(`生成中にエラーが発生しました: ${errMsg}`, 'error');
+    }
+
+    btnMerge.disabled = false;
+    btnMerge.classList.remove('opacity-50');
+  });
+
+  function showStatus(msg: string, type: 'info' | 'success' | 'error') {
+    statusMessage.classList.remove('hidden', 'bg-blue-50', 'text-blue-600', 'bg-emerald-50', 'text-emerald-600', 'bg-red-50', 'text-red-600');
+    if (type === 'info') statusMessage.classList.add('bg-blue-50', 'text-blue-600');
+    else if (type === 'success') statusMessage.classList.add('bg-emerald-50', 'text-emerald-600');
+    else if (type === 'error') statusMessage.classList.add('bg-red-50', 'text-red-600');
+    statusMessage.textContent = msg;
+  }
+</script>

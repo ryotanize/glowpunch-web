@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.2",
     "@imgly/background-removal": "^1.7.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
@@ -21,6 +22,8 @@
     "gpt-tokenizer": "^3.4.0",
     "jszip": "^3.10.1",
     "mediabunny": "^1.40.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.6.205",
     "tailwindcss": "^4.2.2"
   }
 }
