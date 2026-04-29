@@ -124,24 +124,89 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="audio-loudness-banner" />
     </div>
 
-    <article class="prose prose-slate mt-8 max-w-none border-t border-slate-200 pt-10">
-      <h2>動画広告入稿に欠かせない「ラウドネス調整」をブラウザで</h2>
-      <p>
-        YouTubeなどの動画プラットフォームや動画広告入稿時に「ラウドネス値が規定を超えています」というエラーで差し戻されたことはありませんか？
-        デジタル放送やインターネット動画配信の世界では、番組や広告の間で音量差が生じないよう、聴感上の音量を測る「ラウドネス値（LKFS/LUFS）」という基準が設けられています。
-      </p>
-      <h3>主な特徴</h3>
-      <ul>
-        <li><strong>EBU R128準拠の測定</strong>：国際規格に基づいた正確な Integrated Loudness（統合ラウドネス）を算出します。</li>
-        <li><strong>自動ノーマライズ</strong>：目標値（-24.0 LKFS）までの差分を計算し、一括で音量を調整して再出力します。</li>
-        <li><strong>プライバシー保護</strong>：解析・調整処理はすべてあなたのブラウザ上で行われます。動画データが外部のサーバーに送信されることはありません。</li>
-      </ul>
-      <p>
-        ※本ツールは全体の音量（ゲイン）を一定比率で変更するノーマライズ処理を行います。極端に音量の起伏が激しい動画の場合、ラウドネスは適合してもピーク音量（True Peak）が 0dB を超えて歪む可能性があるため、歪みが発生する場合は元の動画でのコンプレッサー処理をお勧めします。
-      </p>
-    </article>
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" open>
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>動画ラウドネスチェッカーについて（FAQ・解説）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>動画広告入稿に欠かせない「ラウドネス調整」をブラウザで</h3>
+            <p>
+              YouTubeなどの動画プラットフォームやWebCMを入稿する際、「ラウドネス値が規定を超えています」というエラーで差し戻されたことはありませんか？
+              当ツールは、EBU R128準拠の正確な測定を行い、目標値（-24.0 LKFS等）に一括ノーマライズする完全無料のブラウザ完結型ツールです。
+            </p>
+
+            <h3>よくある質問 (FAQ)</h3>
+            
+            <h4>Q. なぜYouTubeなどの動画サイトで音量が勝手に下がるのですか？</h4>
+            <p>A. YouTubeなどの主要動画プラットフォームでは、<strong>ラウドネスノーマライゼーション</strong>という機能が働いています。動画の元の音量が大きすぎる（ラウドネス規定値を超えている）場合、他の動画と極端な音量差が出ないようにプラットフォーム側で自動的に音量を下げて再生されます。クリエイターが意図した迫力ある音量感で視聴者に届けるには、投稿前の適切なラウドネス調整が非常に重要です。</p>
+
+            <h4>Q. TVerやWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？</h4>
+            <p>A. デジタルテレビ放送やインターネット配信において、番組やCMが切り替わった際の「音量差による視聴者の不快感」をなくすための国際基準値です。日本国内の主要な動画広告入稿フォーマットでは「<strong>-24.0 LKFS</strong>（許容誤差±1dB以内）」が厳格な基準として運用されており、これに準拠しないファイルは入稿システムでエラーとなります。</p>
+
+            <h4>Q. アップロードした動画や音声データはサーバーに保存されますか？</h4>
+            <p>A. いいえ、当ツールは完全にプロのクリエイター向けに設計されており、<strong>処理はすべてブラウザ内（あなたの端末上）で完結</strong>します。動画データが外部のサーバーにアップロード・保存されることは一切ないため、発表前の未公開MV、社外秘のWebCM素材、個人情報を含む動画などでも安全にご利用いただけます。</p>
+            
+            <p class="text-sm mt-8 p-4 bg-slate-50 rounded-lg border border-slate-100">
+              ※本ツールは動画のオーディオトラック全体の音量（ゲイン）を一定比率で変更するノーマライズ処理を行います。極端に音量の起伏が激しい動画の場合、ラウドネスは指定値に適合してもピーク音量（True Peak）が 0dB を超え、音割れ（クリッピング歪み）が発生する可能性があります。その場合は、動画編集ソフト等で事前にコンプレッサーやリミッター処理を行うことを強く推奨します。
+            </p>
+          </div>
+        </div>
+      </details>
+    </div>
 
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "動画ラウドネスチェッカー＆ノーマライザー",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "動画音声のラウドネス値（LKFS/LUFS）をブラウザ上で測定し、主要な入稿規定に合わせた-24.0 LKFSに自動調整（ノーマライズ）する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "なぜYouTubeなどの動画サイトで音量が勝手に下がるのですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "YouTubeなどの主要動画プラットフォームでは、ラウドネスノーマライゼーションという機能が働いています。動画の元の音量が大きすぎる（ラウドネス規定値を超えている）場合、他の動画と極端な音量差が出ないようにプラットフォーム側で自動的に音量を下げて再生されます。クリエイターが意図した迫力ある音量感で視聴者に届けるには、投稿前の適切なラウドネス調整が非常に重要です。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "TVerやWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "デジタルテレビ放送やインターネット配信において、番組やCMが切り替わった際の「音量差による視聴者の不快感」をなくすための国際基準値です。日本国内の主要な動画広告入稿フォーマットでは「-24.0 LKFS（許容誤差±1dB以内）」が厳格な基準として運用されており、これに準拠しないファイルは入稿システムでエラーとなります。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "アップロードした動画や音声データはサーバーに保存されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、当ツールは完全にプロのクリエイター向けに設計されており、処理はすべてブラウザ内（あなたの端末上）で完結します。動画データが外部のサーバーにアップロード・保存されることは一切ないため、発表前の未公開MV、社外秘のWebCM素材、個人情報を含む動画などでも安全にご利用いただけます。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

@@ -112,18 +112,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
         プライバシーを守りながら、クリエイティブな作業をお楽しみください。
       </p>
     </article>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>メッシュグラデーション生成ツールについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>メッシュグラデーション生成ツールについて</h3>
+            <p>Webサイトの背景やSNS用ビジュアルに使える、幻想的で美しいメッシュグラデーションをブラウザ上で作成・ダウンロードできるツールです。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. メッシュグラデーションとは何ですか？</h4>
+            <p>A. 通常のグラデーション（2色の直線的な変化）と異なり、複数の色が不規則に溶け合うような自然で美しいグラデーションのことです。AppleやInstagramなどの有名ブランドがロゴや背景に採用しています。</p>
+
+            <h4>Q. どのような形式で書き出せますか？</h4>
+            <p>A. CSS（コピー＆ペーストでWebサイトに使用可能）、SVG、PNG画像の3形式に対応しています。</p>
+
+            <h4>Q. 商用利用はできますか？</h4>
+            <p>A. はい、当ツールで生成したグラデーション画像は個人・商用問わず自由にお使いいただけます。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
 
-  <!-- SVG Filter Definition for Noise -->
-  <svg class="hidden">
-    <filter id="noiseFilter">
-      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-      <feColorMatrix type="saturate" values="0" />
-    </filter>
-  </svg>
-
-  <!-- Dummy Canvas for PNG export -->
-  <canvas id="export-canvas" class="hidden"></canvas>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "Glow Mesh Generator",
+          "operatingSystem": "All",
+          "applicationCategory": "DesignApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "美しいメッシュグラデーションを直感的に作成し、CSS/SVG/PNG形式で書き出せる無料デザインツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "メッシュグラデーションとは何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "通常のグラデーション（2色の直線的な変化）と異なり、複数の色が不規則に溶け合うような自然で美しいグラデーションのことです。AppleやInstagramなどの有名ブランドがロゴや背景に採用しています。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "どのような形式で書き出せますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "CSS（コピー＆ペーストでWebサイトに使用可能）、SVG、PNG画像の3形式に対応しています。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "商用利用はできますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、当ツールで生成したグラデーション画像は個人・商用問わず自由にお使いいただけます。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <style is:global>

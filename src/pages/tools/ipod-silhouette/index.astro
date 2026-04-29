@@ -94,7 +94,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     <div class="mt-4">
       <AdSensePlaceholder slotId="retro-silhouette-bottom" />
     </div>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>レトロシルエットメーカーについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>レトロシルエットメーカーについて</h3>
+            <p>2000年代のApple iPod CMで一世を風靡した「ビビッドカラーの背景に黒いシルエットが踊る」あのスタイルの画像を、AI技術で誰でも簡単に作れるツールです。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. どのような画像が向いていますか？</h4>
+            <p>A. 人物が写っている写真が最も映えます。ダンスポーズ、ジャンプしている写真、楽器を演奏している写真など、動きのあるポーズだとよりCM風の仕上がりになります。</p>
+
+            <h4>Q. イヤホンの線は自動で描かれますか？</h4>
+            <p>A. 背景色の設定とシルエット化はAIが自動で行いますが、白いイヤホンの線は手動で描画する機能を搭載しています。マウスやタッチ操作で自由に描けます。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、AI処理を含むすべてがブラウザ内で完結します。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "レトロシルエットメーカー",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "画像からAIが被写体を切り抜き、iPod CM風のビビッド背景×黒塗りシルエット画像を自動生成する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "どのような画像が向いていますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "人物が写っている写真が最も映えます。ダンスポーズ、ジャンプしている写真、楽器を演奏している写真など、動きのあるポーズだとよりCM風の仕上がりになります。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "イヤホンの線は自動で描かれますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "背景色の設定とシルエット化はAIが自動で行いますが、白いイヤホンの線は手動で描画する機能を搭載しています。マウスやタッチ操作で自由に描けます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、AI処理を含むすべてがブラウザ内で完結します。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

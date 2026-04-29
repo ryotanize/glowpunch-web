@@ -75,7 +75,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="tool-bottom-banner" />
     </div>
 
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>AI背景透過ツールについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>AI背景透過ツールについて</h3>
+            <p>写真やイラストの背景をワンクリックで透過処理できるAI搭載の無料ツールです。ECサイトの商品画像、SNS用のプロフィール画像、プレゼン資料の素材作りなど幅広い用途にお使いいただけます。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. どのような画像形式に対応していますか？</h4>
+            <p>A. PNG、JPEG、WebPなど主要な画像形式に対応しています。出力は透過情報を保持できるPNG形式となります。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、AI処理を含むすべての処理がブラウザ内で完結します。画像データが外部に送信されることはありません。</p>
+
+            <h4>Q. 複雑な背景でも綺麗に切り抜けますか？</h4>
+            <p>A. 当ツールは高精度なAIセグメンテーションモデルを使用しており、人物・動物・商品など多くの被写体で高品質な切り抜きが可能です。ただし、被写体と背景の色が非常に似ている場合は精度が低下する場合があります。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "AI 背景透過ツール",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "画像をアップロードするだけでAIが被写体を判別し、背景を自動で透過処理する無料ツールです。ブラウザ完結。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "どのような画像形式に対応していますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "PNG、JPEG、WebPなど主要な画像形式に対応しています。出力は透過情報を保持できるPNG形式となります。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、AI処理を含むすべての処理がブラウザ内で完結します。画像データが外部に送信されることはありません。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "複雑な背景でも綺麗に切り抜けますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "当ツールは高精度なAIセグメンテーションモデルを使用しており、人物・動物・商品など多くの被写体で高品質な切り抜きが可能です。ただし、被写体と背景の色が非常に似ている場合は精度が低下する場合があります。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

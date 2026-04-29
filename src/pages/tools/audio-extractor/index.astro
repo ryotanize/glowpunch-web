@@ -146,7 +146,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       </p>
     </article>
 
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>音声抽出ツールについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>音声抽出ツールについて</h3>
+            <p>動画ファイルから音声だけを取り出して保存できるツールです。会議録音の抽出、音楽ファイルの変換、ポッドキャスト素材の作成など、さまざまな場面で活用できます。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. 出力できる音声形式は？</h4>
+            <p>A. MP3、WAV、AACの3形式に対応しています。用途に合わせて最適な形式をお選びいただけます。</p>
+
+            <h4>Q. 動画データはサーバーに送信されますか？</h4>
+            <p>A. いいえ、すべての処理はブラウザ内で完結します。機密動画や個人的な映像でも安心してご利用いただけます。</p>
+
+            <h4>Q. 長時間の動画からも抽出できますか？</h4>
+            <p>A. はい、ブラウザのメモリが許す範囲であれば長時間の動画にも対応しています。ただし、100MB超の大容量ファイルの場合は処理に時間がかかることがあります。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "動画の音声抽出ツール",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "動画ファイルから音声をMP3/WAV/AAC形式で高速に抽出する無料ツールです。ブラウザ完結で安全。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "出力できる音声形式は？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MP3、WAV、AACの3形式に対応しています。用途に合わせて最適な形式をお選びいただけます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "動画データはサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理はブラウザ内で完結します。機密動画や個人的な映像でも安心してご利用いただけます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "長時間の動画からも抽出できますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、ブラウザのメモリが許す範囲であれば長時間の動画にも対応しています。ただし、100MB超の大容量ファイルの場合は処理に時間がかかることがあります。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

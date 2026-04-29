@@ -21,6 +21,7 @@
     "astro": "^6.1.5",
     "gpt-tokenizer": "^3.4.0",
     "jszip": "^3.10.1",
+    "konva": "^10.2.5",
     "mediabunny": "^1.40.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.6.205",

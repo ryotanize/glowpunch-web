@@ -66,7 +66,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       </ul>
       <p>API費用の見積もりや、コンテキストウィンドウの制限確認にご活用ください。</p>
     </article>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>LLMトークンカウンターについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>LLMトークンカウンターについて</h3>
+            <p>ChatGPTやGPT-4などの大規模言語モデル（LLM）を利用する際、APIコストの見積もりやコンテキストウィンドウの管理に欠かせないトークン数の計測を、ブラウザ内で安全に行えるツールです。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. トークンとは何ですか？</h4>
+            <p>A. トークンとは、LLM（大規模言語モデル）がテキストを処理する際の最小単位です。英語では1単語が1〜2トークン、日本語では1文字が1〜3トークン程度になります。APIの料金はトークン数に基づいて計算されるため、事前にトークン数を把握することがコスト管理に重要です。</p>
+
+            <h4>Q. 入力したプロンプトはサーバーに送信されますか？</h4>
+            <p>A. いいえ、すべての処理はブラウザ内で完結します。機密性の高いプロンプトや業務データでも安心してトークン数を確認できます。</p>
+
+            <h4>Q. どのモデルのトークナイザーに対応していますか？</h4>
+            <p>A. 現在はOpenAIのGPTシリーズ（GPT-4 / GPT-3.5等）で使用されるtiktokenベースのトークナイザーに対応しています。Claude等の他モデルとはトークン数が異なる場合があります。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "LLMトークンカウンター",
+          "operatingSystem": "All",
+          "applicationCategory": "UtilitiesApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "ChatGPT等のLLM向けにプロンプトのトークン数をブラウザ内で安全に計算する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "トークンとは何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "トークンとは、LLM（大規模言語モデル）がテキストを処理する際の最小単位です。英語では1単語が1〜2トークン、日本語では1文字が1〜3トークン程度になります。APIの料金はトークン数に基づいて計算されるため、事前にトークン数を把握することがコスト管理に重要です。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "入力したプロンプトはサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理はブラウザ内で完結します。機密性の高いプロンプトや業務データでも安心してトークン数を確認できます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "どのモデルのトークナイザーに対応していますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "現在はOpenAIのGPTシリーズ（GPT-4 / GPT-3.5等）で使用されるtiktokenベースのトークナイザーに対応しています。Claude等の他モデルとはトークン数が異なる場合があります。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

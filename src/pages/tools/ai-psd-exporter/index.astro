@@ -97,7 +97,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     <div class="mt-4">
       <AdSensePlaceholder slotId="ai-psd-exporter-bottom" />
     </div>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>AI レイヤー分割ツールについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>AI レイヤー分割ツールについて</h3>
+            <p>写真やイラストをアップロードするだけで、AIが人物・背景・物体などを自動的に認識・分割し、各パーツを独立したレイヤーとして持つPSDファイルを生成します。Photoshopでの後加工が格段に楽になります。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. PSDファイルとは何ですか？</h4>
+            <p>A. Adobe Photoshopのネイティブファイル形式で、複数のレイヤー（重ね合わせた画像層）を保持できます。当ツールで生成したPSDはPhotoshopやGIMPなどの画像編集ソフトで開けます。</p>
+
+            <h4>Q. どのような画像でもレイヤー分割できますか？</h4>
+            <p>A. AIが「意味のある領域」を自動認識するため、人物写真、風景写真、イラストなど幅広い画像に対応しています。ただし、非常にシンプルな画像や抽象的なパターンでは分割精度が低下する場合があります。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、AI推論を含むすべての処理がブラウザ内で完結します。未公開のデザインデータでも安心です。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "AI 自動レイヤー分割＆PSD生成",
+          "operatingSystem": "All",
+          "applicationCategory": "DesignApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "画像をAIが意味推論してパーツごとに自動分割し、レイヤー付きPSDファイルとして保存する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "PSDファイルとは何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Adobe Photoshopのネイティブファイル形式で、複数のレイヤー（重ね合わせた画像層）を保持できます。当ツールで生成したPSDはPhotoshopやGIMPなどの画像編集ソフトで開けます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "どのような画像でもレイヤー分割できますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "AIが「意味のある領域」を自動認識するため、人物写真、風景写真、イラストなど幅広い画像に対応しています。ただし、非常にシンプルな画像や抽象的なパターンでは分割精度が低下する場合があります。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、AI推論を含むすべての処理がブラウザ内で完結します。未公開のデザインデータでも安心です。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

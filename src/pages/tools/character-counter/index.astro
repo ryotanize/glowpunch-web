@@ -66,7 +66,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       </ul>
       <p>ぜひブックマークして、毎日の作業にお役立てください！</p>
     </article>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>文字数カウンターについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>文字数カウンターについて</h3>
+            <p>レポートやSNS投稿、ブログ記事の文字数制限チェックに便利な、完全無料のブラウザ完結型テキスト解析ツールです。入力テキストが外部に送信されることは一切ありません。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. スマホからでも使えますか？</h4>
+            <p>A. はい、スマートフォン・タブレット・PCなど、モダンブラウザが動作するすべてのデバイスでご利用いただけます。アプリのインストールも不要です。</p>
+
+            <h4>Q. 入力したテキストはサーバーに送信されますか？</h4>
+            <p>A. いいえ、すべての処理はお使いのブラウザ内で完結します。入力データが外部に送信・保存されることは一切ないため、機密文書や個人情報を含むテキストでも安心してお使いいただけます。</p>
+
+            <h4>Q. 文字数のカウント方式はどうなっていますか？</h4>
+            <p>A. 全角・半角を問わず1文字として数えます。改行コードは行数としてカウントされ、空白除外文字数では半角スペース・全角スペース・タブ・改行を除いた純粋な文字数を表示します。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "文字数カウンター",
+          "operatingSystem": "All",
+          "applicationCategory": "UtilitiesApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "入力したテキストの文字数、単語数、行数、空白除外文字数を瞬時にカウントする無料ブラウザツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "スマホからでも使えますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、スマートフォン・タブレット・PCなど、モダンブラウザが動作するすべてのデバイスでご利用いただけます。アプリのインストールも不要です。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "入力したテキストはサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理はお使いのブラウザ内で完結します。入力データが外部に送信・保存されることは一切ないため、機密文書や個人情報を含むテキストでも安心してお使いいただけます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "文字数のカウント方式はどうなっていますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "全角・半角を問わず1文字として数えます。改行コードは行数としてカウントされ、空白除外文字数では半角スペース・全角スペース・タブ・改行を除いた純粋な文字数を表示します。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

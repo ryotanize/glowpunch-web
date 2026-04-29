@@ -4,9 +4,11 @@ const currentYear = new Date().getFullYear();
 <footer class="w-full py-12 mt-auto border-t border-slate-200 bg-slate-50 text-slate-500 text-sm">
   <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
     <div>
-      &copy; {currentYear} GlowPunch. All rights reserved.
+      &copy; {currentYear} GlowPunch運営事務局. All rights reserved.
     </div>
-    <div class="flex gap-6">
+    <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+      <a href="/about" class="hover:text-sky-500 transition-colors">運営者情報</a>
+      <a href="/contact" class="hover:text-sky-500 transition-colors">お問い合わせ</a>
       <a href="/privacy-policy" class="hover:text-sky-500 transition-colors">プライバシーポリシー</a>
       <a href="/disclaimer" class="hover:text-sky-500 transition-colors">免責事項</a>
     </div>

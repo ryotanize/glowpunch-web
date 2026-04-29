@@ -162,10 +162,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
         すべての作業はローカル環境で行われるため、社外秘の情報が含まれる開発画面などでも、安心して加工いただけます。
       </p>
     </article>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>GlowFrameについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>GlowFrameについて</h3>
+            <p>アプリやWebサイトのスクリーンショットを、プロフェッショナルな見た目に仕上げるツールです。ブログのアイキャッチ画像、ポートフォリオ、SNS投稿用の素材作りに最適です。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. どのような装飾ができますか？</h4>
+            <p>A. グラデーション背景、ウィンドウフレーム（macOS風のドットバー付き）、角丸、パディングなどを自由にカスタマイズできます。複数のプリセットも用意しています。</p>
+
+            <h4>Q. 出力画像の解像度は？</h4>
+            <p>A. 高解像度のPNG画像として出力されます。Retinaディスプレイ対応で、ブログやSNSに掲載しても美しく表示されます。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、すべての処理がブラウザ内で完結します。業務上のスクリーンショット等でも安心してお使いいただけます。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
 
-  <!-- Hidden elements for Canvas Export -->
-  <canvas id="export-canvas" class="hidden"></canvas>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "GlowFrame - スクリーンショット装飾ツール",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "スクリーンショットを美しい背景やウィンドウフレームで装飾し、SNS映えする画像を作成する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "どのような装飾ができますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "グラデーション背景、ウィンドウフレーム（macOS風のドットバー付き）、角丸、パディングなどを自由にカスタマイズできます。複数のプリセットも用意しています。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "出力画像の解像度は？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "高解像度のPNG画像として出力されます。Retinaディスプレイ対応で、ブログやSNSに掲載しても美しく表示されます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理がブラウザ内で完結します。業務上のスクリーンショット等でも安心してお使いいただけます。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <style is:global>
