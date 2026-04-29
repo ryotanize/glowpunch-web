@@ -114,7 +114,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     <div class="mt-4">
       <AdSensePlaceholder slotId="frame-extractor-banner" />
     </div>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>動画フレーム抽出ツールについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>動画フレーム抽出ツールについて</h3>
+            <p>動画の好きな瞬間を高品質な静止画として保存できるツールです。YouTubeサムネイル用の画像作成、プレゼン資料への動画キャプチャ挿入、SNS投稿用の写真素材作りなどに最適です。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. どのような動画形式に対応していますか？</h4>
+            <p>A. MP4、WebM、MOVなど、ブラウザが再生可能な主要な動画形式に対応しています。</p>
+
+            <h4>Q. 抽出した画像の解像度はどうなりますか？</h4>
+            <p>A. 元の動画と同じ解像度（フルHD動画なら1920×1080px）で抽出されます。画質の劣化はありません。</p>
+
+            <h4>Q. 連続フレーム抽出とは何ですか？</h4>
+            <p>A. 指定した間隔（例：1秒ごと）で動画全体からフレームを連続抽出し、ZIP形式でまとめてダウンロードできる機能です。タイムラプス素材の作成や動画の内容確認に便利です。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "動画フレーム抽出ツール",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "動画から特定のシーンを高画質画像として切り出す無料ツールです。サムネイル作成やZIPでの連続抽出にも対応。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "どのような動画形式に対応していますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MP4、WebM、MOVなど、ブラウザが再生可能な主要な動画形式に対応しています。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "抽出した画像の解像度はどうなりますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "元の動画と同じ解像度（フルHD動画なら1920×1080px）で抽出されます。画質の劣化はありません。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "連続フレーム抽出とは何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "指定した間隔（例：1秒ごと）で動画全体からフレームを連続抽出し、ZIP形式でまとめてダウンロードできる機能です。タイムラプス素材の作成や動画の内容確認に便利です。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

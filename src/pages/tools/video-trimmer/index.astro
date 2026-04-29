@@ -170,7 +170,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="video-trimmer-banner" />
     </div>
 
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>動画トリマーについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>動画トリマーについて</h3>
+            <p>動画の時間的なトリミング（不要な前後のカット）と、画面のクロッピング（縦長・横長への変換）をブラウザだけで行える無料ツールです。SNS投稿やプレゼン用動画の調整に最適です。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. スマホ向け縦動画(9:16)に変換できますか？</h4>
+            <p>A. はい、Instagram Reels/TikTok向けの9:16、Instagram投稿向けの1:1、YouTube向けの16:9など、主要なアスペクト比への変換に対応しています。</p>
+
+            <h4>Q. 動画はサーバーに送信されますか？</h4>
+            <p>A. いいえ、すべての処理がブラウザ内で完結します。動画データが外部に送信されることはありません。</p>
+
+            <h4>Q. 画質は劣化しますか？</h4>
+            <p>A. ブラウザ内での再エンコード処理となるため、若干の画質変化が生じる場合があります。元の動画と比べて大幅な劣化にはなりませんが、プロ用途には専用ソフトとの併用を推奨します。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "スマート動画クロッパー＆トリマー",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "動画の不要部分のカットやアスペクト比の変更をブラウザ内で完結させる無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "スマホ向け縦動画(9:16)に変換できますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、Instagram Reels/TikTok向けの9:16、Instagram投稿向けの1:1、YouTube向けの16:9など、主要なアスペクト比への変換に対応しています。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "動画はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理がブラウザ内で完結します。動画データが外部に送信されることはありません。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画質は劣化しますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "ブラウザ内での再エンコード処理となるため、若干の画質変化が生じる場合があります。元の動画と比べて大幅な劣化にはなりませんが、プロ用途には専用ソフトとの併用を推奨します。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

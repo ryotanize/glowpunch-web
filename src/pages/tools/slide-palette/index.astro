@@ -92,7 +92,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="palette-bottom-banner" />
     </div>
 
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>スライドパレットについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>スライドパレットについて</h3>
+            <p>プレゼン資料のデザインで「色選びに悩む」問題を解決するツールです。参考画像やブランドロゴをアップロードするだけで、統一感のあるカラーパレットを自動生成します。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. どのように色を抽出していますか？</h4>
+            <p>A. K-meansクラスタリングというアルゴリズムを使用して、画像内の支配的な色を自動的に分析・抽出します。</p>
+
+            <h4>Q. 抽出した色をGoogleスライドで使うには？</h4>
+            <p>A. 各色のHEXカラーコード（例: #FF5733）をコピーし、Googleスライドの色選択画面で「カスタム」を選んで貼り付けるだけです。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、色抽出の処理はすべてブラウザ内で行われます。画像データが外部に送信されることはありません。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "スライドパレット",
+          "operatingSystem": "All",
+          "applicationCategory": "DesignApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "画像から色を自動抽出し、GoogleスライドやPowerPointで使えるカラーパレットを生成する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "どのように色を抽出していますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "K-meansクラスタリングというアルゴリズムを使用して、画像内の支配的な色を自動的に分析・抽出します。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "抽出した色をGoogleスライドで使うには？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "各色のHEXカラーコード（例: #FF5733）をコピーし、Googleスライドの色選択画面で「カスタム」を選んで貼り付けるだけです。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、色抽出の処理はすべてブラウザ内で行われます。画像データが外部に送信されることはありません。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

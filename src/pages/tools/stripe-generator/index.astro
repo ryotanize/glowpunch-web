@@ -124,7 +124,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="stripe-bottom-banner" />
     </div>
 
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>ストライプジェネレーターについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>ストライプジェネレーターについて</h3>
+            <p>写真やイラストから色を抽出し、それらの色を使ったおしゃれなストライプパターンを自動生成するデザインツールです。壁紙やSNSカバー画像の作成に最適です。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. どのような画像からストライプを作れますか？</h4>
+            <p>A. どんな画像でもOKです。風景写真、ファッション写真、アート作品など、お好みの画像をアップロードすると、その画像の色合いを反映したストライプパターンが生成されます。</p>
+
+            <h4>Q. 生成した画像は商用利用できますか？</h4>
+            <p>A. はい、当ツールで生成したストライプ画像は個人・商用問わずご利用いただけます。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、すべての処理がブラウザ内で完結します。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "AI ストライプジェネレーター",
+          "operatingSystem": "All",
+          "applicationCategory": "DesignApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "画像から色を抽出し、Paul Smith風のハイブランドなストライプ画像を自動生成する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "どのような画像からストライプを作れますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "どんな画像でもOKです。風景写真、ファッション写真、アート作品など、お好みの画像をアップロードすると、その画像の色合いを反映したストライプパターンが生成されます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "生成した画像は商用利用できますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、当ツールで生成したストライプ画像は個人・商用問わずご利用いただけます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理がブラウザ内で完結します。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

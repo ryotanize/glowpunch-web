@@ -235,28 +235,88 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="video-optimizer-banner" />
     </div>
 
-    <!-- SEO Article -->
-    <article class="prose prose-slate mt-8 max-w-none border-t border-slate-200 pt-10">
-      <h2>動画広告の入稿規定エラーをブラウザで解決</h2>
-      <p>
-        主要な動画プラットフォームやSNS広告などに動画を入稿する際、「解像度が規定外」「フレームレートが非対応」「ビットレートが高すぎる」といったエラーに悩んだことはありませんか？
-        このツールは、そんな動画広告制作者・Webディレクター向けに開発した、完全無料のブラウザ完結型の動画変換ツールです。
-      </p>
-      <h3>主な機能</h3>
-      <ul>
-        <li><strong>インスペクター</strong>：動画ファイルの解像度・FPS・コーデック・ビットレートを瞬時に確認</li>
-        <li><strong>コンバーター</strong>：用途に合わせた解像度・FPS・ビットレートに変換してMP4を出力</li>
-        <li><strong>完全ローカル処理</strong>：動画データは一切サーバーに送信されません。機密性の高い素材でも安全にご利用いただけます</li>
-      </ul>
-      <h3>対応している動画フォーマット</h3>
-      <p>MP4、MOV、WebMなど主要な動画形式に対応しています。出力はMP4（H.264）形式です。</p>
-      <h3>ご注意</h3>
-      <p>
-        当ツールは基本的なスペック変換を目的としています。音声のラウドネス値（LKFS）の調整や参照フレーム数の細かな制御が必要な場合は、Adobe Premiere ProなどのプロフェッショナルなNLEソフトウェアをご利用ください。
-      </p>
-    </article>
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" open>
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>動画スペックチェッカー＆コンバーターについて（FAQ・解説）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>動画の入稿規定エラーをブラウザ一発で解決</h3>
+            <p>
+              主要な動画プラットフォームやSNS広告（Twitter/X, Instagram, TikTok等）を入稿する際、「解像度が規定外」「フレームレートが非対応」「ビットレートが高すぎる」といったエラーで弾かれたことはありませんか？当ツールは、そんな動画広告制作者や担当者向けに開発した、完全無料の動画メタデータ確認・変換ツールです。
+            </p>
+
+            <h3>よくある質問 (FAQ)</h3>
+            
+            <h4>Q. Twitter(X)やInstagramで動画がアップロードできない・エラーになる時の対処法は？</h4>
+            <p>A. SNSごとに推奨される動画スペックが存在します。例えばTwitter(X)の場合、一般的に「<strong>1920×1200以下の解像度</strong>」「<strong>40fps以下</strong>」「<strong>ビットレートは25Mbps（25,000kbps）以下</strong>」が推奨されています。また、音声サンプリングレートが特殊だったり、最新のH.265コーデックが非対応の環境もあります。本ツールで一旦「H.264形式、30fps、適切なビットレート」に変換することで、アップロードエラーの多くを解消できます。</p>
+
+            <h4>Q. 動画の画質をできるだけ保ったまま、ファイル容量を軽く（圧縮）するには？</h4>
+            <p>A. 容量を下げるための最も効果的な方法は「<strong>ビットレートの最適化</strong>」です。解像度を下げずにファイルサイズだけを削減したい場合、コンバーター画面で動画の「現在の映像ビットレート」よりも少し低い値を設定して変換してください。一般的にスマホ視聴メインのSNS向けであれば、1920x1080解像度でも「3,000〜5,000kbps」あれば十分な画質が保たれます。</p>
+
+            <h4>Q. 動画ファイルはどこで処理されていますか？サーバーに送信されますか？</h4>
+            <p>A. <strong>一切送信されません。</strong>本ツールは最新のWeb標準技術（WebCodecs API）を使用し、動画の解析圧縮処理をすべてあなたのブラウザ（ローカル）環境内で実行します。そのため、発表前の社外秘映像や個人情報を含む動画であっても、情報漏洩のリスクなく安全かつ高速にご利用いただけます。</p>
+            
+            <p class="text-sm mt-8 p-4 bg-slate-50 rounded-lg border border-slate-100">
+              ※本ツールは基本的な解像度・FPS・ビットレートの変換を高速に行うことを目的としています。音声のラウドネス値（LKFS）の調整や、厳密な参照フレーム数の指定が必要な配信プラットフォーム向けには、Adobe Premiere Proなどの本格的な動画編集ソフトで再書き出しを行ってください。
+            </p>
+          </div>
+        </div>
+      </details>
+    </div>
 
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "動画スペックチェッカー＆コンバーター",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "動画の解像度・FPS・ビットレートなどの詳細スペックをブラウザ上で素早く確認し、SNSや広告入稿規定に合わせた仕様に無料変換できるツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Twitter(X)やInstagramで動画がアップロードできない・エラーになる時の対処法は？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "SNSごとに推奨される動画スペックが存在します。例えばTwitter(X)の場合、一般的に「1920×1200以下の解像度」「40fps以下」「ビットレートは25Mbps以下」が推奨されています。本ツールで一旦「H.264形式、30fps、適切なビットレート」に変換することで、アップロードエラーの多くを解消できます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "動画の画質をできるだけ保ったまま、ファイル容量を軽く（圧縮）するには？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "容量を下げるための最も効果的な方法は「ビットレートの最適化」です。解像度を下げずにファイルサイズだけを削減したい場合、コンバーター画面で動画の「現在の映像ビットレート」よりも少し低い値を設定して変換してください。SNS向けであれば「3,000〜5,000kbps」で十分な画質が保たれることが多いです。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "動画ファイルはどこで処理されていますか？サーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "一切送信されません。本ツールは最新のWeb標準技術を使用し、動画の解析・圧縮処理をすべてあなたのブラウザ（ローカル）環境内で実行します。そのため、発表前の社外秘映像や個人情報を含む動画であっても、情報漏洩のリスクなく安全かつ高速にご利用いただけます。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>

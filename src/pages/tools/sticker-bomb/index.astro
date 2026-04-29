@@ -1,0 +1,652 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
+---
+
+<BaseLayout title="ステッカーボム・コラージュメーカー - GlowPunch" description="複数の写真をアップロードして、被写体を自動で切り抜き、SNS映えするステッカーボム（スクラップブック）風のコラージュ画像を自動生成します。">
+  <div class="flex flex-col gap-6">
+    <div class="mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">ステッカーボム・<span class="text-pink-500">コラージュメーカー</span></h1>
+      <p class="text-slate-600 text-lg">大量の写真をアップロードすると、被写体をAIが自動で切り抜き、ステッカーやポラロイド風に加工して1枚のリッチなコラージュを生成します。YOPE風のポップな画像が作れます。</p>
+    </div>
+
+    <!-- UI App -->
+    <div class="glass-panel p-6 flex flex-col items-center justify-center min-h-[500px] border-dashed border-2 border-slate-300 relative transition-colors" id="app-container">
+      
+      <!-- Initial UI (Upload) -->
+      <div id="initial-ui" class="text-center w-full flex flex-col items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <p class="text-xl font-bold text-slate-800 mb-2">画像を複数選択 または ドラッグ＆ドロップ</p>
+        <p class="text-slate-500 text-sm mb-2">JPG, PNG に対応（最大30枚まで）</p>
+        <p class="text-pink-500 text-xs font-bold bg-pink-50 px-3 py-1 rounded-full mb-6">AIが被写体を自動で切り抜いてステッカーにします！</p>
+        <button id="btn-select" class="btn-primary !bg-pink-500 hover:!bg-pink-600 px-8 py-3 text-lg">写真を選ぶ（複数可）</button>
+        <input type="file" id="file-input" class="hidden" accept="image/*" multiple />
+      </div>
+
+      <!-- Processing UI -->
+      <div id="loading-ui" class="hidden flex-col items-center justify-center text-center w-full max-w-md">
+        <div class="animate-spin w-12 h-12 border-4 border-slate-200 border-t-pink-500 rounded-full mb-4"></div>
+        <p class="text-xl font-bold text-slate-800" id="loading-title">コラージュを生成中...</p>
+        <p class="text-md font-bold text-pink-500 mt-2" id="loading-progress-text">準備中</p>
+        <p class="text-sm text-slate-500 mt-2" id="loading-status">AIモデルを読み込んでいます（初回は数秒かかります）</p>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 rounded-full h-3 mt-4 overflow-hidden">
+          <div class="bg-gradient-to-r from-pink-400 to-pink-600 h-3 rounded-full transition-all duration-300" style="width: 0%" id="progress-bar"></div>
+        </div>
+
+        <!-- Preview during process -->
+        <div class="mt-8 flex flex-wrap justify-center gap-2 max-h-32 overflow-hidden opacity-50" id="processing-preview">
+          <!-- Small thumbnails will be appended here -->
+        </div>
+      </div>
+
+      <!-- Result UI (Canvas) -->
+      <div id="result-ui" class="hidden flex-col items-center w-full">
+        <!-- Toolbar -->
+        <div class="flex flex-wrap items-center justify-between w-full mb-4 gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-bold text-slate-700">背景色:</span>
+            <div class="flex gap-2" id="bg-color-picker">
+              <button class="w-6 h-6 rounded-full border-2 border-slate-300 bg-transparent relative overflow-hidden group" data-color="transparent" title="透過">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjY2JkNWUxIj48L3JlY3Q+CjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNjYmQ1ZTEiPjwvcmVjdD4KPC9zdmc+')]"></div>
+              </button>
+              <button class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white" data-color="#ffffff" title="白"></button>
+              <button class="w-6 h-6 rounded-full border-2 border-slate-300 bg-slate-900" data-color="#0f172a" title="黒"></button>
+              <button class="w-6 h-6 rounded-full border-2 border-slate-300 bg-pink-400" data-color="#f472b6" title="ピンク"></button>
+              <button class="w-6 h-6 rounded-full border-2 border-slate-300 bg-sky-400" data-color="#38bdf8" title="ブルー"></button>
+              <button class="w-6 h-6 rounded-full border-2 border-slate-300 bg-lime-400" data-color="#a3e635" title="ライム"></button>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 text-sm text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span>ドラッグして移動・クリックで最前面へ</span>
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div id="konva-container" class="w-full max-w-3xl aspect-[4/5] md:aspect-square bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2UyZThmMCI+PC9yZWN0Pgo8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2UyZThmMCI+PC9yZWN0Pgo8L3N2Zz4=')] rounded-xl overflow-hidden shadow-lg border-2 border-slate-200 cursor-move relative">
+          <!-- Konva stage will be injected here -->
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-4 mt-6">
+          <button id="btn-shuffle" class="px-6 py-3 rounded-xl font-bold text-slate-700 bg-white hover:bg-slate-50 border-2 border-slate-200 shadow-sm transition-colors flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            シャッフル
+          </button>
+          <button id="btn-download" class="btn-primary !bg-pink-500 hover:!bg-pink-600 flex items-center gap-2 shadow-pink-500/30 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            高画質で保存
+          </button>
+          <button id="btn-reset" class="px-6 py-3 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 border border-transparent transition-colors flex items-center gap-2">
+            最初から
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features & Info -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+      <div class="glass-panel p-5 bg-pink-50/50">
+        <h3 class="font-bold text-pink-600 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>完全自動のステッカー化</h3>
+        <p class="text-sm text-slate-600">最新のAIが画像の被写体を自動で認識して切り抜き、オシャレな白枠をつけてステッカー風に加工します。ポラロイド風もランダムに混ざります。</p>
+      </div>
+      <div class="glass-panel p-5 bg-sky-50/50">
+        <h3 class="font-bold text-sky-600 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>ドラッグ＆ドロップで微調整</h3>
+        <p class="text-sm text-slate-600">自動配置された後は、キャンバス上のステッカーを自由に移動できます。クリックすると最前面にくるので、お気に入りの写真を主役にできます。</p>
+      </div>
+      <div class="glass-panel p-5 bg-slate-50/50">
+        <h3 class="font-bold text-slate-600 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>ローカル完結で安全</h3>
+        <p class="text-sm text-slate-600">すべてのAI処理と画像合成はお使いのブラウザ内で行われます。画像がサーバーに送信されることはないため、プライベートな写真でも安心です。</p>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <AdSensePlaceholder slotId="tool-bottom-banner" />
+    </div>
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>コラージュメーカーについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>コラージュメーカーについて</h3>
+            <p>複数の写真をアップロードするだけで、被写体をAIが自動で切り抜き、ステッカーやポラロイド風に加工して1枚の華やかなコラージュ画像を生成するツールです。SNS投稿やフォトブックの表紙に最適です。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. 何枚の写真をアップロードできますか？</h4>
+            <p>A. 推奨は10〜30枚程度です。写真の枚数が多いほど密度の高いコラージュが生成されますが、ブラウザのメモリ使用量も増加します。</p>
+
+            <h4>Q. 背景の切り抜きは自動ですか？</h4>
+            <p>A. はい、AI背景透過技術を使って各写真の被写体を自動で切り抜きます。手動での調整は不要です。</p>
+
+            <h4>Q. 画像はサーバーに送信されますか？</h4>
+            <p>A. いいえ、AI処理を含むすべてがブラウザ内で完結します。プライベートな写真でも安心です。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "ステッカーボム・コラージュメーカー",
+          "operatingSystem": "All",
+          "applicationCategory": "MultimediaApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "大量の写真をAIで自動切り抜きし、ステッカーやポラロイド風に加工して1枚のリッチなコラージュを生成する無料ツールです。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "何枚の写真をアップロードできますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "推奨は10〜30枚程度です。写真の枚数が多いほど密度の高いコラージュが生成されますが、ブラウザのメモリ使用量も増加します。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "背景の切り抜きは自動ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、AI背景透過技術を使って各写真の被写体を自動で切り抜きます。手動での調整は不要です。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "画像はサーバーに送信されますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、AI処理を含むすべてがブラウザ内で完結します。プライベートな写真でも安心です。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+</BaseLayout>
+
+<script>
+  import { removeBackground } from '@imgly/background-removal';
+  import Konva from 'konva';
+
+  // Constants
+  const MAX_FILES = 30;
+  const MAX_IMAGE_SIZE = 800; // Resize before processing to save memory
+  const STICKER_PROBABILITY = 0.7; // 70% chance to be a cutout sticker, 30% polaroid
+  const CANVAS_SIZE = 1200; // High-res export size
+  const BORDER_WIDTH = 20; // Sticker border width
+  
+  // UI Elements
+  const dropZone = document.getElementById('app-container');
+  const btnSelect = document.getElementById('btn-select');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  
+  const initialUi = document.getElementById('initial-ui');
+  const loadingUi = document.getElementById('loading-ui');
+  const resultUi = document.getElementById('result-ui');
+  
+  const loadingProgressText = document.getElementById('loading-progress-text');
+  const loadingStatus = document.getElementById('loading-status');
+  const progressBar = document.getElementById('progress-bar');
+  const processingPreview = document.getElementById('processing-preview');
+  
+  const konvaContainer = document.getElementById('konva-container');
+  const btnDownload = document.getElementById('btn-download');
+  const btnReset = document.getElementById('btn-reset');
+  const btnShuffle = document.getElementById('btn-shuffle');
+  const colorPickers = document.querySelectorAll('#bg-color-picker button');
+
+  // State
+  let stage: Konva.Stage | null = null;
+  let layer: Konva.Layer | null = null;
+  let bgLayer: Konva.Layer | null = null;
+  let bgRect: Konva.Rect | null = null;
+  let processedImages: { src: string, type: 'sticker' | 'polaroid', originalWidth: number, originalHeight: number }[] = [];
+  let isProcessing = false;
+
+  // Initialize Konva
+  function initKonva() {
+    if (stage) return;
+    
+    // We use a fixed internal resolution, but scale it to fit the container visually
+    stage = new Konva.Stage({
+      container: 'konva-container',
+      width: konvaContainer?.clientWidth || 600,
+      height: konvaContainer?.clientHeight || 600,
+    });
+
+    // Create background layer
+    bgLayer = new Konva.Layer();
+    bgRect = new Konva.Rect({
+      x: 0, y: 0,
+      width: CANVAS_SIZE, height: CANVAS_SIZE,
+      fill: 'transparent',
+    });
+    bgLayer.add(bgRect);
+    stage.add(bgLayer);
+
+    // Create main items layer
+    layer = new Konva.Layer();
+    stage.add(layer);
+
+    // Handle resize
+    window.addEventListener('resize', fitStageIntoParentContainer);
+  }
+
+  function fitStageIntoParentContainer() {
+    if (!stage || !konvaContainer) return;
+    const containerWidth = konvaContainer.clientWidth;
+    const containerHeight = konvaContainer.clientHeight;
+    
+    // The internal logical size is CANVAS_SIZE x CANVAS_SIZE
+    const scale = Math.min(containerWidth / CANVAS_SIZE, containerHeight / CANVAS_SIZE);
+    
+    stage.width(containerWidth);
+    stage.height(containerHeight);
+    
+    // Center the content
+    const offsetX = (containerWidth - CANVAS_SIZE * scale) / 2;
+    const offsetY = (containerHeight - CANVAS_SIZE * scale) / 2;
+    
+    stage.scale({ x: scale, y: scale });
+    stage.position({ x: offsetX, y: offsetY });
+  }
+
+  // Handle Input
+  btnSelect?.addEventListener('click', () => fileInput?.click());
+  fileInput?.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      handleFiles(Array.from(target.files));
+    }
+  });
+
+  // Drag & Drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+    dropZone?.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+  });
+  
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone?.addEventListener(evt, () => dropZone?.classList.add('border-pink-400', 'bg-pink-50/30'), false);
+  });
+  
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone?.addEventListener(evt, () => dropZone?.classList.remove('border-pink-400', 'bg-pink-50/30'), false);
+  });
+  
+  dropZone?.addEventListener('drop', (e: DragEvent) => {
+    if (isProcessing) return;
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      handleFiles(Array.from(dt.files));
+    }
+  });
+
+  // Flow Controller
+  async function handleFiles(files: File[]) {
+    const imageFiles = files.filter(f => f.type.startsWith('image/')).slice(0, MAX_FILES);
+    if (imageFiles.length === 0) return alert('画像ファイルを選択してください');
+
+    isProcessing = true;
+    processedImages = [];
+    
+    // UI Update
+    initialUi?.classList.add('hidden');
+    loadingUi?.classList.remove('hidden');
+    loadingUi?.classList.add('flex');
+    if (processingPreview) processingPreview.innerHTML = '';
+    
+    initKonva();
+
+    // Process Queue
+    for (let i = 0; i < imageFiles.length; i++) {
+      if (loadingProgressText) loadingProgressText.textContent = `${i + 1} / ${imageFiles.length} 枚を処理中...`;
+      if (progressBar) progressBar.style.width = `${((i) / imageFiles.length) * 100}%`;
+      
+      try {
+        await processSingleImage(imageFiles[i]);
+      } catch (err) {
+        console.error(`Error processing image ${i}:`, err);
+        // Continue to next even if one fails
+      }
+    }
+
+    if (progressBar) progressBar.style.width = `100%`;
+    if (loadingStatus) loadingStatus.textContent = "配置しています...";
+
+    // All done, render Konva
+    renderCollage();
+
+    // Switch UI
+    loadingUi?.classList.add('hidden');
+    loadingUi?.classList.remove('flex');
+    resultUi?.classList.remove('hidden');
+    resultUi?.classList.add('flex');
+    fitStageIntoParentContainer();
+    
+    isProcessing = false;
+  }
+
+  // Process a single image
+  async function processSingleImage(file: File) {
+    // 1. Load and resize
+    const imgUrl = URL.createObjectURL(file);
+    const imgObj = await loadImage(imgUrl);
+    URL.revokeObjectURL(imgUrl);
+
+    const { canvas: resizedCanvas, width: rw, height: rh } = resizeCanvas(imgObj, MAX_IMAGE_SIZE);
+    
+    // Decide style
+    const isSticker = Math.random() < STICKER_PROBABILITY;
+
+    let finalDataUrl = '';
+
+    if (isSticker) {
+      if (loadingStatus) loadingStatus.textContent = "AI被写体認識中...";
+      
+      // Convert to blob for imgly
+      const blob = await new Promise<Blob>((resolve) => resizedCanvas.toBlob(b => resolve(b!), 'image/jpeg', 0.9));
+      
+      // Remove Background
+      const transparentBlob = await removeBackground(blob, {
+        progress: (key, current, total) => {
+          // Ignore granular progress to avoid flickering, just show status
+        }
+      });
+      
+      if (loadingStatus) loadingStatus.textContent = "縁取りエフェクト生成中...";
+      
+      // Add Sticker Border
+      const transImgUrl = URL.createObjectURL(transparentBlob);
+      const transImgObj = await loadImage(transImgUrl);
+      URL.revokeObjectURL(transImgUrl);
+      
+      finalDataUrl = createStickerBorder(transImgObj, BORDER_WIDTH, '#ffffff');
+      
+      processedImages.push({
+        src: finalDataUrl,
+        type: 'sticker',
+        originalWidth: transImgObj.width,
+        originalHeight: transImgObj.height
+      });
+    } else {
+      // Polaroid style (no AI needed)
+      if (loadingStatus) loadingStatus.textContent = "ポラロイド化処理中...";
+      finalDataUrl = createPolaroid(resizedCanvas);
+      
+      processedImages.push({
+        src: finalDataUrl,
+        type: 'polaroid',
+        originalWidth: Math.min(rw, rh),
+        originalHeight: Math.min(rw, rh)
+      });
+    }
+
+    // Add thumbnail to preview
+    if (processingPreview) {
+      const thumb = document.createElement('img');
+      thumb.src = finalDataUrl;
+      thumb.className = "w-12 h-12 object-contain bg-slate-100 rounded border border-slate-200 shadow-sm";
+      processingPreview.appendChild(thumb);
+    }
+  }
+
+  // --- Helper Functions ---
+
+  function loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function resizeCanvas(img: HTMLImageElement, maxSize: number) {
+    const canvas = document.createElement('canvas');
+    let width = img.width;
+    let height = img.height;
+
+    if (width > maxSize || height > maxSize) {
+      if (width > height) {
+        height = Math.round((height * maxSize) / width);
+        width = maxSize;
+      } else {
+        width = Math.round((width * maxSize) / height);
+        height = maxSize;
+      }
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.drawImage(img, 0, 0, width, height);
+    
+    return { canvas, width, height };
+  }
+
+  function createStickerBorder(img: HTMLImageElement, border: number, color: string) {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width + border * 2;
+    canvas.height = img.height + border * 2;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+
+    // Create solid mask
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = img.width;
+    maskCanvas.height = img.height;
+    const mCtx = maskCanvas.getContext('2d');
+    if (mCtx) {
+      mCtx.drawImage(img, 0, 0);
+      mCtx.globalCompositeOperation = 'source-in';
+      mCtx.fillStyle = color;
+      mCtx.fillRect(0, 0, img.width, img.height);
+    }
+
+    // Draw mask around center
+    const angles = 32;
+    for (let i = 0; i < angles; i++) {
+      const angle = (i / angles) * Math.PI * 2;
+      const dx = border + Math.cos(angle) * border;
+      const dy = border + Math.sin(angle) * border;
+      ctx.drawImage(maskCanvas, dx, dy);
+    }
+
+    // Drop shadow on the border to make it pop
+    ctx.shadowColor = 'rgba(0,0,0,0.15)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 4;
+    
+    // Redraw once more to apply shadow, then original
+    ctx.drawImage(canvas, 0, 0);
+    ctx.shadowColor = 'transparent';
+    
+    // Draw original
+    ctx.drawImage(img, border, border);
+    
+    return canvas.toDataURL('image/png');
+  }
+
+  function createPolaroid(canvas: HTMLCanvasElement) {
+    const minDim = Math.min(canvas.width, canvas.height);
+    const size = minDim;
+    
+    const outCanvas = document.createElement('canvas');
+    const padding = 20;
+    const bottomPadding = 60;
+    outCanvas.width = size + padding * 2;
+    outCanvas.height = size + padding + bottomPadding;
+    const ctx = outCanvas.getContext('2d');
+    if (!ctx) return '';
+
+    // Shadow
+    ctx.shadowColor = 'rgba(0,0,0,0.15)';
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+
+    // White paper
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(5, 5, outCanvas.width - 10, outCanvas.height - 10);
+    
+    ctx.shadowColor = 'transparent';
+
+    // Crop center square
+    const sx = (canvas.width - size) / 2;
+    const sy = (canvas.height - size) / 2;
+    ctx.drawImage(canvas, sx, sy, size, size, padding, padding, size, size);
+
+    return outCanvas.toDataURL('image/png');
+  }
+
+  // --- Konva Rendering ---
+
+  async function renderCollage() {
+    if (!layer || !stage) return;
+    layer.destroyChildren();
+
+    // Center and spread logic
+    const centerX = CANVAS_SIZE / 2;
+    const centerY = CANVAS_SIZE / 2;
+    const spreadRadius = CANVAS_SIZE * 0.35; // How far items can spread from center
+
+    for (const item of processedImages) {
+      const img = await loadImage(item.src);
+      
+      // Calculate scale to fit nicely in collage
+      // We want items to be roughly 1/3 to 1/4 of the canvas size
+      const targetMaxDim = CANVAS_SIZE * (item.type === 'polaroid' ? 0.3 : 0.4);
+      const scale = targetMaxDim / Math.max(img.width, img.height);
+      
+      // Random position with a bias towards center
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * spreadRadius;
+      const x = centerX + Math.cos(angle) * r;
+      const y = centerY + Math.sin(angle) * r;
+      
+      const rotation = (Math.random() - 0.5) * 40; // -20 to 20 degrees
+
+      const konvaImg = new Konva.Image({
+        x: x,
+        y: y,
+        image: img,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: rotation,
+        draggable: true,
+        offsetX: img.width / 2,
+        offsetY: img.height / 2,
+      });
+
+      // Hover cursors
+      konvaImg.on('mouseenter', () => document.body.style.cursor = 'grab');
+      konvaImg.on('mouseleave', () => document.body.style.cursor = 'default');
+      konvaImg.on('mousedown touchstart', () => {
+        document.body.style.cursor = 'grabbing';
+        konvaImg.moveToTop();
+        layer?.draw();
+      });
+      konvaImg.on('mouseup touchend', () => document.body.style.cursor = 'grab');
+
+      layer.add(konvaImg);
+    }
+
+    layer.draw();
+  }
+
+  // Actions
+  btnShuffle?.addEventListener('click', () => {
+    if (!layer) return;
+    const centerX = CANVAS_SIZE / 2;
+    const centerY = CANVAS_SIZE / 2;
+    const spreadRadius = CANVAS_SIZE * 0.35;
+
+    layer.getChildren().forEach(node => {
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * spreadRadius;
+      node.to({
+        x: centerX + Math.cos(angle) * r,
+        y: centerY + Math.sin(angle) * r,
+        rotation: (Math.random() - 0.5) * 40,
+        duration: 0.3,
+        easing: Konva.Easings.EaseOut
+      });
+    });
+  });
+
+  colorPickers.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const color = target.dataset.color || 'transparent';
+      if (bgRect && bgLayer) {
+        bgRect.fill(color);
+        bgLayer.draw();
+      }
+    });
+  });
+
+  btnDownload?.addEventListener('click', () => {
+    if (!stage) return;
+    
+    // We want to export at CANVAS_SIZE resolution, regardless of current container scale
+    const originalScaleX = stage.scaleX();
+    const originalScaleY = stage.scaleY();
+    const originalX = stage.x();
+    const originalY = stage.y();
+
+    stage.scale({ x: 1, y: 1 });
+    stage.position({ x: 0, y: 0 });
+    stage.width(CANVAS_SIZE);
+    stage.height(CANVAS_SIZE);
+
+    const dataURL = stage.toDataURL({ pixelRatio: 2 }); // 2x for retina quality
+
+    // Restore
+    stage.scale({ x: originalScaleX, y: originalScaleY });
+    stage.position({ x: originalX, y: originalY });
+    fitStageIntoParentContainer();
+
+    const link = document.createElement('a');
+    link.download = `sticker-bomb-${Date.now()}.png`;
+    link.href = dataURL;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  btnReset?.addEventListener('click', () => {
+    if (fileInput) fileInput.value = '';
+    processedImages = [];
+    if (layer) { layer.destroyChildren(); layer.draw(); }
+    
+    resultUi?.classList.add('hidden');
+    resultUi?.classList.remove('flex');
+    initialUi?.classList.remove('hidden');
+    
+    if (progressBar) progressBar.style.width = '0%';
+  });
+
+</script>

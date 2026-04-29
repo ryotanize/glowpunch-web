@@ -88,7 +88,83 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
       <AdSensePlaceholder slotId="pdf-editor-banner" />
     </div>
 
+  
+    <div class="mt-8 border-t border-slate-200 pt-8">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>PDF結合・分割ツールについて（使い方・FAQ）</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600 space-y-6">
+          <div class="prose prose-slate max-w-none">
+            <h3>PDF結合・分割ツールについて</h3>
+            <p>複数のPDFファイルを1つに結合したり、不要なページを削除したり、ページ順を入れ替えたりする作業を、ブラウザだけで完結させる無料ツールです。機密書類でも安心してお使いいただけます。</p>
+
+            <h3>よくある質問 (FAQ)</h3>
+
+            <h4>Q. PDFファイルはサーバーにアップロードされますか？</h4>
+            <p>A. いいえ、すべての処理はブラウザ内で完結します。PDFデータが外部のサーバーに送信・保存されることは一切ないため、契約書や社内資料など機密性の高い文書でも安心です。</p>
+
+            <h4>Q. 何ページまで結合できますか？</h4>
+            <p>A. ブラウザのメモリに依存しますが、通常のPCであれば数百ページ程度の結合は問題なく行えます。非常に大きなファイル（100MB超）の場合はメモリ不足になる可能性があります。</p>
+
+            <h4>Q. スマホからも使えますか？</h4>
+            <p>A. はい、iPhoneやAndroidのモダンブラウザでもご利用可能です。ただし、大量のPDFを扱う場合はPCでの利用を推奨します。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
   </div>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "PDF分割・結合・編集ツール",
+          "operatingSystem": "All",
+          "applicationCategory": "UtilitiesApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "複数のPDFファイルをブラウザ上で結合・分割・ページ並べ替えできる無料ツールです。サーバーへのアップロード不要。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "PDFファイルはサーバーにアップロードされますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "いいえ、すべての処理はブラウザ内で完結します。PDFデータが外部のサーバーに送信・保存されることは一切ないため、契約書や社内資料など機密性の高い文書でも安心です。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "何ページまで結合できますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "ブラウザのメモリに依存しますが、通常のPCであれば数百ページ程度の結合は問題なく行えます。非常に大きなファイル（100MB超）の場合はメモリ不足になる可能性があります。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "スマホからも使えますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、iPhoneやAndroidのモダンブラウザでもご利用可能です。ただし、大量のPDFを扱う場合はPCでの利用を推奨します。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
 </BaseLayout>
 
 <script>
@@ -294,23 +370,70 @@ import AdSensePlaceholder from '../../../components/AdSensePlaceholder.astro';
     showStatus('PDFを生成しています...', 'info');
 
     try {
-      const mergedPdf = await PDFDocument.create();
-      // Cache loaded docs to avoid parsing the same ArrayBuffer multiple times
-      const docCache = new Map<string, any>();
+      const uniqueFileIds = new Set(pages.map(p => p.fileId));
+      let finalPdfBytes: Uint8Array | undefined;
 
-      for (const p of pages) {
-        let pdfDoc = docCache.get(p.fileId);
-        if (!pdfDoc) {
-          pdfDoc = await PDFDocument.load(p.fileBytes);
-          docCache.set(p.fileId, pdfDoc);
-        }
+      // --- 最適化1：単一ファイルかつ「削除のみ」の場合 ---
+      if (uniqueFileIds.size === 1) {
+        // ページ順序が厳密に昇順か（入れ替えられていないか）チェック
+        const isStrictlyAscending = pages.every((p, i) => i === 0 || pages[i - 1].pageIndex < p.pageIndex);
         
-        const copied = await mergedPdf.copyPages(pdfDoc, [p.pageIndex]);
-        mergedPdf.addPage(copied[0]);
+        if (isStrictlyAscending) {
+          // 元のPDFデータをそのまま読み込み、不要なページだけを削除する
+          const sourceBytes = pages[0].fileBytes;
+          const pdfDoc = await PDFDocument.load(sourceBytes);
+          
+          const pagesToKeep = new Set(pages.map(p => p.pageIndex));
+          const totalPages = pdfDoc.getPageCount();
+          
+          // インデックスのずれを防ぐため、後ろのページから順に削除
+          for (let i = totalPages - 1; i >= 0; i--) {
+            if (!pagesToKeep.has(i)) {
+              pdfDoc.removePage(i);
+            }
+          }
+          finalPdfBytes = await pdfDoc.save();
+        }
       }
 
-      const pdfBytes = await mergedPdf.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      // --- 最適化2：複数ファイル、または順序の入れ替えがある場合 ---
+      if (!finalPdfBytes) {
+        const mergedPdf = await PDFDocument.create();
+        
+        // リソース（フォント・画像等）の重複保存を防ぐため、ファイル単位で必要なページをまとめる
+        const pagesByFile = new Map<string, { fileBytes: ArrayBuffer, indices: number[] }>();
+        for (const p of pages) {
+          if (!pagesByFile.has(p.fileId)) {
+            pagesByFile.set(p.fileId, { fileBytes: p.fileBytes, indices: [] });
+          }
+          if (!pagesByFile.get(p.fileId)!.indices.includes(p.pageIndex)) {
+            pagesByFile.get(p.fileId)!.indices.push(p.pageIndex);
+          }
+        }
+
+        // ファイルごとに「一度にまとめて」ページをコピーする
+        const copiedPagesMap = new Map<string, Map<number, any>>();
+        for (const [fileId, data] of pagesByFile.entries()) {
+          const pdfDoc = await PDFDocument.load(data.fileBytes);
+          const copiedPages = await mergedPdf.copyPages(pdfDoc, data.indices);
+          
+          const pageMap = new Map<number, any>();
+          data.indices.forEach((originalIndex, i) => {
+            pageMap.set(originalIndex, copiedPages[i]);
+          });
+          copiedPagesMap.set(fileId, pageMap);
+        }
+
+        // ユーザーが指定した順序通りに、コピー済みのページを新しいPDFに追加する
+        for (const p of pages) {
+          const copiedPage = copiedPagesMap.get(p.fileId)!.get(p.pageIndex);
+          mergedPdf.addPage(copiedPage);
+        }
+        
+        finalPdfBytes = await mergedPdf.save();
+      }
+
+      const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
