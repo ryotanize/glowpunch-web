@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import AdSensePlaceholder from '../../components/AdSensePlaceholder.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -36,7 +35,6 @@ const { Content } = await render(post);
   </article>
 
   <div class="mt-12">
-    <AdSensePlaceholder slotId="blog-bottom-banner" />
   </div>
   
   <div class="mt-8 text-center">
