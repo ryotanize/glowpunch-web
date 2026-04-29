@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="使い方ガイド | サーバー送信なしの無料ツール集" description="GlowPunchのツールの安全な使い方をご案内します。すべての処理がブラウザ内で完結するため、データが外部に送信されることはありません。">
+  <div class="max-w-3xl mx-auto py-12 md:py-20 w-full">
+    <div class="text-center mb-16">
+      <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight mb-4">
+        使い方ガイド
+      </h1>
+      <p class="text-lg text-slate-500 font-medium">
+        GlowPunchのツールは、すべてブラウザ内で安全に動作します。
+      </p>
+    </div>
+
+    <div class="space-y-12">
+      <!-- Step 1 -->
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-bl-full -z-10"></div>
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xl shrink-0">
+            1
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-3">ツールを選ぶ</h2>
+            <p class="text-slate-600 leading-relaxed font-medium">
+              トップページから、目的のツールを選択します。PDF編集、動画処理、画像処理など、多岐にわたるツールを用意しています。面倒な会員登録やログインは一切不要ですぐに使い始められます。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -z-10"></div>
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl shrink-0">
+            2
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-3">ファイルを読み込む</h2>
+            <p class="text-slate-600 leading-relaxed font-medium mb-5">
+              処理したいファイルを画面にドラッグ＆ドロップ、またはクリックして選択します。
+            </p>
+            <div class="bg-emerald-50 border border-emerald-100 text-emerald-800 p-5 rounded-2xl flex items-start gap-3 shadow-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-emerald-500 mt-0.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+              <div class="text-sm font-medium leading-relaxed">
+                <strong>安心ポイント：</strong> ここで読み込まれたファイルは、あなたの端末（スマホやPC）のメモリ上でのみ処理されます。外部のサーバーへアップロードされることは絶対にありません。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-full -z-10"></div>
+        <div class="flex flex-col md:flex-row items-start gap-6">
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xl shrink-0">
+            3
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-3">処理と保存</h2>
+            <p class="text-slate-600 leading-relaxed font-medium">
+              ブラウザの機能（WebAssemblyやモダンJavaScriptAPI）をフル活用し、高速に処理を行います。処理が完了したら「保存」や「ダウンロード」ボタンを押すことで、結果をあなたの端末に直接保存します。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-16 text-center">
+      <a href="/#tools" class="inline-flex items-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
+        さっそくツールを使ってみる
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</BaseLayout>
