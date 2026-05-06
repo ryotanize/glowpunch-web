@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
@@ -34,7 +36,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
       <div class="text-center">
         <p class="text-slate-700 font-semibold text-lg">動画ファイルをドロップ</p>
-        <p class="text-slate-500 text-sm mt-1">MP4, MOV, WebMなどに対応</p>
+        <p class="text-slate-500 text-sm mt-1 mb-4">MP4, MOV, WebMなどに対応</p>
+        <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium mb-2">
+          ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+        </p>
       </div>
       <input id="file-input" type="file" accept="video/*" class="hidden" />
     </div>
@@ -104,6 +109,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             <div id="progress-bar" class="h-full bg-gradient-to-r from-rose-400 to-orange-400 rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
         </div>
+        <process-step-log id="audio-log" class="hidden w-full mt-2 text-left"></process-step-log>
 
         <div id="done-message" class="hidden flex items-center gap-2 text-emerald-600 font-semibold mt-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -144,8 +150,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </p>
     </article>
 
-  
     <div class="mt-8 border-t border-slate-200 pt-8">
+      <div class="mb-8">
+        <TransparencyCard />
+      </div>
+      
+      <!-- Hidden Template for Step Log -->
+      <ProcessStepLog />
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
           <span>音声抽出ツールについて（使い方・FAQ）</span>
@@ -240,6 +251,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   const errorMessage = document.getElementById('error-message') as HTMLElement;
   const errorText = document.getElementById('error-text') as HTMLElement;
   const unsupportedBanner = document.getElementById('unsupported-banner') as HTMLElement;
+  const logger = document.getElementById('audio-log') as any;
 
   let currentFile: File | null = null;
   let worker: Worker | null = null;
@@ -289,6 +301,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     fileNameEl.textContent = file.name;
     settingsSection.classList.remove('hidden');
     resetState();
+    
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('read', '動画ファイルをブラウザ内に読み込みました', 'done');
+    }
   }
 
   function resetState() {
@@ -307,6 +327,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     errorText.textContent = msg;
     btnExtract.disabled = false;
     btnExtract.classList.remove('opacity-50', 'cursor-not-allowed');
+    
+    if (logger && logger.updateStep) {
+       logger.updateStep('extract', 'error', '処理中にエラーが発生しました');
+    }
   }
 
   btnExtract.addEventListener('click', () => {
@@ -316,6 +340,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     btnExtract.disabled = true;
     btnExtract.classList.add('opacity-50', 'cursor-not-allowed');
     progressContainer.classList.remove('hidden');
+
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('read', '動画ファイルをブラウザ内に読み込みました', 'done');
+       logger.addStep('extract', 'ブラウザ内で動画から音声を抽出中...', 'running');
+       logger.addStep('generate', '音声ファイルを生成中...', 'pending');
+    }
 
     if (worker) {
       worker.terminate();
@@ -359,6 +393,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   function onExtractionDone(buffer: ArrayBuffer, format: string) {
     progressBar.style.width = '100%';
     progressPct.textContent = '100%';
+
+    if (logger && logger.updateStep) {
+       logger.updateStep('extract', 'done');
+       logger.updateStep('generate', 'done', '完了しました（サーバー送信なし）');
+    }
 
     setTimeout(() => {
       progressContainer.classList.add('hidden');

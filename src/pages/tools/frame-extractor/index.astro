@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
@@ -32,7 +34,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
       <div class="text-center">
         <p class="text-slate-700 font-semibold text-lg">動画ファイルをドロップ</p>
-        <p class="text-slate-500 text-sm mt-1">MP4, MOV, WebMに対応</p>
+        <p class="text-slate-500 text-sm mt-1 mb-4">MP4, MOV, WebMに対応</p>
+        <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium mb-2">
+          ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+        </p>
       </div>
       <input id="file-input" type="file" accept="video/*" class="hidden" />
     </div>
@@ -48,7 +53,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </h3>
         
         <div class="relative bg-black rounded-lg overflow-hidden flex items-center justify-center min-h-[300px] border border-slate-800">
-          <video id="video-player" class="max-h-[60vh] max-w-full" controls playsinline controlsList="nodownload"></video>
+          <video id="video-player" class="max-h-[60vh] max-w-full" controls playsinline controlslist="nodownload"></video>
         </div>
       </div>
 
@@ -104,16 +109,21 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             </span>
             <div id="seq-progress-bar" class="absolute left-0 top-0 bottom-0 bg-indigo-600 rounded-xl transition-all duration-200 z-0" style="width: 0%"></div>
           </button>
+          
+          <process-step-log id="seq-log" class="hidden w-full mt-2 text-left"></process-step-log>
         </div>
 
         <canvas id="offscreen-canvas" class="hidden"></canvas>
       </div>
     </div>
 
-    <div class="mt-4">
-    </div>
-  
     <div class="mt-8 border-t border-slate-200 pt-8">
+      <div class="mb-8">
+        <TransparencyCard />
+      </div>
+      
+      <!-- Hidden Template for Step Log -->
+      <ProcessStepLog />
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
           <span>動画フレーム抽出ツールについて（使い方・FAQ）</span>
@@ -209,6 +219,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   const intervalSelect = document.getElementById('interval-select') as HTMLSelectElement;
   const seqBtnText = document.getElementById('seq-btn-text') as HTMLElement;
   const seqProgressBar = document.getElementById('seq-progress-bar') as HTMLElement;
+  const logger = document.getElementById('seq-log') as any;
 
   let currentFile: File | null = null;
   let videoURL: string = "";
@@ -236,6 +247,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     videoURL = URL.createObjectURL(file);
     videoPlayer.src = videoURL;
     editorSection.classList.remove('hidden');
+
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('read', '動画をブラウザ内に読み込みました', 'done');
+    }
   }
 
   // --- Single Extraction ---
@@ -257,6 +276,15 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     const timeCode = videoPlayer.currentTime.toFixed(2).replace('.', '_');
     a.download = `${baseName}_${timeCode}s.${ext}`;
     a.click();
+    
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('read', '動画をブラウザ内に読み込みました', 'done');
+       logger.addStep('extract', '画像を抽出しました（サーバー送信なし）', 'done');
+    }
   });
 
   // --- Sequential Extraction ---
@@ -281,6 +309,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     seqProgressBar.style.width = '0%';
     btnExtractSeq.disabled = true;
     btnExtractSeq.classList.add('cursor-not-allowed');
+
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('read', '動画をブラウザ内に読み込みました', 'done');
+       logger.addStep('extract', '動画フレームを切り出し中...', 'running');
+       logger.addStep('zip', 'ZIPファイルを生成中', 'pending');
+    }
 
     let currentTime = 0;
     for (let i = 0; i < totalFrames; i++) {
@@ -315,6 +353,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     seqProgressBar.style.width = '100%';
     seqProgressBar.classList.replace('bg-indigo-600', 'bg-emerald-500');
 
+    if (logger && logger.updateStep) {
+       logger.updateStep('extract', 'done');
+       logger.updateStep('zip', 'running');
+    }
+
     try {
       const content = await zip.generateAsync({ type: "blob" });
       const a = document.createElement('a');
@@ -322,9 +365,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       a.download = `${baseName}_frames.zip`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+      
+      if (logger && logger.updateStep) {
+         logger.updateStep('zip', 'done', '処理が完了しました（サーバー送信なし）');
+      }
     } catch(e) {
       console.error(e);
       alert('ZIPの生成に失敗しました。');
+      if (logger && logger.updateStep) {
+         logger.updateStep('extract', 'error', '処理中にエラーが発生しました');
+      }
     }
 
     // Restore

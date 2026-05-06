@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
@@ -41,7 +43,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
       <div class="text-center">
         <p class="text-slate-700 font-semibold text-lg">MP4・MOV・WebMファイルをドロップ</p>
-        <p class="text-slate-500 text-sm mt-1">またはクリックしてファイルを選択</p>
+        <p class="text-slate-500 text-sm mt-1 mb-4">またはクリックしてファイルを選択</p>
+        <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium mb-2">
+          ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+        </p>
       </div>
       <input id="file-input" type="file" accept="video/*" class="hidden" />
     </div>
@@ -213,6 +218,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               <div id="progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
+          <process-step-log id="converter-log" class="w-full mt-2 hidden text-left"></process-step-log>
 
           <!-- Done message -->
           <div id="done-message" class="hidden flex items-center gap-2 text-emerald-600 font-semibold">
@@ -230,10 +236,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
     </div>
 
-    <div class="mt-4">
-    </div>
-
     <div class="mt-8 border-t border-slate-200 pt-8">
+      <div class="mb-8">
+        <TransparencyCard />
+      </div>
+      
+      <!-- Hidden Template for Step Log -->
+      <ProcessStepLog />
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" open>
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
           <span>動画スペックチェッカー＆コンバーターについて（FAQ・解説）</span>
@@ -364,6 +373,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   const errorMessage = document.getElementById('error-message') as HTMLElement;
   const errorText = document.getElementById('error-text') as HTMLElement;
   const unsupportedBanner = document.getElementById('unsupported-banner') as HTMLElement;
+  const logger = document.getElementById('converter-log') as any;
 
   let currentFile: File | null = null;
   let worker: Worker | null = null;
@@ -534,6 +544,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     progressLabel.textContent = '変換処理中...';
     btnConvert.disabled = false;
     btnConvert.classList.remove('opacity-50', 'cursor-not-allowed');
+    if (logger && logger.container) {
+       logger.container.innerHTML = '';
+       logger.container.classList.add('hidden');
+    }
   }
 
   function startConversion(file: File) {
@@ -566,6 +580,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     btnConvert.disabled = true;
     btnConvert.classList.add('opacity-50', 'cursor-not-allowed');
 
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('init', '動画のデコード・エンコード準備', 'running');
+       logger.addStep('encode', 'ブラウザ内で動画を変換中...', 'pending');
+       logger.addStep('generate', 'ファイル生成', 'pending');
+    }
+
     // Launch worker
     worker = new Worker(
       new URL('../../../workers/video-optimizer-worker.js', import.meta.url),
@@ -576,6 +600,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       const { type, value, buffer, message } = e.data;
 
       if (type === 'progress') {
+        if (value === 0 && logger && logger.updateStep) {
+          logger.updateStep('init', 'done');
+          logger.updateStep('encode', 'running');
+        }
         const pct = Math.round(value * 100);
         progressBar.style.width = `${pct}%`;
         progressPct.textContent = `${pct}%`;
@@ -601,6 +629,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     progressBar.style.width = '100%';
     progressPct.textContent = '100%';
     progressLabel.textContent = '完了！';
+
+    if (logger && logger.updateStep) {
+       logger.updateStep('encode', 'done');
+       logger.updateStep('generate', 'done', '完了しました（サーバー送信なし）');
+    }
 
     setTimeout(() => {
       progressContainer.classList.add('hidden');
@@ -629,6 +662,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     errorText.textContent = `エラー: ${message}`;
     btnConvert.disabled = false;
     btnConvert.classList.remove('opacity-50', 'cursor-not-allowed');
+
+    if (logger && logger.updateStep) {
+       logger.updateStep('encode', 'error', '処理中にエラーが発生しました');
+    }
 
     worker?.terminate();
     worker = null;

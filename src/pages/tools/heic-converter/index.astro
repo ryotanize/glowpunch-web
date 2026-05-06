@@ -1,0 +1,367 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
+---
+
+<BaseLayout title="HEIC JPG 変換ツール (完全ローカル・サーバー送信なし) - GlowPunch" description="ブラウザだけでiPhoneのHEIC画像をJPGやPNGに変換します。データはサーバーに保存・送信されないため、プライベートな写真も安心です。">
+  <div class="flex flex-col gap-8 max-w-4xl mx-auto">
+    <div class="text-center">
+      <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight mb-4">
+        HEIC <span class="text-sky-500">Converter</span>
+      </h1>
+      <p class="text-slate-600 text-lg">
+        iPhoneのHEIC画像を、ブラウザ内で高速にJPG / PNGへ変換します。<br/>
+        <span class="font-bold text-sky-600 bg-sky-50 px-2 py-1 rounded">データはサーバーに送信されません</span>
+      </p>
+    </div>
+
+    <!-- Converter App -->
+    <div class="glass-panel p-6 md:p-10 space-y-8 relative overflow-hidden border-2 border-slate-100">
+      
+      <!-- Controls -->
+      <div class="flex flex-wrap items-center justify-center gap-6 pb-6 border-b border-slate-100">
+         <div class="flex items-center gap-3">
+           <label class="text-sm font-bold text-slate-600">変換先フォーマット:</label>
+           <select id="select-format" class="p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500/20">
+             <option value="image/jpeg">JPG (標準)</option>
+             <option value="image/png">PNG (透過対応/高画質)</option>
+           </select>
+         </div>
+         <div class="flex items-center gap-3 transition-opacity duration-300" id="quality-container">
+           <label class="text-sm font-bold text-slate-600">画質:</label>
+           <input type="range" id="range-quality" min="0.1" max="1.0" step="0.1" value="0.8" class="w-24 accent-sky-500" />
+           <span id="label-quality" class="text-xs font-mono text-slate-500 w-6">0.8</span>
+         </div>
+      </div>
+
+      <!-- Drop Zone -->
+      <div id="drop-zone" class="relative bg-slate-50 border-2 border-dashed border-slate-300 hover:border-sky-400 hover:bg-sky-50 transition-colors duration-300 rounded-2xl cursor-pointer overflow-hidden flex flex-col items-center justify-center min-h-[300px] group">
+        <input type="file" id="file-input" class="hidden" accept=".heic,.heif" multiple />
+        
+        <div id="empty-state" class="flex flex-col items-center gap-4 text-slate-500 p-8">
+          <div class="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center border border-slate-200 group-hover:scale-110 transition-transform">
+             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="text-center">
+            <p class="font-bold text-slate-700 text-lg">HEIC画像をドロップ、またはクリック</p>
+            <p class="text-sm mt-1 mb-4">※複数のファイルを選択可能です</p>
+            <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium">
+              ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Area -->
+      <div id="result-area" class="hidden space-y-4">
+        <h3 class="font-bold text-slate-700 border-b border-slate-100 pb-2">変換結果</h3>
+        <div id="file-list" class="space-y-3">
+          <!-- Items will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <TransparencyCard />
+    </div>
+
+    <!-- Hidden Template for Step Log -->
+    <ProcessStepLog />
+
+    <!-- SEO / Instructions in Accordion -->
+    <div class="mt-12 space-y-4 pt-8 border-t border-slate-200">
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" open>
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>ツールの説明と使い方</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600">
+          <article class="prose prose-slate max-w-none">
+            <h2>iPhoneのHEIC画像をブラウザで安全に変換</h2>
+            <p>
+              「iPhoneで撮った写真がパソコンで開けない」「ブログにアップロードできない」
+              そんな時に便利なのが、このHEIC to JPGコンバータです。
+            </p>
+            
+            <div class="bg-sky-50 border-l-4 border-sky-500 p-4 my-6 rounded-r-lg">
+              <h3 class="text-sky-800 m-0 text-lg font-bold">完全ローカル処理だから安心・高速</h3>
+              <p class="text-sky-700 text-sm mt-2 mb-0">
+                当サイトのツールは、最新のWeb技術を利用して<strong>お使いのブラウザ内（手元のパソコンやスマホ）で直接画像を変換</strong>します。<br/>
+                外部のサーバーに画像を送信しないため、プライベートな写真や機密情報が流出する心配は一切ありません。
+              </p>
+            </div>
+
+            <h3>使い方</h3>
+            <ol>
+              <li>変換したいHEIC画像を点線枠内にドラッグ＆ドロップします（複数選択も可能）。</li>
+              <li>お好みに合わせて、JPG（標準）またはPNGを選択します。</li>
+              <li>自動的に変換が開始されます。</li>
+              <li>変換が完了したら「保存」ボタンを押してダウンロードします。</li>
+            </ol>
+          </article>
+        </div>
+      </details>
+
+      <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+          <span>よくある質問 (FAQ)</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="p-6 text-slate-600">
+          <article class="prose prose-slate max-w-none">
+            <h4>Q. 変換に時間がかかるのはなぜですか？</h4>
+            <p>A. 画像をサーバーに送らず、お使いの端末（スマホやPC）のCPUを使って直接変換しているためです。端末の性能によっては少し時間がかかる場合がありますが、その分プライバシーが完全に守られます。</p>
+
+            <h4>Q. 複数ファイルを一括で変換できますか？</h4>
+            <p>A. はい、可能です。複数のファイルをまとめてドロップすると、順番に変換処理が行われます。</p>
+
+            <h4>Q. JPGとPNG、どちらを選べばいいですか？</h4>
+            <p>A. 一般的な写真やブログへの掲載なら、ファイルサイズが小さくなる「JPG」がおすすめです。画質を一切落としたくない場合や、イラストなどで輪郭をくっきりさせたい場合は「PNG」をお選びください。</p>
+          </article>
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "HEIC JPG 変換ツール (完全ローカル・サーバー送信なし) - GlowPunch",
+          "operatingSystem": "All",
+          "applicationCategory": "UtilitiesApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+          },
+          "description": "ブラウザ内でiPhoneのHEIC画像をJPGやPNGに変換します。データはサーバーに保存・送信されません。"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "変換に時間がかかるのはなぜですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "画像をサーバーに送らず、お使いの端末（スマホやPC）のCPUを使って直接変換しているためです。端末の性能によっては少し時間がかかる場合がありますが、その分プライバシーが完全に守られます。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "複数ファイルを一括で変換できますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい、可能です。複数のファイルをまとめてドロップすると、順番に変換処理が行われます。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+</BaseLayout>
+
+<script>
+  import heic2any from 'heic2any';
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const selectFormat = document.getElementById('select-format') as HTMLSelectElement;
+  const rangeQuality = document.getElementById('range-quality') as HTMLInputElement;
+  const labelQuality = document.getElementById('label-quality');
+  const qualityContainer = document.getElementById('quality-container');
+  const resultArea = document.getElementById('result-area');
+  const fileList = document.getElementById('file-list');
+  
+  function setup() {
+    // Format selection toggle for Quality slider
+    selectFormat?.addEventListener('change', () => {
+       if (selectFormat.value === 'image/png') {
+         qualityContainer?.classList.add('opacity-30', 'pointer-events-none');
+       } else {
+         qualityContainer?.classList.remove('opacity-30', 'pointer-events-none');
+       }
+    });
+
+    rangeQuality?.addEventListener('input', () => {
+      if (labelQuality) labelQuality.textContent = parseFloat(rangeQuality.value).toFixed(1);
+    });
+
+    // Dropzone logic
+    dropZone?.addEventListener('click', () => fileInput.click());
+    dropZone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-sky-500', 'bg-sky-50');
+    });
+    dropZone?.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-sky-500', 'bg-sky-50');
+    });
+    dropZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-sky-500', 'bg-sky-50');
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) handleFiles(files);
+    });
+
+    fileInput?.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) handleFiles(target.files);
+    });
+  }
+
+  async function handleFiles(files: FileList) {
+    if (!resultArea || !fileList) return;
+    
+    resultArea.classList.remove('hidden');
+    
+    // Process files one by one to avoid UI blocking too much
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.name.toLowerCase().endsWith('.heic') && !file.name.toLowerCase().endsWith('.heif')) {
+         continue; // Skip non-heic files
+      }
+      
+      const id = `item-${Date.now()}-${i}`;
+      const format = selectFormat.value;
+      const quality = parseFloat(rangeQuality.value);
+      const ext = format === 'image/png' ? 'png' : 'jpg';
+      const outputName = file.name.replace(/\.(heic|heif)$/i, `.${ext}`);
+
+      // Create UI Element for this file
+      const itemEl = document.createElement('div');
+      itemEl.id = id;
+      itemEl.className = 'flex flex-col p-4 bg-white rounded-xl border border-slate-200 shadow-sm transition-all';
+      itemEl.innerHTML = `
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center gap-4 overflow-hidden">
+             <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center shrink-0" id="preview-container-${id}">
+                <svg class="animate-spin h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+             </div>
+             <div class="min-w-0">
+               <p class="text-sm font-bold text-slate-700 truncate">${file.name}</p>
+               <p class="text-xs text-slate-500" id="status-${id}">処理中...</p>
+             </div>
+          </div>
+          <div id="action-${id}" class="shrink-0 ml-4">
+             <!-- Download button will be injected here -->
+          </div>
+        </div>
+        <process-step-log id="log-${id}" class="w-full mt-2"></process-step-log>
+      `;
+      fileList.appendChild(itemEl);
+      
+      const logger = document.getElementById(`log-${id}`) as any;
+      if (logger && logger.addStep) {
+         logger.addStep('read', 'ファイルをブラウザ内に読み込みました', 'done');
+         logger.addStep('check', 'HEIC画像の形式を確認しています', 'running');
+      }
+
+      // We use a timeout to let the UI update before the heavy sync conversion blocking the main thread
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Perform Conversion
+      try {
+        if (logger && logger.updateStep) {
+           logger.updateStep('check', 'done');
+           logger.addStep('convert', `ブラウザ内で${format === 'image/png' ? 'PNG' : 'JPG'}に変換しています`, 'gear');
+        }
+        
+        // Let UI update again for 'gear' step
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: format,
+          quality: quality
+        });
+        
+        if (logger && logger.updateStep) {
+           logger.updateStep('convert', 'done');
+           logger.addStep('generate', 'ダウンロード用ファイルを生成しています', 'down');
+        }
+        
+        // Handle case where heic2any returns an array of blobs (for animations/bursts)
+        const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        const objectUrl = URL.createObjectURL(finalBlob);
+        
+        // Update UI
+        const sizeMb = (finalBlob.size / (1024 * 1024)).toFixed(2);
+        const statusEl = document.getElementById(`status-${id}`);
+        if (statusEl) {
+            statusEl.textContent = `完了 (${sizeMb} MB)`;
+            statusEl.classList.add('text-green-600', 'font-medium');
+        }
+        
+        const previewContainer = document.getElementById(`preview-container-${id}`);
+        if (previewContainer) {
+          previewContainer.innerHTML = `<img src="${objectUrl}" class="w-full h-full object-cover rounded-lg" />`;
+        }
+
+        const actionEl = document.getElementById(`action-${id}`);
+        if (actionEl) {
+          actionEl.innerHTML = `
+            <a href="${objectUrl}" download="${outputName}" class="btn-primary px-4 py-2 text-sm shadow-md">
+              保存
+            </a>
+          `;
+        }
+        
+        if (logger && logger.updateStep) {
+           logger.updateStep('generate', 'done');
+           logger.addStep('complete', '処理済みファイルはこのブラウザ内で生成されました（サーバー送信なし）', 'done');
+        }
+      } catch (err) {
+        console.error("Conversion failed:", err);
+        const statusEl = document.getElementById(`status-${id}`);
+        if (statusEl) {
+           statusEl.textContent = '変換エラー';
+           statusEl.classList.add('text-red-500', 'font-bold');
+        }
+        const previewContainer = document.getElementById(`preview-container-${id}`);
+        if (previewContainer) {
+           previewContainer.innerHTML = `<svg class="w-6 h-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>`;
+        }
+        
+        if (logger && logger.updateStep) {
+           logger.addStep('error', '変換中にエラーが発生しました', 'error');
+        }
+      }
+    }
+  }
+
+  setup();
+</script>
+
+<style>
+  input[type=range] {
+    -webkit-appearance: none;
+    background: transparent;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #0ea5e9;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    cursor: pointer;
+    margin-top: -6px;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+  }
+</style>

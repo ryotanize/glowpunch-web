@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout title="AI 背景透過ツール - GlowPunch" description="画像をアップロードするだけで、AIが被写体を認識し背景を自動で透過します。すべてブラウザ内で完結するので安全です。">
@@ -16,7 +18,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
         <p class="text-xl font-bold text-slate-800 mb-2">画像を選択 または ドラッグ＆ドロップ</p>
-        <p class="text-slate-500 text-sm mb-6">JPG, PNG などの画像ファイルに対応</p>
+        <p class="text-slate-500 text-sm mb-4">JPG, PNG などの画像ファイルに対応</p>
+        <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium mb-6">
+          ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+        </p>
         <button id="btn-select" class="btn-primary !bg-pink-500 hover:!bg-pink-600">ファイルを選択する</button>
         <input type="file" id="file-input" class="hidden" accept="image/*" />
       </div>
@@ -29,6 +34,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <div class="w-full max-w-xs bg-slate-200 rounded-full h-2.5 mt-4 overflow-hidden">
           <div class="bg-gradient-to-r from-pink-400 to-pink-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%" id="progress-bar"></div>
         </div>
+        <process-step-log id="bg-log" class="w-full max-w-sm mt-6 text-left"></process-step-log>
       </div>
 
       <div id="result-ui" class="hidden flex-col items-center w-full">
@@ -70,11 +76,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
     </div>
 
-    <div class="mt-8">
-    </div>
-
-  
     <div class="mt-8 border-t border-slate-200 pt-8">
+      <div class="mb-8">
+        <TransparencyCard />
+      </div>
+      
+      <!-- Hidden Template for Step Log -->
+      <ProcessStepLog />
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
           <span>AI背景透過ツールについて（使い方・FAQ）</span>
@@ -164,6 +172,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   const resultUi = document.getElementById('result-ui');
   const loadingText = document.getElementById('loading-text');
   const progressBar = document.getElementById('progress-bar');
+  const logger = document.getElementById('bg-log') as any;
   const resultImage = document.getElementById('result-image') as HTMLImageElement;
   
   const btnDownload = document.getElementById('btn-download');
@@ -229,6 +238,17 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     if (progressBar) progressBar.style.width = '10%';
     loadingText.textContent = "AIを初期化中...";
 
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.add('hidden');
+       }
+       logger.addStep('read', '画像をブラウザ内に読み込みました', 'done');
+       logger.addStep('init', 'AIモデルを初期化しています', 'running');
+       logger.addStep('compute', '背景を推論・透過しています', 'pending');
+       logger.addStep('generate', '結果を生成しています', 'pending');
+    }
+
     try {
       // Configuration for imgly
       const config = {
@@ -240,8 +260,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           if (loadingText) {
             if (key.includes('model_')) {
               loadingText.textContent = `ONNXモデルをロード中...`;
+              if (logger && logger.updateStep) logger.updateStep('init', 'running', 'ONNXモデルをブラウザにダウンロード中');
             } else if (key.includes('compute')) {
               loadingText.textContent = `推論を実行中（少し時間がかかります）...`;
+              if (logger && logger.updateStep) {
+                 logger.updateStep('init', 'done', 'AIモデルの準備完了');
+                 logger.updateStep('compute', 'gear');
+              }
             }
           }
         }
@@ -250,6 +275,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       // Process
       const imageBlob = await removeBackground(file, config);
       
+      if (logger && logger.updateStep) {
+         logger.updateStep('compute', 'done');
+         logger.updateStep('generate', 'done', '透過済み画像を生成しました（サーバー送信なし）');
+      }
+
       // Free old blob url if exists
       if (currentBlobUrl) {
         URL.revokeObjectURL(currentBlobUrl);
@@ -270,6 +300,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     } catch (err) {
       console.error(err);
       alert('エラーが発生しました。申し訳ありませんが、別の画像でお試しいただくか、ブラウザをリロードしてください。');
+      if (logger && logger.updateStep) {
+         logger.updateStep('init', 'error', '処理中にエラーが発生しました');
+      }
       resetUI();
     }
   }
