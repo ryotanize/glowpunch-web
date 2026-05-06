@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
@@ -33,7 +35,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
       <div class="text-center">
         <p class="text-slate-700 font-semibold text-lg">複数のPDFファイルをドロップ</p>
-        <p class="text-slate-500 text-sm mt-1">追加していくことができます</p>
+        <p class="text-slate-500 text-sm mt-1 mb-4">追加していくことができます</p>
+        <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium">
+          ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+        </p>
       </div>
       <input id="file-input" type="file" accept="application/pdf" multiple class="hidden" />
     </div>
@@ -75,8 +80,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           この順序でPDFを生成する
         </button>
 
-        <!-- Status -->
+        <!-- Status and Logs -->
         <div id="status-message" class="hidden text-sm font-bold text-center mt-2 rounded p-3"></div>
+        <process-step-log id="editor-log" class="w-full mt-2"></process-step-log>
       </div>
     </div>
 
@@ -86,8 +92,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     <div class="mt-4">
     </div>
 
-  
     <div class="mt-8 border-t border-slate-200 pt-8">
+      <div class="mb-8">
+        <TransparencyCard />
+      </div>
+      
+      <!-- Hidden Template for Step Log -->
+      <ProcessStepLog />
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
           <span>PDF結合・分割ツールについて（使い方・FAQ）</span>
@@ -189,6 +200,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   const pageCount = document.getElementById('page-count') as HTMLElement;
   const btnMerge = document.getElementById('btn-merge') as HTMLButtonElement;
   const statusMessage = document.getElementById('status-message') as HTMLElement;
+  const logger = document.getElementById('editor-log') as any;
   const canvas = document.getElementById('pdf-render-canvas') as HTMLCanvasElement;
   const ctx = canvas.getContext('2d');
 
@@ -218,6 +230,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     loadingIndicator.classList.add('flex');
     btnMerge.disabled = true;
 
+    editorSection.classList.remove('hidden');
+    
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.add('hidden');
+       }
+       logger.addStep('read', 'PDFファイルをブラウザ内に読み込んでいます', 'running');
+    }
+
     try {
       for (const file of pdfs) {
         const fileBytes = await file.arrayBuffer();
@@ -239,6 +261,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           canvas.width = scaledViewport.width;
           canvas.height = scaledViewport.height;
 
+          // @ts-ignore
           await page.render({
             canvasContext: ctx!,
             viewport: scaledViewport
@@ -259,9 +282,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       
       editorSection.classList.remove('hidden');
       renderPages();
+      
+      if (logger && logger.updateStep) {
+         logger.updateStep('read', 'done');
+      }
     } catch (err) {
       console.error(err);
       alert('PDFの読み込みに失敗しました。');
+      if (logger && logger.updateStep) {
+         logger.updateStep('read', 'error', '読み込みエラーが発生しました');
+      }
     }
 
     loadingIndicator.classList.add('hidden');
@@ -366,6 +396,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     btnMerge.disabled = true;
     btnMerge.classList.add('opacity-50');
     showStatus('PDFを生成しています...', 'info');
+    
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.add('hidden');
+       }
+       logger.addStep('init', '結合・分割の準備をしています', 'running');
+    }
 
     try {
       const uniqueFileIds = new Set(pages.map(p => p.fileId));
@@ -377,6 +415,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         const isStrictlyAscending = pages.every((p, i) => i === 0 || pages[i - 1].pageIndex < p.pageIndex);
         
         if (isStrictlyAscending) {
+          if (logger && logger.updateStep) {
+             logger.updateStep('init', 'done');
+             logger.addStep('delete', '不要なページをブラウザ内で削除しています', 'running');
+          }
           // 元のPDFデータをそのまま読み込み、不要なページだけを削除する
           const sourceBytes = pages[0].fileBytes;
           const pdfDoc = await PDFDocument.load(sourceBytes);
@@ -396,6 +438,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
       // --- 最適化2：複数ファイル、または順序の入れ替えがある場合 ---
       if (!finalPdfBytes) {
+        if (logger && logger.updateStep) {
+             logger.updateStep('init', 'done');
+             logger.addStep('merge', '複数PDFのページを抽出し、再結合しています', 'running');
+        }
         const mergedPdf = await PDFDocument.create();
         
         // リソース（フォント・画像等）の重複保存を防ぐため、ファイル単位で必要なページをまとめる
@@ -431,6 +477,12 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         finalPdfBytes = await mergedPdf.save();
       }
 
+      if (logger && logger.updateStep) {
+         logger.updateStep('delete', 'done');
+         logger.updateStep('merge', 'done');
+         logger.addStep('generate', 'PDFファイルを生成しています', 'running');
+      }
+
       const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -440,11 +492,19 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       
       setTimeout(() => URL.revokeObjectURL(url), 10000);
       showStatus('処理が完了しました！ダウンロードを開始しました。', 'success');
+      
+      if (logger && logger.updateStep) {
+         logger.updateStep('generate', 'done');
+         logger.addStep('complete', '処理済みPDFはこのブラウザ内で生成されました（サーバー送信なし）', 'done');
+      }
 
     } catch (error) {
       console.error(error);
       const errMsg = error instanceof Error ? error.message : String(error);
       showStatus(`生成中にエラーが発生しました: ${errMsg}`, 'error');
+      if (logger && logger.addStep) {
+         logger.addStep('error', '処理中にエラーが発生しました', 'error');
+      }
     }
 
     btnMerge.disabled = false;

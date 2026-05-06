@@ -1,0 +1,74 @@
+---
+// src/components/ProcessStepLog.astro
+---
+<template id="step-log-template">
+  <div class="step-log-container text-sm space-y-2.5 mt-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100 hidden shadow-inner">
+    <!-- Steps will be injected here -->
+  </div>
+</template>
+
+<script>
+  class ProcessStepLog extends HTMLElement {
+    container!: HTMLElement;
+
+    constructor() {
+      super();
+    }
+    
+    connectedCallback() {
+      const template = document.getElementById('step-log-template') as HTMLTemplateElement;
+      this.appendChild(template.content.cloneNode(true));
+      this.container = this.querySelector('.step-log-container') as HTMLElement;
+    }
+
+    // Status mapping for icons
+    // 'done', 'running', 'search', 'gear', 'down'
+    addStep(id: string, label: string, status: string = 'running') {
+      this.container.classList.remove('hidden');
+      const stepEl = document.createElement('div');
+      stepEl.id = `step-${id}`;
+      stepEl.className = 'flex items-start gap-3 text-slate-600 leading-snug transition-all';
+      stepEl.innerHTML = this.getStepHTML(label, status);
+      this.container.appendChild(stepEl);
+    }
+
+    updateStep(id: string, status: string, newLabel?: string) {
+      const stepEl = this.container.querySelector(`#step-${id}`);
+      if (stepEl) {
+        const currentLabelEl = stepEl.querySelector('.step-label');
+        const label = newLabel || (currentLabelEl ? currentLabelEl.textContent : '');
+        stepEl.innerHTML = this.getStepHTML(label || '', status);
+        
+        if (status === 'done') {
+           stepEl.classList.add('opacity-70');
+        } else {
+           stepEl.classList.remove('opacity-70');
+        }
+      }
+    }
+
+    getStepHTML(label: string, status: string) {
+      let icon = '';
+      let colorClass = 'text-slate-600';
+      
+      if (status === 'done') {
+         icon = '✅';
+         colorClass = 'text-emerald-700 font-medium';
+      } else if (status === 'running') {
+         icon = `<svg class="animate-spin h-4 w-4 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+         colorClass = 'text-sky-700 font-bold';
+      } else if (status === 'search') {
+         icon = '🔍';
+      } else if (status === 'gear') {
+         icon = '⚙️';
+         colorClass = 'text-sky-700 font-bold';
+      } else if (status === 'down') {
+         icon = '⬇️';
+      }
+
+      return `<span class="w-5 flex justify-center shrink-0 mt-0.5">${icon}</span> <span class="step-label ${colorClass}">${label}</span>`;
+    }
+  }
+
+  customElements.define('process-step-log', ProcessStepLog);
+</script>

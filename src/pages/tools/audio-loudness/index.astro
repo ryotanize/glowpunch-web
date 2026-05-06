@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TransparencyCard from '../../../components/TransparencyCard.astro';
+import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
@@ -33,7 +35,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
       <div class="text-center">
         <p class="text-slate-700 font-semibold text-lg">動画ファイルをドロップして測定開始</p>
-        <p class="text-slate-500 text-sm mt-1">MP4, MOV, WebMに対応（最大100MB推奨）</p>
+        <p class="text-slate-500 text-sm mt-1 mb-4">MP4, MOV, WebMに対応（最大100MB推奨）</p>
+        <p class="text-xs text-slate-500 bg-white/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm inline-block border border-slate-100 font-medium mb-2">
+          ファイルを選択しても、アップロードは始まりません。<br class="md:hidden"/>選択したファイルは、あなたのブラウザ内で読み込まれます。
+        </p>
       </div>
       <input id="file-input" type="file" accept="video/*" class="hidden" />
     </div>
@@ -50,6 +55,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
         <div id="status-bar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
       </div>
+      <process-step-log id="loudness-log" class="w-full mt-2 text-left"></process-step-log>
     </div>
 
     <!-- Results Section -->
@@ -119,10 +125,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     </div>
 
     <!-- Info Section -->
-    <div class="mt-4">
-    </div>
-
     <div class="mt-8 border-t border-slate-200 pt-8">
+      <div class="mb-8">
+        <TransparencyCard />
+      </div>
+      
+      <!-- Hidden Template for Step Log -->
+      <ProcessStepLog />
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" open>
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
           <span>動画ラウドネスチェッカーについて（FAQ・解説）</span>
@@ -208,6 +217,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  // @ts-nocheck
   // DOM References
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
@@ -221,6 +231,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   const btnNormalize = document.getElementById('btn-normalize');
   const errorContainer = document.getElementById('error-container');
   const errorMsg = document.getElementById('error-msg');
+  const logger = document.getElementById('loudness-log');
 
   let currentFile = null;
   let worker = null;
@@ -252,6 +263,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   function startAnalysis() {
     resetUI();
     statusContainer.classList.remove('hidden');
+    
+    if (logger && logger.addStep) {
+       if (logger.container) {
+          logger.container.innerHTML = '';
+          logger.container.classList.remove('hidden');
+       }
+       logger.addStep('read', '動画をブラウザ内に読み込みました', 'done');
+       logger.addStep('analyze', '音声をスキャン中...', 'running');
+       logger.addStep('normalize', 'ラウドネス自動調整', 'pending');
+    }
     
     initWorker();
     worker.postMessage({ type: 'analyze', file: currentFile });
@@ -297,6 +318,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     } else {
       resStatusText.innerHTML = `<span class="text-amber-600">⚠ 規定値から ${Math.abs(diff).toFixed(1)}dB 外れています。</span> 下記ボタンで調整を推奨します。`;
     }
+
+    if (logger && logger.updateStep) {
+       logger.updateStep('analyze', 'done', 'スキャン完了');
+    }
   }
 
   btnNormalize.onclick = () => {
@@ -306,6 +331,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     resultsSection.classList.add('hidden');
     statusLabel.textContent = '正規化中...';
     statusBar.style.width = '0%';
+    
+    if (logger && logger.updateStep) {
+       logger.updateStep('normalize', 'running', 'ターゲット値に合わせて調整中...');
+    }
     
     worker.postMessage({ 
       type: 'normalize', 
@@ -328,6 +357,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     a.download = currentFile.name.replace(/\.[^/.]+$/, "") + "_L24.mp4";
     a.click();
     
+    if (logger && logger.updateStep) {
+       logger.updateStep('normalize', 'done', '処理が完了しました（サーバー送信なし）');
+    }
+    
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
@@ -343,5 +376,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     resultsSection.classList.add('hidden');
     errorContainer.classList.remove('hidden');
     errorMsg.textContent = msg;
+    
+    if (logger && logger.updateStep) {
+       logger.updateStep('analyze', 'error', '処理中にエラーが発生しました');
+       logger.updateStep('normalize', 'error', '処理中にエラーが発生しました');
+    }
   }
 </script>
