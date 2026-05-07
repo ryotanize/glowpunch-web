@@ -5,8 +5,8 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
-  title="動画ラウドネスチェッカー＆ノーマライザー - GlowPunch"
-  description="動画音声のラウドネス値（LKFS/LUFS）を測定し、主要な入稿規定に合わせた-24.0 LKFSに自動調整します。ブラウザ完結で安全・高速。"
+  title="動画ラウドネスチェッカー【無料・安全】サーバー送信なしで確認・測定＆自動調整 - GlowPunch"
+  description="動画のラウドネス値(LKFS/LUFS)を無料で簡単に確認・測定し、-24.0 LKFSへ自動調整できるブラウザツールです。動画ファイルをサーバーに送信せず、すべてお使いの端末内で処理するため、未公開の動画素材でも情報漏洩の心配なく安全にご利用いただけます。"
 >
   <div class="flex flex-col gap-6">
 
@@ -18,6 +18,17 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
       <p class="text-slate-600 text-lg">
         動画音声のラウドネス値（LKFS/LUFS）を測定し、主要な入稿規定に合わせた-24.0 LKFSへ自動調整します。
       </p>
+      
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs sm:text-sm font-semibold border border-indigo-100">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+          測定から自動調整・保存までワンストップ
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-semibold border border-emerald-100">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+          サーバー送信なし（完全ブラウザ処理）
+        </span>
+      </div>
     </div>
 
     <!-- Drop Zone -->
@@ -139,18 +150,37 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         </summary>
         <div class="p-6 text-slate-600 space-y-6">
           <div class="prose prose-slate max-w-none">
-            <h3>動画広告入稿に欠かせない「ラウドネス調整」をブラウザで</h3>
+            <h3>動画の「音量が下がる」を防ぐ！ラウドネス基準と正しい合わせ方</h3>
+            
+            <h4>なぜ「音を限界まで大きくする」のはNGなのか？</h4>
             <p>
-              YouTubeなどの動画プラットフォームやWebCMを入稿する際、「ラウドネス値が規定を超えています」というエラーで差し戻されたことはありませんか？
-              当ツールは、EBU R128準拠の正確な測定を行い、目標値（-24.0 LKFS等）に一括ノーマライズする完全無料のブラウザ完結型ツールです。
+              以前の映像制作では「音割れしない（0dBを超えない）範囲で限界まで大きくする」のが一般的でした。しかし現在、YouTubeやテレビ放送などほぼすべてのプラットフォームで<strong>「ラウドネス・ノーマライゼーション」</strong>が導入されています。<br>
+              これにより、無理に音圧を上げすぎた動画は、配信側で強制的に全体の音量を下げられてしまいます。「迫力を出そうとした結果、逆に他の動画より音が小さくなってしまった」という失敗を防ぐため、適切なラウドネス管理が必須の時代です。
             </p>
+
+            <h4>測定（解析）だけで終わらせない。本ツール最大の強み</h4>
+            <p>
+              世の中にはラウドネス値を「測定（解析）するだけ」のツールは存在します。しかし、動画制作者にとって本当に必要なのは、<strong>「基準値から外れていた場合、どう修正して書き出すか？」</strong>という解決策です。<br>
+              当ツールは、専用ソフト不要の<strong>フリーのラウドネスメーター</strong>として機能するだけでなく、ワンクリックで業界標準の <strong>-24.0 LKFS</strong> へ音質を損なうことなく全体ゲインを自動調整（ノーマライズ）し、新しい動画ファイルとして直接保存できる点で、他の解析ツールとは一線を画しています。
+            </p>
+
+            <h3>ラウドネス値の確認方法・調整のやり方</h3>
+            <p>本ツールを使えば、以下の3ステップで誰でも簡単にラウドネス値の確認と調整（音量揃え）が可能です。</p>
+            <ol>
+              <li><strong>動画を読み込む:</strong> 画面上の点線エリアに対象の動画ファイル（MP4, MOV等）をドラッグ＆ドロップします。</li>
+              <li><strong>ラウドネス値を確認:</strong> 数秒で現在のラウドネス値（LKFS/LUFS）が測定・表示されます。規定値に収まっているかここで確認できます。</li>
+              <li><strong>ターゲット値に自動調整:</strong> 値が外れている場合は「ターゲット値に合わせて調整・保存」ボタンを押すだけで、音質劣化なく全体の音量（ゲイン）が -24.0 LKFS に自動調整（ノーマライズ）され、安全に手元へ保存されます。</li>
+            </ol>
 
             <h3>よくある質問 (FAQ)</h3>
             
             <h4>Q. なぜYouTubeなどの動画サイトで音量が勝手に下がるのですか？</h4>
             <p>A. YouTubeなどの主要動画プラットフォームでは、<strong>ラウドネスノーマライゼーション</strong>という機能が働いています。動画の元の音量が大きすぎる（ラウドネス規定値を超えている）場合、他の動画と極端な音量差が出ないようにプラットフォーム側で自動的に音量を下げて再生されます。クリエイターが意図した迫力ある音量感で視聴者に届けるには、投稿前の適切なラウドネス調整が非常に重要です。</p>
 
-            <h4>Q. TVerやWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？</h4>
+            <h4>Q. YouTubeの基準値（-14 LUFS）と、-24.0 LKFS の違いは何ですか？</h4>
+            <p>A. <strong>-14 LUFS</strong>はYouTube全体で標準化されている「配信の再生時」の目標値です。一方、<strong>-24.0 LKFS</strong>は日本のテレビ放送や主要なWebCMの「入稿時」に厳格に求められる業界標準（EBU R128 / ARIB TR-B32）です。本ツールは、特にリジェクト（差し戻し）の原因となりやすい「広告入稿時の -24.0 LKFS 合わせ」に特化して自動調整を行います。</p>
+
+            <h4>Q. 日本のテレビ放送や主要なWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？</h4>
             <p>A. デジタルテレビ放送やインターネット配信において、番組やCMが切り替わった際の「音量差による視聴者の不快感」をなくすための国際基準値です。日本国内の主要な動画広告入稿フォーマットでは「<strong>-24.0 LKFS</strong>（許容誤差±1dB以内）」が厳格な基準として運用されており、これに準拠しないファイルは入稿システムでエラーとなります。</p>
 
             <h4>Q. アップロードした動画や音声データはサーバーに保存されますか？</h4>
@@ -180,7 +210,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             "price": "0",
             "priceCurrency": "JPY"
           },
-          "description": "動画音声のラウドネス値（LKFS/LUFS）をブラウザ上で測定し、主要な入稿規定に合わせた-24.0 LKFSに自動調整（ノーマライズ）する無料ツールです。"
+          "description": "動画のラウドネス値(LKFS/LUFS)を無料で簡単に確認・測定し、-24.0 LKFSへ自動調整できるブラウザツールです。動画ファイルをサーバーに送信せず、すべてお使いの端末内で処理するため、未公開の動画素材でも情報漏洩の心配なく安全にご利用いただけます。"
         },
         {
           "@type": "FAQPage",
@@ -195,7 +225,15 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             },
             {
               "@type": "Question",
-              "name": "TVerやWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？",
+              "name": "YouTubeの基準値（-14 LUFS）と、-24.0 LKFS の違いは何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "-14 LUFSはYouTube全体で標準化されている「配信の再生時」の目標値です。一方、-24.0 LKFSは日本のテレビ放送や主要なWebCMの「入稿時」に厳格に求められる業界標準（EBU R128 / ARIB TR-B32）です。本ツールは、特にリジェクトの原因となりやすい「広告入稿時の -24.0 LKFS 合わせ」に特化して自動調整を行います。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "日本のテレビ放送や主要なWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "デジタルテレビ放送やインターネット配信において、番組やCMが切り替わった際の「音量差による視聴者の不快感」をなくすための国際基準値です。日本国内の主要な動画広告入稿フォーマットでは「-24.0 LKFS（許容誤差±1dB以内）」が厳格な基準として運用されており、これに準拠しないファイルは入稿システムでエラーとなります。"
