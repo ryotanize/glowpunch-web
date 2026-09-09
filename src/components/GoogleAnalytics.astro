@@ -1,15 +1,55 @@
 ---
+interface Props {
+  pagePath: string;
+  pageTitle: string;
+  siteRevision?: string;
+}
+
+const { pagePath, pageTitle, siteRevision } = Astro.props;
 const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+const toolEventsEnabled = import.meta.env.PUBLIC_GA_TOOL_EVENTS_ENABLED === "true";
+const validMeasurementId = typeof measurementId === "string" && /^G-[A-Z0-9]+$/.test(measurementId);
+const validRevision = typeof siteRevision === "string" && /^[a-f0-9]{40}$/.test(siteRevision);
+const pageLocation = `https://glowpunch.net${pagePath}`;
 ---
 
-{measurementId && (
+{validMeasurementId && (
   <>
-    <script async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
-    <script is:inline define:vars={{ measurementId }}>
+    <script async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`} referrerpolicy="strict-origin"></script>
+    <script is:inline define:vars={{ measurementId, pageLocation, pageTitle, toolEventsEnabled, validRevision, siteRevision }}>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', measurementId);
+      const referrerOrigin = (() => {
+        try { return document.referrer ? new URL(document.referrer).origin : ''; } catch { return ''; }
+      })();
+      gtag('config', measurementId, {
+        page_location: pageLocation,
+        page_referrer: referrerOrigin,
+        page_title: pageTitle,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false,
+      });
+      if (toolEventsEnabled && validRevision) {
+        const eventNames = new Set(['tool_start', 'tool_success', 'tool_error']);
+        const operations = new Set(['analyze', 'normalize']);
+        const errorCodes = new Set(['processing_failed', 'worker_failed']);
+        window.gpTrackToolEvent = (name, input) => {
+          if (!eventNames.has(name) || !input || !operations.has(input.operation)) return;
+          if (input.tool_id !== 'audio-loudness' || input.measurement_version !== 1 || input.site_revision !== siteRevision) return;
+          const errorCode = input.error_code;
+          if ((name === 'tool_error' && !errorCodes.has(errorCode)) || (name !== 'tool_error' && errorCode !== undefined)) return;
+          try {
+            gtag('event', name, {
+              tool_id: 'audio-loudness',
+              operation: input.operation,
+              measurement_version: 1,
+              site_revision: siteRevision,
+              ...(name === 'tool_error' ? { error_code: errorCode } : {}),
+            });
+          } catch {}
+        };
+      }
     </script>
   </>
 )}

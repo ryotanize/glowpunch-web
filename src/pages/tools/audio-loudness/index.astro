@@ -256,6 +256,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 
 <script>
   // @ts-nocheck
+  import { createToolEventReporter } from '../../../components/tool-events';
   // DOM References
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
@@ -272,8 +273,24 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
   const logger = document.getElementById('loudness-log');
 
   let currentFile = null;
-  let worker = null;
   let measuredLoudness = null;
+  let activeAttempt = null;
+
+  const releaseManifest = (() => {
+    try {
+      const marker = document.getElementById('gp-release-manifest');
+      const manifest = marker?.textContent ? JSON.parse(marker.textContent) : undefined;
+      return manifest?.schemaVersion === 1 && manifest?.measurementVersion === 1 && /^[a-f0-9]{40}$/.test(manifest?.siteRevision)
+        ? manifest
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+  const reporter = createToolEventReporter({
+    siteRevision: releaseManifest?.siteRevision,
+    send: (name, params) => window.gpTrackToolEvent?.(name, params),
+  });
 
   // Drag & Drop
   dropZone.onclick = () => fileInput.click();
@@ -294,6 +311,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
       showError('動画ファイルを指定してください（MP4, MOV, WebMなど）');
       return;
     }
+    cancelActiveAttempt();
     currentFile = file;
     startAnalysis();
   }
@@ -312,42 +330,96 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
        logger.addStep('normalize', 'ラウドネス自動調整', 'pending');
     }
     
-    initWorker();
-    worker.postMessage({ type: 'analyze', file: currentFile });
+    startWorkerAttempt('analyze', { type: 'analyze', file: currentFile });
   }
 
-  function initWorker() {
-    if (worker) worker.terminate();
-    worker = new Worker(new URL('../../../workers/loudness-worker.js', import.meta.url), { type: 'module' });
-    
-    worker.onmessage = (e) => {
-      const { type, value, label, results, buffer, message } = e.data;
-      
-      if (type === 'progress') {
-        const pct = Math.round(value * 100);
-        statusBar.style.width = pct + '%';
-        statusPct.textContent = pct + '%';
-        if (label) statusLabel.textContent = label;
-      } else if (type === 'analysis_done') {
-        onAnalysisComplete(results);
-      } else if (type === 'done') {
-        onNormalizationComplete(buffer);
-      } else if (type === 'error') {
-        showError(message);
+  function startWorkerAttempt(operation, message) {
+    cancelActiveAttempt();
+    const event = reporter.start(operation);
+    const attempt = { operation, event, worker: null, complete: false };
+    activeAttempt = attempt;
+    try {
+      attempt.worker = new Worker(new URL('../../../workers/loudness-worker.js', import.meta.url), { type: 'module' });
+      attempt.worker.onmessage = (event) => onWorkerMessage(attempt, event.data);
+      attempt.worker.onerror = () => failAttempt(attempt, 'worker_failed');
+      attempt.worker.postMessage(message);
+    } catch {
+      failAttempt(attempt, 'worker_failed');
+    }
+  }
+
+  function onWorkerMessage(attempt, message) {
+    if (activeAttempt !== attempt || attempt.complete || !message || typeof message.type !== 'string') return;
+    if (message.type === 'progress') {
+      const value = Number(message.value);
+      if (!Number.isFinite(value)) return;
+      const pct = Math.max(0, Math.min(100, Math.round(value * 100)));
+      statusBar.style.width = pct + '%';
+      statusPct.textContent = pct + '%';
+      if (typeof message.label === 'string') statusLabel.textContent = message.label;
+      return;
+    }
+    if (message.type === 'error') return failAttempt(attempt, 'processing_failed');
+    if (attempt.operation === 'analyze' && message.type === 'analysis_done') {
+      const integrated = message.results?.integrated;
+      if (typeof integrated !== 'number' || !Number.isFinite(integrated)) return failAttempt(attempt, 'processing_failed');
+      try {
+        onAnalysisComplete(integrated);
+        completeAttempt(attempt);
+      } catch {
+        failAttempt(attempt, 'processing_failed');
       }
-    };
-
-    worker.onerror = (err) => {
-      showError('内部エラーが発生しました。ブラウザを更新して再度お試しください。');
-      console.error(err);
-    };
+      return;
+    }
+    if (attempt.operation === 'normalize' && message.type === 'done') {
+      if (!(message.buffer instanceof ArrayBuffer) || message.buffer.byteLength === 0) return failAttempt(attempt, 'processing_failed');
+      try {
+        const output = new Blob([message.buffer], { type: 'video/mp4' });
+        if (output.size === 0) return failAttempt(attempt, 'processing_failed');
+        const url = URL.createObjectURL(output);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = currentFile.name.replace(/\.[^/.]+$/, '') + '_L24.mp4';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        onNormalizationComplete();
+        completeAttempt(attempt);
+      } catch {
+        return failAttempt(attempt, 'processing_failed');
+      }
+    }
   }
 
-  function onAnalysisComplete(results) {
+  function completeAttempt(attempt) {
+    if (activeAttempt !== attempt || attempt.complete) return;
+    attempt.complete = true;
+    attempt.worker?.terminate();
+    activeAttempt = null;
+    attempt.event.success();
+  }
+
+  function failAttempt(attempt, code) {
+    if (activeAttempt !== attempt || attempt.complete) return;
+    attempt.complete = true;
+    attempt.worker?.terminate();
+    activeAttempt = null;
+    attempt.event.error(code);
+    showError('処理中に問題が発生しました。ファイルを確認してもう一度お試しください。');
+  }
+
+  function cancelActiveAttempt() {
+    if (!activeAttempt) return;
+    activeAttempt.complete = true;
+    activeAttempt.worker?.terminate();
+    activeAttempt.event.cancel();
+    activeAttempt = null;
+  }
+
+  function onAnalysisComplete(integrated) {
     statusContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
     
-    measuredLoudness = results.integrated;
+    measuredLoudness = integrated;
     resLoudness.textContent = measuredLoudness.toFixed(1);
     
     const diff = -24.0 - measuredLoudness;
@@ -374,7 +446,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
        logger.updateStep('normalize', 'running', 'ターゲット値に合わせて調整中...');
     }
     
-    worker.postMessage({ 
+    startWorkerAttempt('normalize', {
       type: 'normalize', 
       file: currentFile, 
       settings: {
@@ -384,22 +456,12 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
     });
   };
 
-  function onNormalizationComplete(buffer) {
+  function onNormalizationComplete() {
     statusContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
-    
-    const blob = new Blob([buffer], { type: 'video/mp4' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = currentFile.name.replace(/\.[^/.]+$/, "") + "_L24.mp4";
-    a.click();
-    
     if (logger && logger.updateStep) {
        logger.updateStep('normalize', 'done', '処理が完了しました（サーバー送信なし）');
     }
-    
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
   function resetUI() {
