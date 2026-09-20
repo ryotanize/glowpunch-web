@@ -99,7 +99,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             <p>A. PNG、JPEG、WebPなど主要な画像形式に対応しています。出力は透過情報を保持できるPNG形式となります。</p>
 
             <h4>Q. 画像はサーバーに送信されますか？</h4>
-            <p>A. いいえ、AI処理を含むすべての処理がブラウザ内で完結します。画像データが外部に送信されることはありません。</p>
+            <p>A. 選択した画像の背景除去処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得やサイト配信には通信があります。</p>
 
             <h4>Q. 複雑な背景でも綺麗に切り抜けますか？</h4>
             <p>A. 当ツールは高精度なAIセグメンテーションモデルを使用しており、人物・動物・商品など多くの被写体で高品質な切り抜きが可能です。ただし、被写体と背景の色が非常に似ている場合は精度が低下する場合があります。</p>
@@ -124,7 +124,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             "price": "0",
             "priceCurrency": "JPY"
           },
-          "description": "画像をアップロードするだけでAIが被写体を判別し、背景を自動で透過処理する無料ツールです。ブラウザ完結。"
+          "description": "画像から主な被写体を抽出して背景を透過する無料ツールです。処理対象画像は外部サーバーへアップロードしません。"
         },
         {
           "@type": "FAQPage",
@@ -142,7 +142,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "画像はサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、AI処理を含むすべての処理がブラウザ内で完結します。画像データが外部に送信されることはありません。"
+                "text": "選択した画像の背景除去処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得やサイト配信には通信があります。"
               }
             },
             {
@@ -277,7 +277,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
       
       if (logger && logger.updateStep) {
          logger.updateStep('compute', 'done');
-         logger.updateStep('generate', 'done', '透過済み画像を生成しました（サーバー送信なし）');
+         logger.updateStep('generate', 'done', '透過済み画像を生成しました');
       }
 
       // Free old blob url if exists
