@@ -12,7 +12,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
       </h1>
       <p class="text-slate-600 text-lg">
         iPhoneのHEIC画像を、ブラウザ内で高速にJPG / PNGへ変換します。<br/>
-        <span class="font-bold text-sky-600 bg-sky-50 px-2 py-1 rounded">データはサーバーに送信されません</span>
+        <span class="font-bold text-sky-600 bg-sky-50 px-2 py-1 rounded">処理対象ファイルはアップロードしません</span>
       </p>
     </div>
 
@@ -88,7 +88,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               <h3 class="text-sky-800 m-0 text-lg font-bold">完全ローカル処理だから安心・高速</h3>
               <p class="text-sky-700 text-sm mt-2 mb-0">
                 当サイトのツールは、最新のWeb技術を利用して<strong>お使いのブラウザ内（手元のパソコンやスマホ）で直接画像を変換</strong>します。<br/>
-                外部のサーバーに画像を送信しないため、プライベートな写真や機密情報が流出する心配は一切ありません。
+                外部のサーバーに画像を送信しないため、処理のために画像を外部へ預ける必要がありません。保存先や端末の管理は別途必要です。
               </p>
             </div>
 
@@ -111,13 +111,13 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         <div class="p-6 text-slate-600">
           <article class="prose prose-slate max-w-none">
             <h4>Q. 変換に時間がかかるのはなぜですか？</h4>
-            <p>A. 画像をサーバーに送らず、お使いの端末（スマホやPC）のCPUを使って直接変換しているためです。端末の性能によっては少し時間がかかる場合がありますが、その分プライバシーが完全に守られます。</p>
+            <p>A. 画像をサーバーに送らず、お使いの端末（スマホやPC）のCPUを使って直接変換しているためです。端末の性能によっては少し時間がかかる場合がありますが、処理対象画像を外部サーバーへ預けずに変換できます。</p>
 
             <h4>Q. 複数ファイルを一括で変換できますか？</h4>
             <p>A. はい、可能です。複数のファイルをまとめてドロップすると、順番に変換処理が行われます。</p>
 
             <h4>Q. JPGとPNG、どちらを選べばいいですか？</h4>
-            <p>A. 一般的な写真やブログへの掲載なら、ファイルサイズが小さくなる「JPG」がおすすめです。画質を一切落としたくない場合や、イラストなどで輪郭をくっきりさせたい場合は「PNG」をお選びください。</p>
+            <p>A. 一般的な写真やブログへの掲載なら、ファイルサイズが小さくなる「JPG」がおすすめです。変換後の画像を可逆圧縮で保存したい場合や、イラストなどで輪郭をくっきりさせたい場合は「PNG」をお選びください。</p>
           </article>
         </div>
       </details>
@@ -150,7 +150,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "変換に時間がかかるのはなぜですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "画像をサーバーに送らず、お使いの端末（スマホやPC）のCPUを使って直接変換しているためです。端末の性能によっては少し時間がかかる場合がありますが、その分プライバシーが完全に守られます。"
+                "text": "画像をサーバーに送らず、お使いの端末（スマホやPC）のCPUを使って直接変換しているためです。端末の性能によっては少し時間がかかる場合がありますが、処理対象画像を外部サーバーへ預けずに変換できます。"
               }
             },
             {

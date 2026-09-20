@@ -6,7 +6,7 @@ pubDate: 2026-04-13
 
 GlowPunchの最新ツールとして、 **「Glow Mesh Generator（メッシュグラデーション生成ツール）」** を公開しました！
 
-[Glow Mesh Generatorを使ってみる](/tools/mesh-gradient)
+[Glow Mesh Generatorを使ってみる](/tools/mesh-gradient/)
 
 ## モダンなWebデザインに欠かせない「メッシュグラデーション」
 

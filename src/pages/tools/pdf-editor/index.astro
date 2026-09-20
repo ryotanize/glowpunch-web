@@ -112,7 +112,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             <h3>よくある質問 (FAQ)</h3>
 
             <h4>Q. PDFファイルはサーバーにアップロードされますか？</h4>
-            <p>A. いいえ、すべての処理はブラウザ内で完結します。PDFデータが外部のサーバーに送信・保存されることは一切ないため、契約書や社内資料など機密性の高い文書でも安心です。</p>
+            <p>A. いいえ、すべての処理はブラウザ内で完結します。処理対象PDFは外部サーバーへアップロードしません。契約書や社内資料などの機密文書は、組織の利用規則も確認してください。</p>
 
             <h4>Q. 何ページまで結合できますか？</h4>
             <p>A. ブラウザのメモリに依存しますが、通常のPCであれば数百ページ程度の結合は問題なく行えます。非常に大きなファイル（100MB超）の場合はメモリ不足になる可能性があります。</p>
@@ -150,7 +150,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "PDFファイルはサーバーにアップロードされますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、すべての処理はブラウザ内で完結します。PDFデータが外部のサーバーに送信・保存されることは一切ないため、契約書や社内資料など機密性の高い文書でも安心です。"
+                "text": "いいえ、すべての処理はブラウザ内で完結します。処理対象PDFは外部サーバーへアップロードしません。契約書や社内資料などの機密文書は、組織の利用規則も確認してください。"
               }
             },
             {
@@ -483,7 +483,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
          logger.addStep('generate', 'PDFファイルを生成しています', 'running');
       }
 
-      const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(finalPdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

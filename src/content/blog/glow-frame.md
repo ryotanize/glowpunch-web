@@ -6,7 +6,7 @@ pubDate: 2026-04-13
 
 GlowPunchの新ツールとして、 **「GlowFrame（スクリーンショット装飾ツール）」** を公開しました！
 
-[GlowFrameを使ってみる](/tools/glow-frame)
+[GlowFrameを使ってみる](/tools/glow-frame/)
 
 ## ただの「スクショ」を「作品」に変える
 
@@ -32,4 +32,4 @@ GlowPunchの新ツールとして、 **「GlowFrame（スクリーンショッ�
 
 インストール不要、登録不要。今すぐあなたのスクリーンショットを「映える」一枚に変えてみてください。
 
-[GlowFrameで画像を装飾する](/tools/glow-frame)
+[GlowFrameで画像を装飾する](/tools/glow-frame/)

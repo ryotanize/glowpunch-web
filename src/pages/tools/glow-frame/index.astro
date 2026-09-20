@@ -317,7 +317,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     vaporwave: ['#4a044e', ['#ff00ff', '#00ffff', '#7028e4', '#d946ef']],
     ice: ['#0c4a6e', ['#38bdf8', '#7dd3fc', '#bae6fd', '#0284c7']],
     white: ['#f8fafc', ['#e2e8f0', '#cbd5e1', '#94a3b8', '#64748b']],
-  };
+  } as const;
 
   function setup() {
     // Drop Zone Listeners
@@ -448,7 +448,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
        windowFrame?.classList.remove('hidden');
        previewImg.style.paddingTop = '40px';
        previewImg.classList.add('bg-white/10', 'backdrop-blur-xl');
-       windowFrame.style.borderRadius = `${radius}px ${radius}px 0 0`;
+       windowFrame!.style.borderRadius = `${radius}px ${radius}px 0 0`;
     } else if (frame === 'browser') {
         // Simple version for now
         windowFrame?.classList.add('hidden');
@@ -462,7 +462,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   async function exportImage() {
     if (!currentImage) return;
     
-    const canvas = document.getElementById('export-canvas') as HTMLCanvasElement;
+    const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     

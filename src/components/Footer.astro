@@ -1,25 +1,13 @@
 ---
 const currentYear = new Date().getFullYear();
 ---
-<footer class="w-full py-12 mt-auto border-t border-slate-200 bg-slate-50 text-slate-500 text-sm">
-  <div class="max-w-[1200px] mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-    <div class="flex flex-col items-center md:items-start gap-2">
-      <div class="flex items-center gap-2">
-        <div class="w-6 h-6 rounded-md bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-        </div>
-        <span class="font-bold text-slate-800">サーバー送信なしの無料ツール集</span>
-      </div>
-      <div>&copy; {currentYear} GlowPunch運営事務局. All rights reserved.</div>
-    </div>
-    <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center font-medium">
-      <a href="/#tools" class="hover:text-sky-500 transition-colors">ツール一覧</a>
-      <a href="/guide" class="hover:text-sky-500 transition-colors">使い方</a>
-      <a href="/blog" class="hover:text-sky-500 transition-colors">ブログ</a>
-      <a href="/about" class="hover:text-sky-500 transition-colors">運営者情報</a>
-      <a href="/contact" class="hover:text-sky-500 transition-colors">お問い合わせ</a>
-      <a href="/privacy-policy" class="hover:text-sky-500 transition-colors">プライバシーポリシー</a>
-      <a href="/disclaimer" class="hover:text-sky-500 transition-colors">免責事項</a>
-    </div>
+<footer class="w-full py-10 mt-auto border-t border-slate-200 bg-white text-sm">
+  <div class="max-w-[1200px] mx-auto px-4">
+    <p class="font-bold text-lg mb-2">GlowPunch</p>
+    <p class="mb-5">ファイルを預けず、小さな作業を解決する無料ブラウザツール。</p>
+    <nav aria-label="フッターナビゲーション" class="flex flex-wrap gap-x-6 gap-y-3 mb-6">
+      <a href="/#tools">ツール一覧</a><a href="/blog/">ガイド・記事</a><a href="/guide/">使い方</a><a href="/about/">開発方針・運営者情報</a><a href="/contact/">お問い合わせ・訂正依頼</a><a href="/privacy-policy/">プライバシーポリシー</a><a href="/disclaimer/">利用条件・免責事項</a>
+    </nav>
+    <p class="text-slate-500">&copy; {currentYear} GlowPunch</p>
   </div>
 </footer>

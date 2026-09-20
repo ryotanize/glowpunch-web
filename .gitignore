@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Browser test artifacts
+test-results/
+playwright-report/
+
+.build-mode-check-*/

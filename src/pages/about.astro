@@ -1,36 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="運営者情報 | GlowPunch" description="「サーバー送信なしの無料ツール集」GlowPunchの運営者情報・サイトポリシーについてご案内します。">
-  <div class="prose prose-slate max-w-none glass-panel p-8 md:p-12">
-    <h1 class="text-3xl font-bold text-slate-800 mb-8">運営者情報</h1>
+<BaseLayout title="GlowPunchについて・運営者情報 | GlowPunch" description="大切なファイルを外部サーバーへ預けず、小さな作業を解決する。GlowPunchの開発思想、できることと限界、運営窓口をご案内します。">
+  <article class="prose prose-slate max-w-3xl mx-auto w-full glass-panel p-6 md:p-10">
+    <h1>GlowPunchについて・運営者情報</h1>
 
-    <p class="text-slate-500 mb-6">最終更新日: 2026年4月29日</p>
+    <p>PDFをひとつにまとめたい。写真の形式を変えたい。動画から音声だけを取り出したい。そのたびに、ファイルを知らないサーバーへ渡す必要はあるのでしょうか。</p>
+    <p>GlowPunchは、<strong>手元のブラウザでできる処理は、手元で完結させる</strong>という考えから作る無料Webツール集です。インストールや会員登録をせず、小さな日常の作業をすぐに解決できることを目指しています。</p>
+    <h2>ブラウザを選ぶ理由</h2>
+    <p>ブラウザはページを見るだけでなく、選択したファイルを読み取り、画像を描画し、PDFや動画を加工できます。GlowPunchはこれらの機能と公開ライブラリを組み合わせ、処理対象ファイルを外部サーバーへアップロードしない設計にしています。AIを使う画像処理も、モデルを取得して端末内で計算します。</p>
+    <h2>プライバシーは、説明できることから</h2>
+    <p>「通信が一切ない」「あらゆる情報漏洩を防げる」とは考えていません。サイト配信、モデルの取得、設定に応じた解析・広告には通信があります。何を端末内で処理し、何のために通信するのかを分けて伝えます。</p>
+    <p>端末やブラウザ拡張機能、保存後の共有先までは管理できません。業務ファイルは所属組織のルールに従って扱ってください。<a href="/blog/browser-local-processing/">ブラウザ内処理の仕組みと限界</a>もご覧ください。</p>
+    <h2>便利さと引き換えに隠さない制約</h2>
+    <ul><li>大きな動画や多数の画像は端末のメモリを使い、スマートフォンでは処理できないことがあります。</li><li>ブラウザやOSによって使える動画・音声形式が異なります。</li><li>変換後の画質・色・文書構造が原本と同じとは限りません。元ファイルを残して確認してください。</li></ul>
+    <h2>ツールと記事の作り方</h2>
+    <p>ツールはPDF・画像・動画・音声・テキストの小さな処理を中心に増やします。端末内で扱えるか、用途と限界を説明できるかを重視します。ガイドは公開告知だけでなく、形式の選び方や失敗時の対処を扱い、実装と公式資料を照合して更新します。</p>
+    <p>公開日と更新日を区別し、過去の告知は履歴として表示します。説明の誤りや環境による不具合を見つけた場合は、<a href="/contact/">訂正・不具合報告の窓口</a>へお知らせください。</p>
+    <h2>運営者と連絡先</h2>
+    <dl><dt>サイト・運営窓口</dt><dd>GlowPunch（公開上の運営者表記：GlowPunch運営事務局）</dd><dt>サイトURL</dt><dd><a href="https://glowpunch.net/">https://glowpunch.net/</a></dd><dt>連絡先</dt><dd><a href="mailto:contact@glowpunch.net">contact@glowpunch.net</a></dd></dl>
+    <p>ツールは無料で利用できます。広告を導入する場合も、操作ボタンと混同する配置や処理を遮る表示を避ける方針です。<a href="/privacy-policy/">プライバシーポリシー</a>と<a href="/disclaimer/">利用条件</a>をご確認ください。</p>
 
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">サイト名</h2>
-    <p class="text-slate-600 mb-4">GlowPunch（グロウパンチ）— サーバー送信なしの無料Webツール集</p>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">サイトURL</h2>
-    <p class="text-slate-600 mb-4"><a href="https://glowpunch.net" class="text-sky-500 hover:text-sky-600 transition-colors">https://glowpunch.net</a></p>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">運営者</h2>
-    <p class="text-slate-600 mb-4">GlowPunch運営事務局</p>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">サイトの目的</h2>
-    <p class="text-slate-600 mb-4">当サイトは、日常のちょっとした不便を解消する「ブラウザ完結型」の無料Webツールを提供するサービスです。インストール不要・アカウント登録不要で、どなたでもすぐにお使いいただけます。</p>
-    <p class="text-slate-600 mb-4">すべてのツールはお使いのデバイス内で処理が完結するため、<strong>入力データがサーバーに送信されることはありません</strong>。機密書類やプライベートな写真・動画でも安心してご利用いただけることが、当サイト最大の特徴です。</p>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">提供しているツールの例</h2>
-    <ul class="text-slate-600 mb-4 list-disc pl-6 space-y-2">
-      <li><strong>PDF結合・並べ替え</strong> — 複数のPDFを1つにまとめるツール</li>
-      <li><strong>AI背景透過</strong> — 画像の背景をワンクリックで削除</li>
-      <li><strong>文字数カウンター</strong> — テキストの文字数・行数・単語数を瞬時に計測</li>
-      <li><strong>動画フレーム抽出</strong> — 動画から好きなシーンを静止画として切り出し</li>
-      <li><strong>動画トリマー</strong> — 動画のカット・アスペクト比変更</li>
-      <li>...その他多数のツールを提供中</li>
-    </ul>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">お問い合わせ</h2>
-    <p class="text-slate-600 mb-4">ご意見・ご要望・不具合報告などは <a href="/contact" class="text-sky-500 hover:text-sky-600 transition-colors">お問い合わせページ</a> よりお寄せください。</p>
-  </div>
+  </article>
 </BaseLayout>
