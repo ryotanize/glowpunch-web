@@ -2,7 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="GlowFrame - スクリーンショットをおしゃれに装飾 - GlowPunch" description="スクリーンショットを美しい背景やウィンドウフレームで装飾し、SNS映えする画像を作成。ブラウザ完結でプライバシーも安心。">
+<BaseLayout title="GlowFrame - スクリーンショットをおしゃれに装飾 - GlowPunch" description="スクリーンショットを背景やウィンドウフレームで装飾するツールです。処理対象画像は外部サーバーへアップロードしません。">
   <div class="flex flex-col gap-8 max-w-6xl mx-auto">
     <div class="text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
@@ -128,7 +128,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </div>
 
         <div class="flex items-center justify-between text-slate-400 text-xs px-2">
-           <p>※ 画像はブラウザ内で処理され、サーバーには送信されません。</p>
+           <p>※ 画像はブラウザ内で処理し、処理対象画像を外部サーバーへアップロードしません。</p>
            <p id="img-info" class="hidden">Original: 1920x1080</p>
         </div>
       </div>
@@ -158,7 +158,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <li>「保存」ボタンを押すだけ</li>
       </ol>
       <p>
-        すべての作業はローカル環境で行われるため、社外秘の情報が含まれる開発画面などでも、安心して加工いただけます。
+        作業はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。業務データでは、所属組織のルール、端末環境、保存先も確認してください。
       </p>
     </article>
   
@@ -182,7 +182,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             <p>A. 高解像度のPNG画像として出力されます。Retinaディスプレイ対応で、ブログやSNSに掲載しても美しく表示されます。</p>
 
             <h4>Q. 画像はサーバーに送信されますか？</h4>
-            <p>A. いいえ、すべての処理がブラウザ内で完結します。業務上のスクリーンショット等でも安心してお使いいただけます。</p>
+            <p>A. 処理はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。サイト配信などの通信は別途発生します。</p>
           </div>
         </div>
       </details>
@@ -230,7 +230,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "画像はサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、すべての処理がブラウザ内で完結します。業務上のスクリーンショット等でも安心してお使いいただけます。"
+                "text": "処理はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。サイト配信などの通信は別途発生します。"
               }
             }
           ]

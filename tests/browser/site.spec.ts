@@ -5,7 +5,7 @@ import { tools } from '../../src/data/tools';
 import { isGuide } from '../../src/data/content-policy.mjs';
 test.beforeEach(async ({page}) => { page.on('pageerror', error => console.error('BROWSER ERROR:', error.message)); });
 const articles = readdirSync('src/content/blog').map(name => name.replace(/\.md$/, ''));
-const routes = ['/', '/blog/', '/guide/', '/about/', '/contact/', '/privacy-policy/', '/disclaimer/', ...tools.map(tool => `/tools/${tool.id}/`), ...articles.map(id => `/blog/${id}/`)];
+const routes = ['/', '/blog/', '/guide/', '/changelog/', '/about/', '/contact/', '/privacy-policy/', '/disclaimer/', ...tools.map(tool => `/tools/${tool.id}/`), ...articles.map(id => `/blog/${id}/`)];
 
 for (const width of [390, 1280]) {
   test(`all public pages: navigation, metadata, structured data and layout at ${width}px`, async ({ page }, testInfo) => {

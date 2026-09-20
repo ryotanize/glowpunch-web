@@ -4,12 +4,11 @@ import { getCollection } from 'astro:content';
 import { isGuide } from '../../data/content-policy.mjs';
 const posts = await getCollection('blog');
 const guides = posts.filter(post => isGuide(post.id)).sort((a, b) => (b.data.updatedDate ?? b.data.pubDate).valueOf() - (a.data.updatedDate ?? a.data.pubDate).valueOf());
-const announcements = posts.filter(post => !isGuide(post.id)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 <BaseLayout title="ファイル作業のガイド・記事 | GlowPunch" description="PDF・画像・動画・音声の形式選び、変換後の確認、ブラウザ内処理の限界を学ぶ実用ガイド。公開履歴も掲載しています。">
   <header class="max-w-3xl"><h1 class="text-3xl md:text-4xl font-bold mb-4">ファイル作業のガイド・記事</h1><p class="text-lg leading-relaxed">形式を選ぶ、失敗の原因を調べる、出力を確かめる。ツールを開く前にも役立つ知識をまとめています。</p></header>
   <section aria-labelledby="practical-guides"><h2 id="practical-guides" class="text-2xl font-bold mb-5">実用ガイド</h2>
     <div class="grid md:grid-cols-2 gap-5">{guides.map(post => <a href={`/blog/${post.id}/`} class="glass-panel p-6 block hover:border-sky-600"><h3 class="text-xl font-bold text-sky-800 mb-3">{post.data.title}</h3><p class="mb-3">{post.data.description}</p><p class="text-xs text-slate-500">更新：<time datetime={(post.data.updatedDate ?? post.data.pubDate).toISOString()}>{(post.data.updatedDate ?? post.data.pubDate).toLocaleDateString('ja-JP', { timeZone: 'UTC' })}</time></p></a>)}</div>
   </section>
-  <section aria-labelledby="announcements" class="border-t border-slate-200 pt-8"><h2 id="announcements" class="text-xl font-bold mb-3">これまでの公開・開発のお知らせ</h2><p class="mb-5 text-sm">公開時の記録です。現在の仕様・制約は各ツールページと実用ガイドを確認してください。</p><ul class="space-y-4">{announcements.map(post => <li><time class="text-sm text-slate-500 mr-3" datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('ja-JP', { timeZone: 'UTC' })}</time><a class="text-sky-800 underline" href={`/blog/${post.id}/`}>{post.data.title}</a></li>)}</ul></section>
+  <section aria-labelledby="changelog" class="border-t border-slate-200 pt-8"><h2 id="changelog" class="text-xl font-bold mb-3">公開・開発の履歴</h2><p class="mb-5 text-sm">短い公開告知は履歴にまとめました。現在の仕様・制約は各ツールページと実用ガイドを確認してください。</p><a class="text-sky-800 underline" href="/changelog/">GlowPunchの更新履歴を見る</a></section>
 </BaseLayout>

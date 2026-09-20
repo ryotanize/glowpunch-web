@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const updates = [
+  ['first-post', '2026-04-12', 'GlowPunch公開', '/'],
+  ['background-remover', '2026-04-13', 'AI背景透過', '/tools/background-remover/'],
+  ['character-counter', '2026-04-13', '文字数カウンター', '/tools/character-counter/'],
+  ['glow-frame', '2026-04-13', 'GlowFrame', '/tools/glow-frame/'],
+  ['ipod-silhouette', '2026-04-13', 'iPodシルエット', '/tools/ipod-silhouette/'],
+  ['mesh-gradient', '2026-04-13', 'メッシュグラデーション', '/tools/mesh-gradient/'],
+  ['slide-palette', '2026-04-13', 'スライド配色', '/tools/slide-palette/'],
+  ['stripe-generator', '2026-04-13', 'ストライプジェネレーター', '/tools/stripe-generator/'],
+  ['frame-extractor', '2026-04-14', 'フレーム抽出', '/tools/frame-extractor/'],
+  ['video-optimizer', '2026-04-14', '動画スペックチェッカー', '/tools/video-optimizer/'],
+  ['video-trimmer', '2026-04-17', '動画トリミングとクロップ', '/tools/video-trimmer/'],
+  ['sticker-bomb', '2026-04-25', 'ステッカーボム', '/tools/sticker-bomb/'],
+];
+---
+<BaseLayout title="更新履歴 - GlowPunch" description="GlowPunchのツール公開と開発の履歴です。現在の仕様は各ツールページを確認してください。">
+  <article class="max-w-3xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">更新履歴</h1>
+    <p class="text-lg leading-relaxed mb-8">過去の短い公開告知を時系列でまとめています。機能の現在の仕様、対応形式、制約は各ツールページを確認してください。</p>
+    <ol class="border-l border-slate-200 pl-6 space-y-7">
+      {updates.map(([id, date, title, href]) => <li id={id}><time class="text-sm text-slate-500" datetime={date}>{date}</time><h2 class="text-xl font-bold mt-1"><a class="text-sky-800 underline" href={href}>{title}</a></h2></li>)}
+    </ol>
+  </article>
+</BaseLayout>

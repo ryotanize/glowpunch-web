@@ -2,10 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { isIndexable } from '../src/data/content-policy.mjs';
 import { createToolEventReporter } from '../src/components/tool-events.ts';
+import { readFileSync } from 'node:fs';
 
 test('sitemap includes guides and tools, excludes history and all 404 spellings', () => {
   for (const path of ['/', '/blog/', '/blog/pdf-editor/', '/tools/pdf-editor/', '/privacy-policy/']) assert(isIndexable(`https://glowpunch.net${path}`));
   for (const path of ['/404', '/404/', '/404.html', '/blog/first-post/', '/blog/glow-frame']) assert(!isIndexable(`https://glowpunch.net${path}`));
+});
+
+test('former announcements have Cloudflare redirects to the consolidated changelog', () => {
+  const redirects = readFileSync('public/_redirects', 'utf8');
+  for (const id of ['background-remover', 'character-counter', 'first-post', 'frame-extractor', 'glow-frame', 'ipod-silhouette', 'mesh-gradient', 'slide-palette', 'sticker-bomb', 'stripe-generator', 'video-optimizer', 'video-trimmer']) {
+    assert.match(redirects, new RegExp(`/blog/${id}/ /changelog/#${id} 301`));
+  }
 });
 
 test('analytics reports only allowed fields and does not duplicate terminal events', () => {

@@ -2,10 +2,10 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="AI自動レイヤー分割＆PSDエクスポート - GlowPunch" description="画像をAIが解析し、被写体と背景の2層に分割。2層のPSDデータとしてブラウザ完結で出力します。">
+<BaseLayout title="被写体・背景PSD分割 - GlowPunch" description="画像から主な被写体を抽出し、被写体と背景の2層を含むPSDを出力します。処理対象画像は外部サーバーへアップロードしません。">
   <div class="flex flex-col gap-6">
     <div class="mb-4">
-      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">AI自動レイヤー分割＆<span class="text-sky-500">PSDエクスポート</span></h1>
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">被写体・背景<span class="text-sky-500">PSD分割</span></h1>
       <p class="text-slate-600 text-lg">画像をAIが被写体と背景の2層に分割し、PSD形式（レイヤー保持）でダウンロードできるツールです。お使いの端末内で処理が完結するため、処理対象画像は外部サーバーへアップロードしません。</p>
     </div>
 
@@ -51,7 +51,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             処理メニュー
           </h3>
           <button id="btn-segment" class="w-full py-3 mb-4 rounded-xl font-bold text-white bg-sky-500 hover:bg-sky-600 active:scale-95 transition-all shadow shadow-sky-500/30 flex justify-center items-center gap-2">
-            AIで要素ごとに分割
+            被写体と背景に分割
           </button>
           
           <!-- Progress -->
@@ -80,17 +80,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
     </div>
 
-    <!-- SEO text -->
     <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
       <h2>ツールについて</h2>
-      <p>このツールは、ブラウザに搭載された機械学習モデル（ONNX Runtime / Transformers.js）を利用し、画像内の要素（人物、壁、空、地面、建物など）を自動で認識して切り抜くツールです。すべての処理はあなたのブラウザの中だけで高速に行われるため、画像のアップロード不要で安全にお使いいただけます。</p>
+      <p>このツールは、<code>@imgly/background-removal</code> を利用して主な被写体のマスクを作り、画像を「被写体」と「背景」の2層に分けたPSDを生成します。選択した画像の分割処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデルと実行用ライブラリの取得には通信があります。</p>
       <h3>主な用途</h3>
       <ul>
         <li>画像から人物だけを切り抜いて別の背景に合成したい時</li>
-        <li>風景画像から空の部分だけを分離したい時</li>
         <li>デザイン素材として被写体と背景を分けたPSDが欲しい時</li>
+        <li>切り抜き後に編集ソフトで輪郭を手直ししたい時</li>
       </ul>
-      <p>初回の分割時にはモデルデータ（数十MB）のダウンロードが走るため少し時間がかかりますが、2回目以降はオフラインに近い速度でサクサク動作します。</p>
+      <p>元の制作レイヤーの復元、人物・空・建物などの意味単位での個別レイヤー化、隠れていた背景の生成は行いません。初回はAIモデルの取得で時間がかかることがあり、キャッシュの有無や端末環境によって以後の処理時間も変わります。</p>
     </article>
     
     <div class="mt-4">
@@ -99,12 +98,12 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     <div class="mt-8 border-t border-slate-200 pt-8">
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
-          <span>AI レイヤー分割ツールについて（使い方・FAQ）</span>
+          <span>被写体・背景PSD分割について（使い方・FAQ）</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </summary>
         <div class="p-6 text-slate-600 space-y-6">
           <div class="prose prose-slate max-w-none">
-            <h3>AI レイヤー分割ツールについて</h3>
+            <h3>被写体・背景PSD分割について</h3>
             <p>写真やイラストを読み込み、被写体と背景の2層に分けたPSDを生成します。元の制作レイヤーの復元、複数物体の個別分割、隠れた背景の補完はできません。</p>
 
             <h3>よくある質問 (FAQ)</h3>
@@ -113,10 +112,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             <p>A. Adobe Photoshopのネイティブファイル形式で、複数のレイヤー（重ね合わせた画像層）を保持できます。当ツールで生成したPSDはPhotoshopやGIMPなどの画像編集ソフトで開けます。</p>
 
             <h4>Q. どのような画像でもレイヤー分割できますか？</h4>
-            <p>A. AIが「意味のある領域」を自動認識するため、人物写真、風景写真、イラストなど幅広い画像に対応しています。ただし、非常にシンプルな画像や抽象的なパターンでは分割精度が低下する場合があります。</p>
+            <p>A. 主な被写体と背景を2層に分けます。髪、透明な物体、背景と近い色の被写体、複数の被写体が重なる画像では輪郭の手直しが必要になる場合があります。人物・空・建物などを個別の意味レイヤーに分ける機能ではありません。</p>
 
             <h4>Q. 画像はサーバーに送信されますか？</h4>
-            <p>A. いいえ、AI推論を含むすべての処理がブラウザ内で完結します。未公開のデザインデータでも安心です。</p>
+            <p>A. 選択した画像の分割処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。業務データを扱う場合は、所属組織のルール、端末環境、保存先も確認してください。</p>
           </div>
         </div>
       </details>
@@ -130,7 +129,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       "@graph": [
         {
           "@type": "SoftwareApplication",
-          "name": "AI 自動レイヤー分割＆PSD生成",
+          "name": "被写体・背景PSD分割",
           "operatingSystem": "All",
           "applicationCategory": "DesignApplication",
           "offers": {
@@ -156,7 +155,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "どのような画像でもレイヤー分割できますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "AIが「意味のある領域」を自動認識するため、人物写真、風景写真、イラストなど幅広い画像に対応しています。ただし、非常にシンプルな画像や抽象的なパターンでは分割精度が低下する場合があります。"
+                "text": "主な被写体と背景を2層に分けます。髪、透明な物体、背景と近い色の被写体、複数の被写体が重なる画像では輪郭の手直しが必要になる場合があります。人物・空・建物などを個別の意味レイヤーに分ける機能ではありません。"
               }
             },
             {
@@ -164,7 +163,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "画像はサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、AI推論を含むすべての処理がブラウザ内で完結します。未公開のデザインデータでも安心です。"
+                "text": "選択した画像の分割処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。業務データを扱う場合は、所属組織のルール、端末環境、保存先も確認してください。"
               }
             }
           ]
@@ -278,7 +277,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       layerCanvasesContainer.innerHTML = '';
       generatedLayers = [];
       btnSegment.disabled = false;
-      btnSegment.innerHTML = 'AIで要素ごとに分割';
+      btnSegment.innerHTML = '被写体と背景に分割';
       progressContainer.classList.add('hidden');
       btnExportPsd.style.display = 'none';
       origCanvas.style.opacity = '1';
@@ -318,7 +317,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
              progressBar.style.width = `${percent}%`;
              progressDetail.textContent = percent + '%';
              if (key.includes('model_')) {
-                progressStatus.textContent = `ONNXモデルをロード中...`;
+                progressStatus.textContent = `AIモデルをロード中...`;
              } else if (key.includes('compute')) {
                 progressStatus.textContent = `推論を実行中...`;
              }

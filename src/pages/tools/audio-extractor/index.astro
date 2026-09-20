@@ -6,7 +6,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 
 <BaseLayout
   title="動画からの音声抽出ツール - GlowPunch"
-  description="ブラウザ上で動画から音声（MP3, WAV, AAC）を安全・高速に抽出。サーバーへのアップロード不要で機密データも安心です。"
+  description="ブラウザ上で動画から音声（MP3、WAV、AAC）を抽出するツールです。処理対象動画は外部サーバーへアップロードしません。"
 >
   <div class="flex flex-col gap-6">
 
@@ -16,7 +16,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         動画の<span class="text-rose-500">音声抽出</span>ツール
       </h1>
       <p class="text-slate-600 text-lg">
-        動画ファイルから音声だけを抜き出してダウンロード。MP3・WAV・AACに対応し、すべてブラウザ内で安全に処理されます。
+        動画ファイルから音声だけを抜き出してダウンロード。MP3・WAV・AACに対応し、処理対象動画は外部サーバーへアップロードしません。
       </p>
     </div>
 
@@ -135,13 +135,13 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
     </div>
 
     <article class="prose prose-slate mt-8 max-w-none border-t border-slate-200 pt-10">
-      <h2>動画から音声だけを安全に取り出す</h2>
+      <h2>動画から音声だけを取り出す</h2>
       <p>
         「ライブ動画のBGMだけを作業用に保存したい」「会議の録画データから文字起こし用に音声ファイルだけを作りたい」といった場合に、手軽に音声を抽出できるツールです。
       </p>
       <h3>このツールの特徴</h3>
       <ul>
-        <li><strong>完全ローカル処理で安全</strong>：あなたのブラウザ上で直接処理を行うため、ファイルが外部サーバーに送信されることは一切ありません。会議や家族の動画など、プライベートなデータでも安心です。</li>
+        <li><strong>ブラウザ内処理</strong>：変換はブラウザ上で行い、処理対象動画を外部サーバーへアップロードしません。業務データは組織のルール、端末環境、保存先も確認してください。</li>
         <li><strong>人気のフォーマットに対応</strong>：汎用性が高い「MP3」、音質劣化のない「WAV」、動画での利用に適した「AAC」から選べます。</li>
         <li><strong>アップロード待ち時間ゼロ</strong>：サーバーにアップロードしないため、読み込み・処理時間はファイルのサイズや端末の性能によって変わります。</li>
       </ul>
@@ -173,7 +173,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             <p>A. MP3、WAV、AACの3形式に対応しています。用途に合わせて最適な形式をお選びいただけます。</p>
 
             <h4>Q. 動画データはサーバーに送信されますか？</h4>
-            <p>A. いいえ、すべての処理はブラウザ内で完結します。機密動画や個人的な映像でも安心してご利用いただけます。</p>
+            <p>A. 音声抽出はブラウザ内で行い、処理対象動画を外部サーバーへアップロードしません。サイト配信などの通信は別途発生します。</p>
 
             <h4>Q. 長時間の動画からも抽出できますか？</h4>
             <p>A. はい、ブラウザのメモリが許す範囲であれば長時間の動画にも対応しています。ただし、100MB超の大容量ファイルの場合は処理に時間がかかることがあります。</p>
@@ -198,7 +198,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             "price": "0",
             "priceCurrency": "JPY"
           },
-          "description": "動画ファイルから音声をMP3/WAV/AAC形式で高速に抽出する無料ツールです。ブラウザ完結で安全。"
+          "description": "動画ファイルから音声をMP3/WAV/AAC形式で抽出する無料ツールです。処理対象動画は外部サーバーへアップロードしません。"
         },
         {
           "@type": "FAQPage",
@@ -216,7 +216,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "動画データはサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、すべての処理はブラウザ内で完結します。機密動画や個人的な映像でも安心してご利用いただけます。"
+                "text": "音声抽出はブラウザ内で行い、処理対象動画を外部サーバーへアップロードしません。サイト配信などの通信は別途発生します。"
               }
             },
             {

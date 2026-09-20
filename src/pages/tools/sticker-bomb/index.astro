@@ -105,8 +105,8 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         <p class="text-sm text-slate-600">自動配置された後は、キャンバス上のステッカーを自由に移動できます。クリックすると最前面にくるので、お気に入りの写真を主役にできます。</p>
       </div>
       <div class="glass-panel p-5 bg-slate-50/50">
-        <h3 class="font-bold text-slate-600 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>ローカル完結で安全</h3>
-        <p class="text-sm text-slate-600">すべてのAI処理と画像合成はお使いのブラウザ内で行われます。画像がサーバーに送信されることはないため、プライベートな写真でも安心です。</p>
+        <h3 class="font-bold text-slate-600 mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>処理対象画像の扱い</h3>
+        <p class="text-sm text-slate-600">AI処理と画像合成はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。</p>
       </div>
     </div>
 
@@ -136,7 +136,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             <p>A. はい、AI背景透過技術を使って各写真の被写体を自動で切り抜きます。手動での調整は不要です。</p>
 
             <h4>Q. 画像はサーバーに送信されますか？</h4>
-            <p>A. いいえ、AI処理を含むすべてがブラウザ内で完結します。プライベートな写真でも安心です。</p>
+            <p>A. AI処理を含む画像合成はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。</p>
           </div>
         </div>
       </details>
@@ -184,7 +184,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "画像はサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、AI処理を含むすべてがブラウザ内で完結します。プライベートな写真でも安心です。"
+                "text": "AI処理を含む画像合成はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。"
               }
             }
           ]

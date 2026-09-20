@@ -11,14 +11,14 @@ try {
       stdio:'pipe',
     });
     const html = readFileSync(join(output, 'index.html'), 'utf8');
-    const history = readFileSync(join(output, 'blog/first-post/index.html'), 'utf8');
+    const history = readFileSync(join(output, 'changelog/index.html'), 'utf8');
     const preview = branch !== 'main';
     assert.equal(html.includes('name="robots" content="noindex, follow"'), preview);
     assert.equal(html.includes('pagead2.googlesyndication.com'), !preview);
     assert.equal(html.includes('www.googletagmanager.com'), !preview);
-    assert(!history.includes('pagead2.googlesyndication.com'));
-    assert(!history.includes('www.googletagmanager.com'));
-    assert(history.includes('name="robots" content="noindex, follow"'));
+    assert.equal(history.includes('pagead2.googlesyndication.com'), !preview);
+    assert.equal(history.includes('www.googletagmanager.com'), !preview);
+    assert.equal(history.includes('name="robots" content="noindex, follow"'), preview);
     console.log(`${branch}: indexing and third-party script isolation passed.`);
   }
 } finally {
