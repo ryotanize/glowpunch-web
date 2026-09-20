@@ -63,3 +63,4 @@
 - `tests/fixtures/tone.webm`
 - `tests/policies.test.mjs`
 - `docs/adsense-readiness-files.md`
+- `test-rmbg.mjs`（廃止したSegFormerモデルの取得試験を削除）
