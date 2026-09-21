@@ -2,17 +2,17 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="LLMトークンカウンター - GlowPunch" description="ChatGPT等のプロンプトのトークン数をブラウザ内で安全に計算。機密情報も一切外部に送信されません。">
+<BaseLayout title="LLMトークンカウンター - GlowPunch" description="LLM向けの入力本文をブラウザ内でトークン計算します。処理用の外部APIへ入力本文を送信しません。">
   <div class="flex flex-col gap-6">
     <div class="mb-4">
       <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">LLMトークン<span class="text-purple-500">カウンター</span></h1>
-      <p class="text-slate-600 text-lg">ChatGPT等のプロンプトトークン数を瞬時に計算。データは外部に送信されません。</p>
+      <p class="text-slate-600 text-lg">ChatGPT等のプロンプトトークン数を瞬時に計算。処理対象テキストは外部サーバーへ送信しません。</p>
     </div>
 
     <!-- Stats Dashboard -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
       <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
-        <span class="text-slate-500 text-[0.8rem] font-medium mb-1 tracking-wider">トークン数 (GPT-5.4)</span>
+        <span class="text-slate-500 text-[0.8rem] font-medium mb-1 tracking-wider">トークン数 (o200k_base)</span>
         <span class="text-4xl md:text-5xl font-black text-purple-600" id="stat-tokens">0</span>
       </div>
       <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
@@ -24,15 +24,15 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <span class="text-4xl md:text-5xl font-black text-slate-800" id="stat-ratio">0.0</span>
       </div>
       <div class="glass-panel p-5 flex flex-col items-center justify-center relative overflow-hidden group">
-        <span class="text-slate-500 text-[0.8rem] font-medium mb-1 tracking-wider">API入力費用(GPT-5.4)</span>
-        <span class="text-4xl md:text-5xl font-black text-slate-800" id="stat-cost">$0</span>
+        <span class="text-slate-500 text-[0.8rem] font-medium mb-1 tracking-wider">計測対象</span>
+        <span class="text-lg font-bold text-slate-800" id="stat-cost">入力本文のみ</span>
       </div>
     </div>
 
     <!-- Text Area -->
     <div class="glass-panel p-1 rounded-2xl relative group focus-within:ring-2 focus-within:ring-purple-500/50 transition-all bg-white border border-slate-300 shadow-inner">
       <textarea 
-        id="text-input"
+        id="text-input" aria-label="計測するテキスト"
         class="w-full h-80 bg-transparent rounded-xl outline-none border-none p-6 text-slate-800 placeholder-slate-400 resize-y focus:outline-none focus:ring-0 font-sans text-lg appearance-none"
         placeholder="プロンプトを入力、または貼り付けてください..."
       ></textarea>
@@ -53,14 +53,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     <div class="mt-12">
     </div>
 
-    <!-- SEO content hidden below the fold -->
+    <!-- Tool guidance -->
     <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
       <h2>LLMトークンカウンターについて</h2>
-      <p>このツールは、ChatGPT（GPT-5.4 / GPT-4など）やその他の大規模言語モデル（LLM）に入力するテキストの「トークン数」を、ローカル環境で安全に素早く計算するツールです。</p>
-      <h3>安全に計算できる理由</h3>
+      <p>このツールは、入力された本文の「トークン数」をo200k_base方式でブラウザ内で計算するツールです。</p>
+      <h3>処理対象テキストの扱い</h3>
       <ul>
-        <li><strong>完全ローカル処理:</strong> トークンの計算処理はすべてあなたのブラウザ上で行われます。機密情報や社外秘のプロンプトを外部サーバーに送信することなく、安全にトークン数を把握できます。</li>
-        <li><strong>最新のエンコーディング:</strong> 内部では <code>cl100k_base</code> エンコーディングをブラウザに移植したライブラリを使用しており、公式と同等の正確さでカウントします。</li>
+        <li><strong>ブラウザ内処理:</strong> トークン計算はブラウザ上で行い、入力本文を処理用の外部APIへ送信しません。業務データは所属組織のルール、端末環境、保存先も確認してください。</li>
+        <li><strong>最新のエンコーディング:</strong> 内部では <code>o200k_base</code> エンコーディングをブラウザに移植したライブラリを使用しており、本文を計測します。モデルやメッセージ構造によって実際の使用量は異なります。</li>
       </ul>
       <p>API費用の見積もりや、コンテキストウィンドウの制限確認にご活用ください。</p>
     </article>
@@ -74,7 +74,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <div class="p-6 text-slate-600 space-y-6">
           <div class="prose prose-slate max-w-none">
             <h3>LLMトークンカウンターについて</h3>
-            <p>ChatGPTやGPT-4などの大規模言語モデル（LLM）を利用する際、APIコストの見積もりやコンテキストウィンドウの管理に欠かせないトークン数の計測を、ブラウザ内で安全に行えるツールです。</p>
+            <p>LLMを利用する際のAPIコスト見積もりやコンテキストウィンドウ管理に役立つ、ブラウザ内のトークン計算ツールです。</p>
 
             <h3>よくある質問 (FAQ)</h3>
 
@@ -82,10 +82,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             <p>A. トークンとは、LLM（大規模言語モデル）がテキストを処理する際の最小単位です。英語では1単語が1〜2トークン、日本語では1文字が1〜3トークン程度になります。APIの料金はトークン数に基づいて計算されるため、事前にトークン数を把握することがコスト管理に重要です。</p>
 
             <h4>Q. 入力したプロンプトはサーバーに送信されますか？</h4>
-            <p>A. いいえ、すべての処理はブラウザ内で完結します。機密性の高いプロンプトや業務データでも安心してトークン数を確認できます。</p>
+            <p>A. トークン計算はブラウザ内で行い、入力本文を処理用の外部APIへ送信しません。サイト配信やライブラリ取得に伴う通信は別途発生します。</p>
 
             <h4>Q. どのモデルのトークナイザーに対応していますか？</h4>
-            <p>A. 現在はOpenAIのGPTシリーズ（GPT-4 / GPT-3.5等）で使用されるtiktokenベースのトークナイザーに対応しています。Claude等の他モデルとはトークン数が異なる場合があります。</p>
+            <p>A. o200k_base方式の本文計測です。異なる方式のモデルや、会話構造・画像を含む入力の使用量とは一致しません。</p>
           </div>
         </div>
       </details>
@@ -107,7 +107,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             "price": "0",
             "priceCurrency": "JPY"
           },
-          "description": "ChatGPT等のLLM向けにプロンプトのトークン数をブラウザ内で安全に計算する無料ツールです。"
+          "description": "LLM向けの入力本文をブラウザ内でトークン計算する無料ツールです。処理用の外部APIへ入力本文を送信しません。"
         },
         {
           "@type": "FAQPage",
@@ -125,7 +125,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "入力したプロンプトはサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、すべての処理はブラウザ内で完結します。機密性の高いプロンプトや業務データでも安心してトークン数を確認できます。"
+                "text": "トークン計算はブラウザ内で行い、入力本文を処理用の外部APIへ送信しません。サイト配信やライブラリ取得に伴う通信は別途発生します。"
               }
             },
             {
@@ -133,7 +133,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "どのモデルのトークナイザーに対応していますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "現在はOpenAIのGPTシリーズ（GPT-4 / GPT-3.5等）で使用されるtiktokenベースのトークナイザーに対応しています。Claude等の他モデルとはトークン数が異なる場合があります。"
+                "text": "o200k_base方式の本文計測です。異なる方式のモデルや、会話構造・画像を含む入力の使用量とは一致しません。"
               }
             }
           ]
@@ -144,7 +144,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  import { encode } from 'gpt-tokenizer';
+  import { encode } from 'gpt-tokenizer/encoding/o200k_base';
 
   const input = document.getElementById('text-input') as HTMLTextAreaElement | null;
   const statTokens = document.getElementById('stat-tokens');
@@ -182,10 +182,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     }
     statRatio.textContent = ratio.toFixed(2);
     
-    // Cost estimation (GPT-5.4 input cost is $2.50 / 1M tokens)
-    const costPerMillion = 2.50;
-    const estimatedCost = (tokenCount / 1000000) * costPerMillion;
-    statCost.textContent = estimatedCost > 0 ? `~$${estimatedCost.toFixed(4)}` : '$0';
+    statCost.textContent = '入力本文のみ';
   }
 
   input?.addEventListener('input', updateStats);

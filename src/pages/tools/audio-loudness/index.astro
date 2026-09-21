@@ -5,8 +5,8 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 ---
 
 <BaseLayout
-  title="動画ラウドネスチェッカー【無料・安全】サーバー送信なしで確認・測定＆自動調整 - GlowPunch"
-  description="動画のラウドネス値(LKFS/LUFS)を無料で簡単に確認・測定し、-24.0 LKFSへ自動調整できるブラウザツールです。動画ファイルをサーバーに送信せず、すべてお使いの端末内で処理するため、未公開の動画素材でも情報漏洩の心配なく安全にご利用いただけます。"
+  title="動画ラウドネスチェッカー（48 kHzステレオ向け参考測定） - GlowPunch"
+  description="48 kHzステレオの動画音声をブラウザ内で参考測定し、初期値 -24 LKFS へ全体ゲインを調整するツールです。処理対象ファイルは外部サーバーへアップロードしません。"
 >
   <div class="flex flex-col gap-6">
 
@@ -16,7 +16,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         動画ラウドネス<span class="text-indigo-500">チェッカー＆調整</span>
       </h1>
       <p class="text-slate-600 text-lg">
-        動画音声のラウドネス値（LKFS/LUFS）を測定し、主要な入稿規定に合わせた-24.0 LKFSへ自動調整します。
+        48 kHzステレオの動画音声を参考測定し、初期目標値 -24 LKFS へ全体ゲインを調整します。
       </p>
       
       <div class="flex flex-wrap gap-2 mt-4">
@@ -26,7 +26,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         </span>
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-semibold border border-emerald-100">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-          サーバー送信なし（完全ブラウザ処理）
+          処理対象ファイルはサーバーへアップロードしません
         </span>
       </div>
     </div>
@@ -92,13 +92,13 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 
         <!-- Target Info -->
         <div class="glass-panel p-6 bg-slate-800 text-white">
-          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-1">入稿規定（主要プラットフォーム）</h3>
+          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-1">このツールの初期目標値</h3>
           <div class="flex items-baseline gap-2 text-indigo-300">
             <span class="text-4xl font-black">-24.0</span>
             <span class="text-lg font-bold font-mono">LKFS</span>
           </div>
           <p class="mt-2 text-slate-300 text-xs leading-relaxed">
-            平均的な聴感上の音量を一定に保つための国際規格（EBU R128）に基づく目標値です。±1dB 以内が推奨されます。
+            提出先の基準を確認するための初期値です。EBU R128の運用目標（-23 LUFS）やARIB TR-B32の運用条件と同一視しないでください。
           </p>
         </div>
       </div>
@@ -112,7 +112,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         
         <div class="flex flex-col gap-2">
           <p class="text-slate-600 text-sm leading-relaxed">
-            測定されたラウドネス値を元に、音質を損なうことなく全体のゲインを増減させ、入稿目標値の <span class="font-bold text-indigo-600">-24.0 LKFS</span> に自動調整します。
+            測定値を元に音声を再エンコードして全体ゲインを増減し、初期目標値の <span class="font-bold text-indigo-600">-24.0 LKFS</span> に調整します。出力後は再測定と試聴を行ってください。
           </p>
         </div>
 
@@ -150,44 +150,29 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         </summary>
         <div class="p-6 text-slate-600 space-y-6">
           <div class="prose prose-slate max-w-none">
-            <h3>動画の「音量が下がる」を防ぐ！ラウドネス基準と正しい合わせ方</h3>
-            
-            <h4>なぜ「音を限界まで大きくする」のはNGなのか？</h4>
-            <p>
-              以前の映像制作では「音割れしない（0dBを超えない）範囲で限界まで大きくする」のが一般的でした。しかし現在、YouTubeやテレビ放送などほぼすべてのプラットフォームで<strong>「ラウドネス・ノーマライゼーション」</strong>が導入されています。<br>
-              これにより、無理に音圧を上げすぎた動画は、配信側で強制的に全体の音量を下げられてしまいます。「迫力を出そうとした結果、逆に他の動画より音が小さくなってしまった」という失敗を防ぐため、適切なラウドネス管理が必須の時代です。
-            </p>
-
-            <h4>測定（解析）だけで終わらせない。本ツール最大の強み</h4>
-            <p>
-              世の中にはラウドネス値を「測定（解析）するだけ」のツールは存在します。しかし、動画制作者にとって本当に必要なのは、<strong>「基準値から外れていた場合、どう修正して書き出すか？」</strong>という解決策です。<br>
-              当ツールは、専用ソフト不要の<strong>フリーのラウドネスメーター</strong>として機能するだけでなく、ワンクリックで業界標準の <strong>-24.0 LKFS</strong> へ音質を損なうことなく全体ゲインを自動調整（ノーマライズ）し、新しい動画ファイルとして直接保存できる点で、他の解析ツールとは一線を画しています。
-            </p>
-
-            <h3>ラウドネス値の確認方法・調整のやり方</h3>
-            <p>本ツールを使えば、以下の3ステップで誰でも簡単にラウドネス値の確認と調整（音量揃え）が可能です。</p>
+            <h3>このツールの測定範囲と目標値</h3>
+            <p>ITU-R BS.1770は番組ラウドネスとTrue Peakを測るためのアルゴリズムです。EBU R128は欧州放送向けの運用Recommendationで、番組ラウドネスの目標は -23 LUFS です。日本のデジタルテレビ放送にはARIB TR-B32の運用規定があります。媒体・納品先の最新仕様は必ず提出先で確認してください。</p>
+            <p>このツールは、48 kHz・ステレオの入力に限定したブラウザ内の参考測定と、固定初期値 -24 LKFS への全体ゲイン調整を提供します。True Peak測定、リミッティング、サラウンド／LFEのチャンネル重み付け、認証測定器としての適合確認は行いません。</p>
+            <h3>ラウドネス値の確認と調整</h3>
             <ol>
-              <li><strong>動画を読み込む:</strong> 画面上の点線エリアに対象の動画ファイル（MP4, MOV等）をドラッグ＆ドロップします。</li>
-              <li><strong>ラウドネス値を確認:</strong> 数秒で現在のラウドネス値（LKFS/LUFS）が測定・表示されます。規定値に収まっているかここで確認できます。</li>
-              <li><strong>ターゲット値に自動調整:</strong> 値が外れている場合は「ターゲット値に合わせて調整・保存」ボタンを押すだけで、音質劣化なく全体の音量（ゲイン）が -24.0 LKFS に自動調整（ノーマライズ）され、安全に手元へ保存されます。</li>
+              <li><strong>動画を読み込む:</strong> 48 kHzステレオの対象動画を選択します。</li>
+              <li><strong>参考値を確認:</strong> 表示値を提出先の仕様・検証済みの測定環境と照合します。</li>
+              <li><strong>全体ゲインを調整:</strong> 出力はAACへ再エンコードされます。再エンコードにより音質が変化する可能性があるため、出力後に再測定・試聴してください。</li>
             </ol>
 
             <h3>よくある質問 (FAQ)</h3>
             
-            <h4>Q. なぜYouTubeなどの動画サイトで音量が勝手に下がるのですか？</h4>
-            <p>A. YouTubeなどの主要動画プラットフォームでは、<strong>ラウドネスノーマライゼーション</strong>という機能が働いています。動画の元の音量が大きすぎる（ラウドネス規定値を超えている）場合、他の動画と極端な音量差が出ないようにプラットフォーム側で自動的に音量を下げて再生されます。クリエイターが意図した迫力ある音量感で視聴者に届けるには、投稿前の適切なラウドネス調整が非常に重要です。</p>
+            <h4>Q. このツールの -24 LKFS はどの規格ですか？</h4>
+            <p>A. 固定の初期目標値であり、すべての媒体に共通する規格ではありません。EBU R128の目標値は -23 LUFS で、ARIB TR-B32を含む国内放送の運用条件も提出先や最新版を確認してください。</p>
 
-            <h4>Q. YouTubeの基準値（-14 LUFS）と、-24.0 LKFS の違いは何ですか？</h4>
-            <p>A. <strong>-14 LUFS</strong>はYouTube全体で標準化されている「配信の再生時」の目標値です。一方、<strong>-24.0 LKFS</strong>は日本のテレビ放送や主要なWebCMの「入稿時」に厳格に求められる業界標準（EBU R128 / ARIB TR-B32）です。本ツールは、特にリジェクト（差し戻し）の原因となりやすい「広告入稿時の -24.0 LKFS 合わせ」に特化して自動調整を行います。</p>
-
-            <h4>Q. 日本のテレビ放送や主要なWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？</h4>
-            <p>A. デジタルテレビ放送やインターネット配信において、番組やCMが切り替わった際の「音量差による視聴者の不快感」をなくすための国際基準値です。日本国内の主要な動画広告入稿フォーマットでは「<strong>-24.0 LKFS</strong>（許容誤差±1dB以内）」が厳格な基準として運用されており、これに準拠しないファイルは入稿システムでエラーとなります。</p>
+            <h4>Q. YouTubeやSNSへ投稿するための最適値を保証しますか？</h4>
+            <p>A. いいえ。外部プラットフォームの再生時の扱い・投稿要件は変更されることがあります。このツールの結果だけで適合や再生音量を保証せず、各サービスと提出先の最新仕様を確認してください。</p>
 
             <h4>Q. アップロードした動画や音声データはサーバーに保存されますか？</h4>
-            <p>A. いいえ、当ツールは完全にプロのクリエイター向けに設計されており、<strong>処理はすべてブラウザ内（あなたの端末上）で完結</strong>します。動画データが外部のサーバーにアップロード・保存されることは一切ないため、発表前の未公開MV、社外秘のWebCM素材、個人情報を含む動画などでも安全にご利用いただけます。</p>
+            <p>A. 処理対象動画の解析・変換はブラウザ内で実行し、外部サーバーへアップロードしません。サイト配信などの通信は別途発生します。業務データを扱う場合は、所属組織のルール、端末環境、保存先も確認してください。</p>
             
             <p class="text-sm mt-8 p-4 bg-slate-50 rounded-lg border border-slate-100">
-              ※本ツールは動画のオーディオトラック全体の音量（ゲイン）を一定比率で変更するノーマライズ処理を行います。極端に音量の起伏が激しい動画の場合、ラウドネスは指定値に適合してもピーク音量（True Peak）が 0dB を超え、音割れ（クリッピング歪み）が発生する可能性があります。その場合は、動画編集ソフト等で事前にコンプレッサーやリミッター処理を行うことを強く推奨します。
+              ※本ツールは音声トラック全体へ一定ゲインを加える処理です。True Peakの測定・制限は行いません。ピーク超過やクリッピングの可能性があるため、必要に応じて動画編集ソフト等でリミッター処理を行ってください。
             </p>
           </div>
         </div>
@@ -210,33 +195,33 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             "price": "0",
             "priceCurrency": "JPY"
           },
-          "description": "動画のラウドネス値(LKFS/LUFS)を無料で簡単に確認・測定し、-24.0 LKFSへ自動調整できるブラウザツールです。動画ファイルをサーバーに送信せず、すべてお使いの端末内で処理するため、未公開の動画素材でも情報漏洩の心配なく安全にご利用いただけます。"
+          "description": "48 kHzステレオの動画音声をブラウザ内で参考測定し、初期値 -24 LKFS へ全体ゲインを調整するツールです。処理対象ファイルは外部サーバーへアップロードしません。"
         },
         {
           "@type": "FAQPage",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "なぜYouTubeなどの動画サイトで音量が勝手に下がるのですか？",
+              "name": "このツールの -24 LKFS はどの規格ですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "YouTubeなどの主要動画プラットフォームでは、ラウドネスノーマライゼーションという機能が働いています。動画の元の音量が大きすぎる（ラウドネス規定値を超えている）場合、他の動画と極端な音量差が出ないようにプラットフォーム側で自動的に音量を下げて再生されます。クリエイターが意図した迫力ある音量感で視聴者に届けるには、投稿前の適切なラウドネス調整が非常に重要です。"
+                "text": "固定の初期目標値であり、すべての媒体に共通する規格ではありません。EBU R128の目標値は -23 LUFS で、ARIB TR-B32を含む国内放送の運用条件も提出先や最新版を確認してください。"
               }
             },
             {
               "@type": "Question",
-              "name": "YouTubeの基準値（-14 LUFS）と、-24.0 LKFS の違いは何ですか？",
+              "name": "YouTubeやSNSへ投稿するための最適値を保証しますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "-14 LUFSはYouTube全体で標準化されている「配信の再生時」の目標値です。一方、-24.0 LKFSは日本のテレビ放送や主要なWebCMの「入稿時」に厳格に求められる業界標準（EBU R128 / ARIB TR-B32）です。本ツールは、特にリジェクトの原因となりやすい「広告入稿時の -24.0 LKFS 合わせ」に特化して自動調整を行います。"
+                "text": "いいえ。外部プラットフォームの再生時の扱い・投稿要件は変更されることがあります。このツールの結果だけで適合や再生音量を保証せず、各サービスと提出先の最新仕様を確認してください。"
               }
             },
             {
               "@type": "Question",
-              "name": "日本のテレビ放送や主要なWebCMの入稿規定（-24.0 LKFS / LUFS）とは何ですか？",
+              "name": "対応する音声形式は何ですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "デジタルテレビ放送やインターネット配信において、番組やCMが切り替わった際の「音量差による視聴者の不快感」をなくすための国際基準値です。日本国内の主要な動画広告入稿フォーマットでは「-24.0 LKFS（許容誤差±1dB以内）」が厳格な基準として運用されており、これに準拠しないファイルは入稿システムでエラーとなります。"
+                "text": "48 kHz・ステレオ入力に限定しています。True Peak測定、リミッティング、サラウンド／LFEのチャンネル重み付けには対応しないため、認証測定器としての適合確認は行いません。"
               }
             },
             {
@@ -244,7 +229,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "アップロードした動画や音声データはサーバーに保存されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、当ツールは完全にプロのクリエイター向けに設計されており、処理はすべてブラウザ内（あなたの端末上）で完結します。動画データが外部のサーバーにアップロード・保存されることは一切ないため、発表前の未公開MV、社外秘のWebCM素材、個人情報を含む動画などでも安全にご利用いただけます。"
+                "text": "処理対象動画の解析・変換はブラウザ内で実行し、外部サーバーへアップロードしません。サイト配信などの通信は別途発生します。業務データを扱う場合は、所属組織のルール、端末環境、保存先も確認してください。"
               }
             }
           ]
@@ -359,7 +344,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
       if (typeof message.label === 'string') statusLabel.textContent = message.label;
       return;
     }
-    if (message.type === 'error') return failAttempt(attempt, 'processing_failed');
+    if (message.type === 'error') return failAttempt(attempt, 'processing_failed', message.message);
     if (attempt.operation === 'analyze' && message.type === 'analysis_done') {
       const integrated = message.results?.integrated;
       if (typeof integrated !== 'number' || !Number.isFinite(integrated)) return failAttempt(attempt, 'processing_failed');
@@ -398,13 +383,13 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
     attempt.event.success();
   }
 
-  function failAttempt(attempt, code) {
+  function failAttempt(attempt, code, detail) {
     if (activeAttempt !== attempt || attempt.complete) return;
     attempt.complete = true;
     attempt.worker?.terminate();
     activeAttempt = null;
     attempt.event.error(code);
-    showError('処理中に問題が発生しました。ファイルを確認してもう一度お試しください。');
+    showError(typeof detail === 'string' ? detail : '処理中に問題が発生しました。ファイルを確認してもう一度お試しください。');
   }
 
   function cancelActiveAttempt() {
@@ -423,11 +408,9 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
     resLoudness.textContent = measuredLoudness.toFixed(1);
     
     const diff = -24.0 - measuredLoudness;
-    if (Math.abs(diff) <= 1.0) {
-      resStatusText.innerHTML = '<span class="text-emerald-600">✓ 合格範囲内です。</span> そのまま入稿可能です。';
-    } else {
-      resStatusText.innerHTML = `<span class="text-amber-600">⚠ 規定値から ${Math.abs(diff).toFixed(1)}dB 外れています。</span> 下記ボタンで調整を推奨します。`;
-    }
+    resStatusText.innerHTML = Math.abs(diff) <= 1.0
+      ? '<span class="text-emerald-600">初期目標値との差は小さい状態です。</span> 提出先の仕様と再測定で確認してください。'
+      : `<span class="text-amber-600">初期目標値との差は ${Math.abs(diff).toFixed(1)}dB です。</span> 提出先の仕様を確認したうえで調整してください。`;
 
     if (logger && logger.updateStep) {
        logger.updateStep('analyze', 'done', 'スキャン完了');
@@ -460,7 +443,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
     statusContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
     if (logger && logger.updateStep) {
-       logger.updateStep('normalize', 'done', '処理が完了しました（サーバー送信なし）');
+       logger.updateStep('normalize', 'done', 'ブラウザ内の処理が完了しました');
     }
   }
 

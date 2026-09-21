@@ -1,22 +1,33 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="プライバシーポリシー | GlowPunch" description="GlowPunch（サーバー送信なしの無料ツール集）のプライバシーポリシーです。">
-  <div class="prose prose-slate max-w-none glass-panel p-8 md:p-12">
-    <h1 class="text-3xl font-bold text-slate-800 mb-8">プライバシーポリシー</h1>
-    
-    <p class="text-slate-500 mb-6">最終更新日: 2026年4月12日</p>
+<BaseLayout title="プライバシーポリシー | GlowPunch" description="処理対象ファイルとサイト閲覧情報の違い、Cloudflare、Google Analytics、Google AdSense、Cookieと広告設定について説明します。">
+  <article class="prose prose-slate max-w-3xl mx-auto w-full glass-panel p-6 md:p-10">
+    <h1>プライバシーポリシー</h1>
 
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">1. はじめに</h2>
-    <p class="text-slate-600 mb-4">当サイトのご利用につき、プライバシーポリシーを以下の通り定めます。</p>
+    <p>最終更新日：<time datetime="2026-09-20">2026年9月20日</time></p>
+    <h2>1. ツールへ読み込むファイル・入力本文</h2>
+    <p>GlowPunchのツールは、選択されたファイルや処理対象のテキストをお使いのブラウザ内で処理します。これらを処理のために外部サーバーへアップロードする仕組みはありません。ファイル名・ファイル内容・入力本文をアクセス解析イベントへ含める実装もしていません。</p>
+    <p>処理中のデータは主に端末のメモリに保持し、結果は利用者の操作で端末へ保存します。元ファイル、ダウンロードした結果、ブラウザのキャッシュや端末側の記録は、利用者の管理対象です。タブを閉じれば端末上のすべての記録が完全消去される、という保証はしていません。</p>
+    <h2>2. サイト配信・モデル取得の通信</h2>
+    <p>サイトはCloudflare Pagesで配信しています。ページ・画像・スクリプトの取得時には、IPアドレス、リクエスト先、ブラウザ情報などが配信事業者へ伝わります。配信やセキュリティのためのログ・Cookie等は、事業者の設定と方針に従って取り扱われます。</p>
+    <p>背景透過などのAI処理では、IMG.LYの配信先（staticimgly.com）からモデルや実行用ファイルを取得します。この取得にもIPアドレス等を伴う通信がありますが、選択した画像の推論は端末内で行います。ブラウザがモデル等をキャッシュする場合があります。</p>
+    <p>詳細：<a href="https://www.cloudflare.com/privacypolicy/">Cloudflareのプライバシーポリシー</a>、<a href="https://img.ly/privacy-policy">IMG.LYのプライバシーポリシー</a>。</p>
+    <h2>3. アクセス解析</h2>
+    <p>本番サイトでは、設定が有効な場合にGoogle Analyticsを利用します。ページの閲覧、端末・ブラウザ情報、参照元などがサービス改善のために取り扱われ、Cookieや識別子が使われる場合があります。通信時にはIPアドレス等もGoogleへ伝わります。これらを「個人と一切関連しない情報」とは扱いません。</p>
+    <p>当サイトの設定ではURLのクエリ文字列やフラグメントを解析用ページURLに含めず、参照元はオリジンまでとしています。Googleシグナルと広告パーソナライズ用シグナルは無効です。設定により、ラウドネスツールの開始・成功・定型エラーと操作種別・サイト版を計測することがあります。実際のファイル名や内容は含めません。</p>
+    <p><a href="https://tools.google.com/dlpage/gaoptout?hl=ja">Google Analyticsオプトアウトアドオン</a>も利用できます。ブラウザのCookie拒否だけで、すべての通信が停止するとは限りません。</p>
+    <h2>4. Google AdSenseと第三者広告</h2>
+    <p>広告の導入・審査にはGoogle AdSenseを利用します。所有権確認の設定と広告配信スクリプトの読み込みは分けており、広告配信を有効にした本番ページではGoogle等の第三者配信事業者による通信が発生します。プレビュー環境には当サイトの広告・解析スクリプトを読み込みません。</p>
+    <p>広告配信事業者は、Cookie、ウェブビーコン、IPアドレスやその他の識別子を用いて情報を取得することがあります。Googleとそのパートナーは、当サイトや他サイトへの過去のアクセス情報に基づいて広告を配信する場合があります。広告Cookieはパーソナライズ広告にも利用されます。</p>
+    <p>パーソナライズ広告は<a href="https://myadcenter.google.com/">Googleの広告設定（マイ アド センター）</a>で管理できます。第三者配信事業者については<a href="https://www.aboutads.info/choices/">広告Cookieのオプトアウト</a>も参照してください。パーソナライズを無効にしても広告やすべてのCookieがなくなるわけではありません。</p>
+    <p>Googleの取り扱いは<a href="https://policies.google.com/technologies/partner-sites?hl=ja">Googleのサービスを使用するサイトやアプリから収集した情報の使用</a>および<a href="https://policies.google.com/privacy?hl=ja">Googleプライバシーポリシー</a>をご確認ください。地域に応じた同意画面が表示される場合は、その画面で選択できます。</p>
+    <h2>5. Cookie・外部サービスの選択</h2>
+    <p>Cookieの許可・削除はブラウザ設定で変更できます。削除により広告等の選択設定が失われる場合があります。広告の同意や停止は表示される管理画面からも変更してください。Googleスライドなど外部サービスへ保存済みファイルを渡す場合は、そのサービスの規約・ポリシーが適用されます。</p>
+    <h2>6. お問い合わせで受け取る情報</h2>
+    <p>メールでお問い合わせいただいた場合は、メールアドレス、氏名（記載された場合）、相談内容などを受け取ります。対応・不具合確認の目的で必要な範囲で利用し、不要になった情報は適切に削除します。処理対象の機密ファイルや個人情報を添付せず、再現手順や内容を伏せた画面でご連絡ください。</p>
+    <h2>7. 更新と窓口</h2>
+    <p>機能や外部サービスの変更に合わせて本ポリシーを更新します。取り扱いへの質問・訂正・お問い合わせ情報の削除依頼は、GlowPunch運営窓口 <a href="mailto:contact@glowpunch.net">contact@glowpunch.net</a> へご連絡ください。</p>
 
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">2. データの取り扱いについて</h2>
-    <p class="text-slate-600 mb-4">当サイトで提供しているツールは、原則としてお使いのブラウザ内（クライアントサイド）でのみ処理を完結させます。ユーザーがツールに入力したテキスト等のデータが、当サイトのサーバーへ送信・保存されることはありません。</p>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">3. 広告の配信について</h2>
-    <p class="text-slate-600 mb-4">当サイトでは、第三者配信の広告サービス（Google AdSense等）を利用しています。このような広告配信事業者は、ユーザーの興味に応じた商品やサービスの広告を表示するため、当サイトや他サイトへのアクセスに関する情報であるCookieを使用することがあります。</p>
-
-    <h2 class="text-2xl font-semibold text-slate-800 mt-8 mb-4">4. アクセス解析ツールについて</h2>
-    <p class="text-slate-600 mb-4">当サイトでは、サービスの向上を目的としてGoogle Analytics等のアクセス解析ツールを利用する場合があります。これらはトラフィックデータの収集のためにCookieを使用していますが、データは匿名で収集されており、個人を特定するものではありません。</p>
-  </div>
+  </article>
 </BaseLayout>

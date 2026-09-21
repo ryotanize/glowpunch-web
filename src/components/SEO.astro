@@ -4,17 +4,22 @@ export interface Props {
   description?: string;
   image?: string;
   canonicalURL?: string;
+  noindex?: boolean;
+  article?: boolean;
 }
 
 const {
-  title = "サーバー送信なしの無料Webツール集 | GlowPunch",
-  description = "データをサーバーに送信しない、ブラウザ完結型の無料Webツール集。PDF結合・背景透過・動画編集・文字数カウントなど16種類以上。インストール不要で安心・安全。",
+  title = "ファイルをアップロードしない無料ブラウザツール | GlowPunch",
+  description = "処理対象ファイルを外部サーバーへアップロードせず、ブラウザ内で加工する無料ツール集。PDF・画像・動画・音声の作業と実用ガイド。",
   image = "/og-image.png",
-  canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://glowpunch.net").href,
+  noindex = false,
+  article = false,
+  canonicalURL = new URL(Astro.url.pathname === "/" ? "/" : Astro.url.pathname.replace(/\/$/, "") + "/", Astro.site || "https://glowpunch.net").href,
 } = Astro.props;
 ---
 
 <title>{title}</title>
+{noindex && <meta name="robots" content="noindex, follow" />}
 <meta name="description" content={description} />
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -25,11 +30,14 @@ const {
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={article ? "article" : "website"} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image, Astro.site || "https://glowpunch.net")} />
+
+<meta property="og:locale" content="ja_JP" />
+<meta property="og:site_name" content="GlowPunch" />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />

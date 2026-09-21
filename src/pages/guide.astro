@@ -1,79 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
+<BaseLayout title="はじめての使い方 | GlowPunch" description="ツールの選び方、ファイルの読み込みと保存、処理が止まる場合の対処を案内します。">
+  <article class="prose prose-slate max-w-3xl mx-auto w-full glass-panel p-6 md:p-10">
+    <h1>はじめての使い方</h1>
 
-<BaseLayout title="使い方ガイド | サーバー送信なしの無料ツール集" description="GlowPunchのツールの安全な使い方をご案内します。すべての処理がブラウザ内で完結するため、データが外部に送信されることはありません。">
-  <div class="max-w-3xl mx-auto py-12 md:py-20 w-full">
-    <div class="text-center mb-16">
-      <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight mb-4">
-        使い方ガイド
-      </h1>
-      <p class="text-lg text-slate-500 font-medium">
-        GlowPunchのツールは、すべてブラウザ内で安全に動作します。
-      </p>
-    </div>
+    <h2>1. 作業に合うツールを選ぶ</h2><p><a href="/#tools">用途別ツール一覧</a>から選びます。たとえばページをまとめるならPDF結合、写真の形式を変えるならHEIC変換です。各ページの説明で出力形式と制約を確認してください。登録・インストールは不要です。</p>
+    <h2>2. 元ファイルを残して読み込む</h2><p>ファイル選択ボタンまたはドラッグ＆ドロップで読み込みます。この操作は外部サーバーへのアップロードではありません。ブラウザが選択したファイルを読み取ります。大きなファイルは、まず小さな複製や短い素材で試してください。</p>
+    <h2>3. 設定して、結果を保存する</h2><p>形式や範囲を設定し、処理を実行します。保存ボタンを押して結果をダウンロードし、内容・枚数・画質・音声を確認してください。タブを閉じたり再読み込みしたりすると作業中の状態は失われることがあります。</p>
+    <h2>処理が進まないとき</h2><ul><li>AI画像処理は初回にモデルを取得します。通信の遮断や容量不足がないか確認します。</li><li>動画の読み込み・変換対応はOSとブラウザに依存します。同じ拡張子でも内部の形式により失敗します。</li><li>タブが落ちる場合は、他の重いタブを閉じる、ファイル数や長さを減らす、PCで試す、といった方法があります。</li><li>原本を上書きせず、解決しない場合はデスクトップソフトでの処理も検討してください。</li></ul>
+    <h2>ファイル処理と通信の違い</h2><p>処理対象ファイルは外部サーバーへ送信しません。一方、サイト表示・AIモデル取得や設定に応じた広告・解析には通信があります。<a href="/blog/browser-local-processing/">ブラウザ内処理の詳しい解説</a>と<a href="/privacy-policy/">プライバシーポリシー</a>をご覧ください。</p>
+    <p><a href="/blog/">形式の選び方・実務ガイドを読む</a> ／ <a href="/contact/">不具合を報告する</a></p>
 
-    <div class="space-y-12">
-      <!-- Step 1 -->
-      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-bl-full -z-10"></div>
-        <div class="flex flex-col md:flex-row items-start gap-6">
-          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xl shrink-0">
-            1
-          </div>
-          <div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-3">ツールを選ぶ</h2>
-            <p class="text-slate-600 leading-relaxed font-medium">
-              トップページから、目的のツールを選択します。PDF編集、動画処理、画像処理など、多岐にわたるツールを用意しています。面倒な会員登録やログインは一切不要ですぐに使い始められます。
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -z-10"></div>
-        <div class="flex flex-col md:flex-row items-start gap-6">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl shrink-0">
-            2
-          </div>
-          <div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-3">ファイルを読み込む</h2>
-            <p class="text-slate-600 leading-relaxed font-medium mb-5">
-              処理したいファイルを画面にドラッグ＆ドロップ、またはクリックして選択します。
-            </p>
-            <div class="bg-emerald-50 border border-emerald-100 text-emerald-800 p-5 rounded-2xl flex items-start gap-3 shadow-inner">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-emerald-500 mt-0.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-              <div class="text-sm font-medium leading-relaxed">
-                <strong>安心ポイント：</strong> ここで読み込まれたファイルは、あなたの端末（スマホやPC）のメモリ上でのみ処理されます。外部のサーバーへアップロードされることは絶対にありません。
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-full -z-10"></div>
-        <div class="flex flex-col md:flex-row items-start gap-6">
-          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xl shrink-0">
-            3
-          </div>
-          <div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-3">処理と保存</h2>
-            <p class="text-slate-600 leading-relaxed font-medium">
-              ブラウザの機能（WebAssemblyやモダンJavaScriptAPI）をフル活用し、高速に処理を行います。処理が完了したら「保存」や「ダウンロード」ボタンを押すことで、結果をあなたの端末に直接保存します。
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-16 text-center">
-      <a href="/#tools" class="inline-flex items-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
-        さっそくツールを使ってみる
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </a>
-    </div>
-  </div>
+  </article>
 </BaseLayout>

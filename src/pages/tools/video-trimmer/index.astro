@@ -194,7 +194,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
             <p>A. はい、Instagram Reels/TikTok向けの9:16、Instagram投稿向けの1:1、YouTube向けの16:9など、主要なアスペクト比への変換に対応しています。</p>
 
             <h4>Q. 動画はサーバーに送信されますか？</h4>
-            <p>A. いいえ、すべての処理がブラウザ内で完結します。動画データが外部に送信されることはありません。</p>
+            <p>A. 動画のトリミング・クロップ処理はブラウザ内で実行し、処理対象動画を外部サーバーへアップロードしません。サイト配信等の通信は別途発生します。</p>
 
             <h4>Q. 画質は劣化しますか？</h4>
             <p>A. ブラウザ内での再エンコード処理となるため、若干の画質変化が生じる場合があります。元の動画と比べて大幅な劣化にはなりませんが、プロ用途には専用ソフトとの併用を推奨します。</p>
@@ -237,7 +237,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "動画はサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、すべての処理がブラウザ内で完結します。動画データが外部に送信されることはありません。"
+                "text": "動画のトリミング・クロップ処理はブラウザ内で実行し、処理対象動画を外部サーバーへアップロードしません。サイト配信等の通信は別途発生します。"
               }
             },
             {
@@ -508,7 +508,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 
     if (logger && logger.updateStep) {
        logger.updateStep('encode', 'done');
-       logger.updateStep('generate', 'done', '完了しました（サーバー送信なし）');
+       logger.updateStep('generate', 'done', '出力ファイルを生成しました');
     }
 
     setTimeout(() => {

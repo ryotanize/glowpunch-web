@@ -1,0 +1,15 @@
+---
+import { tools } from '../data/tools';
+const { id } = Astro.props;
+const tool = tools.find(tool => tool.id === id);
+const related = tools.filter(item => item.category === tool?.category && item.id !== id).slice(0, 3);
+---
+{tool && <aside class="glass-panel p-6 md:p-8 mt-6" aria-label="利用前の確認と関連ガイド">
+  <h2 class="text-xl font-bold mb-3">このツールで確認しておきたいこと</h2>
+  <p class="leading-relaxed mb-4">{tool.note}</p>
+  <p class="text-sm mb-5">ファイルと処理対象テキストは端末内で処理します。サイト配信・ライブラリ取得・設定に応じたアクセス解析や広告の通信とは区別しています。<a href="/privacy-policy/" class="underline text-sky-800">通信とデータの扱い</a></p>
+  <a href={`/blog/${tool.guide}/`} class="font-bold text-sky-800 underline">作業の判断基準・注意点をガイドで読む</a>
+  <h3 class="font-bold mt-6 mb-3">関連するツール</h3>
+  <ul class="flex flex-wrap gap-4">{related.map(item => <li><a href={`/tools/${item.id}/`} class="text-sky-800 underline">{item.name}</a></li>)}</ul>
+  <p class="mt-5 text-sm"><a href="/contact/" class="underline">不具合や説明の誤りを報告する</a></p>
+</aside>}

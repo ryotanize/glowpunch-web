@@ -9,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <div class="bg-sky-50 border border-sky-200 rounded-xl p-6 mb-8">
       <h2 class="text-xl font-semibold text-slate-800 mb-3">📧 メールでのお問い合わせ</h2>
-      <p class="text-slate-600 mb-4">以下のメールアドレスまでご連絡ください。通常、数営業日以内にご返信いたします。</p>
+      <p class="text-slate-600 mb-4">以下のメールアドレスまでご連絡ください。内容を確認のうえ、対応可能な範囲で返信します。</p>
       <a href="mailto:contact@glowpunch.net" class="inline-flex items-center gap-2 px-6 py-3 bg-sky-500 text-white font-bold rounded-xl hover:bg-sky-600 transition-colors no-underline shadow-md">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         contact@glowpunch.net
@@ -19,10 +19,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <h2 class="text-xl font-semibold text-slate-800 mt-8 mb-4">お問い合わせの際のお願い</h2>
     <ul class="text-slate-600 mb-4 list-disc pl-6 space-y-2">
       <li><strong>不具合のご報告</strong>の場合は、お使いのブラウザ名（Chrome, Safari等）とデバイス（PC, スマホ等）、発生した状況をできるだけ詳しくお知らせいただけると、早期の改善に繋がります。</li>
+      <li>ファイル形式・おおよそのサイズ・操作手順・表示されたエラーをお知らせください。機密ファイルや個人情報の添付は不要です。</li>
+      <li>記事の訂正依頼は、ページURLと該当箇所、確認できる資料をお知らせください。</li>
       <li><strong>新しいツールのリクエスト</strong>も歓迎です。「こんなツールがあったら便利なのに」というアイデアをぜひお聞かせください。</li>
       <li>内容によっては、返信にお時間をいただく場合がございます。あらかじめご了承ください。</li>
     </ul>
 
-    <p class="text-slate-500 text-sm mt-8">※ 個人情報の取り扱いについては、<a href="/privacy-policy" class="text-sky-500 hover:text-sky-600 transition-colors">プライバシーポリシー</a>をご確認ください。</p>
+    <p class="text-slate-500 text-sm mt-8">※ 個人情報の取り扱いについては、<a href="/privacy-policy/" class="text-sky-500 hover:text-sky-600 transition-colors">プライバシーポリシー</a>をご確認ください。</p>
   </div>
 </BaseLayout>

@@ -39,7 +39,7 @@ self.onmessage = async (event) => {
         audioOptions.bitrate = settings?.bitrate || 192000;
       } else if (format === 'wav') {
         outputFormat = new WavOutputFormat();
-        audioOptions.codec = 'pcm_s16le'; // Most compatible PCM format
+        audioOptions.codec = 'pcm-s16'; // Most compatible PCM format
       } else if (format === 'aac') {
         outputFormat = new AdtsOutputFormat();
         audioOptions.codec = 'aac';
@@ -56,7 +56,8 @@ self.onmessage = async (event) => {
       const conversion = await Conversion.init({
         input,
         output,
-        audio: audioOptions, // Note: video options are omitted to drop the video track
+        audio: audioOptions,
+        video: { discard: true },
       });
 
       if (!conversion.isValid) {

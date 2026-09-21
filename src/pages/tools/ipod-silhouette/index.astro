@@ -85,7 +85,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <h3>こだわりの機能</h3>
       <ul>
         <li><strong>AIが自動で高精度に切り抜き：</strong> 髪の毛などの細かい部分もAIが自動認識して切り抜き、綺麗なシルエットにします。</li>
-        <li><strong>安心のローカル処理：</strong> AIの切り抜き処理はすべてブラウザの中で行われます。サーバーに送信されることはないため、プライベートな写真でも安全に加工できます。</li>
+        <li><strong>処理対象画像の扱い：</strong> AIの切り抜き処理はブラウザ内で行い、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。</li>
       </ul>
       <p>SNSのアイコンやヘッダー画像、友達とのシェアなどでぜひ遊んでみてください。</p>
     </article>
@@ -172,25 +172,26 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  import { requiredElement, canvasContext } from "../../../components/dom";
   import { removeBackground } from '@imgly/background-removal';
 
   // Elements
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('file-input');
-  const loadingUi = document.getElementById('loading-ui');
-  const previewContainer = document.getElementById('preview-container');
-  const btnReset = document.getElementById('btn-reset');
-  const controlsPanel = document.getElementById('controls-panel');
-  const loadingText = document.getElementById('loading-text');
-  const progressBar = document.getElementById('progress-bar');
-  const bgColorLayer = document.getElementById('bg-color-layer');
-  const colorBtns = document.querySelectorAll('.color-btn');
-  const btnDownloadImage = document.getElementById('btn-download-image');
+  const dropzone = requiredElement('dropzone', HTMLElement);
+  const fileInput = requiredElement('file-input', HTMLInputElement);
+  const loadingUi = requiredElement('loading-ui', HTMLElement);
+  const previewContainer = requiredElement('preview-container', HTMLElement);
+  const btnReset = requiredElement('btn-reset', HTMLButtonElement);
+  const controlsPanel = requiredElement('controls-panel', HTMLElement);
+  const loadingText = requiredElement('loading-text', HTMLElement);
+  const progressBar = requiredElement('progress-bar', HTMLElement);
+  const bgColorLayer = requiredElement('bg-color-layer', HTMLElement);
+  const colorBtns = document.querySelectorAll<HTMLButtonElement>('.color-btn');
+  const btnDownloadImage = requiredElement('btn-download-image', HTMLButtonElement);
   
-  const silhouetteCanvas = document.getElementById('silhouette-canvas') as HTMLCanvasElement;
-  const silhouetteCtx = silhouetteCanvas.getContext('2d');
+  const silhouetteCanvas = requiredElement('silhouette-canvas', HTMLCanvasElement);
+  const silhouetteCtx = canvasContext(silhouetteCanvas);
 
-  let currentImageFile = null;
+  let currentImageFile: File | null = null;
   let currentColor = '#3b82f6'; // initial blue
   let isProcessing = false;
   
@@ -255,7 +256,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           }
         };
 
-        const fgBlob = await removeBackground(currentImageFile, config);
+        const fgBlob = await removeBackground(file, config);
         const fgUrl = URL.createObjectURL(fgBlob);
         
         const fgImg = new Image();
@@ -315,7 +316,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       const outCvs = document.createElement('canvas');
       outCvs.width = silhouetteCanvas.width;
       outCvs.height = silhouetteCanvas.height;
-      const oCtx = outCvs.getContext('2d');
+      const oCtx = canvasContext(outCvs);
       
       // Draw background color
       oCtx.fillStyle = currentColor;

@@ -1,7 +1,7 @@
 /**
  * loudness-worker.js
  * 
- * Web Worker for measuring and adjusting audio loudness (EBU R128 / ITU-R BS.1770-4).
+ * Web Worker for 48 kHz stereo reference loudness measurements.
  * Uses mediabunny's AudioSampleSink for PCM extraction.
  */
 
@@ -17,7 +17,9 @@ import {
   AudioSample
 } from 'mediabunny';
 
-// Filter coefficients for 48kHz (ITU-R BS.1770-4)
+// K-weighting filter coefficients for 48 kHz only. This worker deliberately
+// rejects other sample rates and channel layouts instead of implying broad
+// BS.1770 conformance.
 const STAGE1 = {
   b0: 1.53512485958697, b1: -2.69169618940638, b2: 1.19839281085285,
   a1: -1.69065929318241, a2: 0.73248077421585
@@ -39,6 +41,12 @@ class BiquadChannel {
     this.x2 = this.x1; this.x1 = x0;
     this.y2 = this.y1; this.y1 = y0;
     return y0;
+  }
+}
+
+function assertSupportedTrack(audioTrack) {
+  if (audioTrack.sampleRate !== 48000 || audioTrack.numberOfChannels !== 2) {
+    throw new Error('このツールは48 kHz・ステレオの音声トラックのみ対応しています。提出先向けの測定は、対応する検証済みの測定環境でも確認してください。');
   }
 }
 
@@ -67,9 +75,10 @@ async function analyzeLoudness(file) {
   if (!audioTrack) {
     throw new Error('音声トラックが見つかりません。音声のない動画は解析できません。');
   }
+  assertSupportedTrack(audioTrack);
 
-  const sampleRate = audioTrack.sampleRate || 48000;
-  const numChannels = audioTrack.numberOfChannels || 1;
+  const sampleRate = audioTrack.sampleRate;
+  const numChannels = audioTrack.numberOfChannels;
   const duration = await input.computeDuration();
   
   const windowSize = Math.floor(0.4 * sampleRate);
@@ -174,6 +183,9 @@ async function normalizeLoudness(file, settings) {
     formats: ALL_FORMATS,
     source: new BlobSource(file),
   });
+  const audioTrack = await input.getPrimaryAudioTrack();
+  if (!audioTrack) throw new Error('音声トラックが見つかりません。音声のない動画は調整できません。');
+  assertSupportedTrack(audioTrack);
 
   const target = new BufferTarget();
   const output = new Output({

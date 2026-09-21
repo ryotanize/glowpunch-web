@@ -67,7 +67,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               </button>
               <button id="btn-export-svg" class="w-full px-6 py-3 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
-                SVGをコピー
+                SVGで保存
               </button>
               <button id="btn-export-png" class="w-full px-6 py-3 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -93,7 +93,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
     </div>
 
-    <!-- SEO content -->
+    <!-- Tool guidance -->
     <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
       <h2>Glow Mesh Generator とは？</h2>
       <p>
@@ -509,9 +509,25 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     });
   }
 
+  // Export a self-contained SVG; no external images or fonts are referenced.
+  document.getElementById('btn-export-svg')?.addEventListener('click', () => {
+    const gradients = points.map((point, index) => {
+      const color = /^#[0-9a-f]{6}$/i.test(point.color) ? point.color : '#ffffff';
+      return `<radialGradient id="point-${index}" cx="${point.x}%" cy="${point.y}%" r="80%"><stop offset="0" stop-color="${color}"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></radialGradient>`;
+    }).join('');
+    const layers = points.map((_, index) => `<rect width="2000" height="2000" fill="url(#point-${index})" style="mix-blend-mode:screen"/>`).join('');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2000" viewBox="0 0 2000 2000"><defs>${gradients}</defs><rect width="2000" height="2000" fill="#0f172a"/>${layers}</svg>`;
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'glow-mesh.svg';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
   // PNG Export (Simplified)
   document.getElementById('btn-export-png')?.addEventListener('click', () => {
-    const canvas = document.getElementById('export-canvas') as HTMLCanvasElement;
+    const canvas = document.createElement('canvas');
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');

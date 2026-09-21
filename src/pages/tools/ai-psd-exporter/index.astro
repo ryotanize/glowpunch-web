@@ -2,11 +2,11 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="AI自動レイヤー分割＆PSDエクスポート - GlowPunch" description="画像をAIが解析し、人物や背景などの要素ごとに自動でレイヤー分割。完全保存版のPSDデータとしてブラウザ完結で出力します。">
+<BaseLayout title="被写体・背景PSD分割 - GlowPunch" description="画像から主な被写体を抽出し、被写体と背景の2層を含むPSDを出力します。処理対象画像は外部サーバーへアップロードしません。">
   <div class="flex flex-col gap-6">
     <div class="mb-4">
-      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">AI自動レイヤー分割＆<span class="text-sky-500">PSDエクスポート</span></h1>
-      <p class="text-slate-600 text-lg">画像をAIが被写体や背景などのパーツごとに自動分割し、PSD形式（レイヤー保持）でダウンロードできるツールです。お使いの端末内で処理が完結するため、外部へのデータ送信は一切ありません。</p>
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight mb-2">被写体・背景<span class="text-sky-500">PSD分割</span></h1>
+      <p class="text-slate-600 text-lg">画像をAIが被写体と背景の2層に分割し、PSD形式（レイヤー保持）でダウンロードできるツールです。お使いの端末内で処理が完結するため、処理対象画像は外部サーバーへアップロードしません。</p>
     </div>
 
     <!-- UI Main Container -->
@@ -51,7 +51,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             処理メニュー
           </h3>
           <button id="btn-segment" class="w-full py-3 mb-4 rounded-xl font-bold text-white bg-sky-500 hover:bg-sky-600 active:scale-95 transition-all shadow shadow-sky-500/30 flex justify-center items-center gap-2">
-            AIで要素ごとに分割
+            被写体と背景に分割
           </button>
           
           <!-- Progress -->
@@ -80,17 +80,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </div>
     </div>
 
-    <!-- SEO text -->
     <article class="prose prose-slate mt-16 max-w-none border-t border-slate-200 pt-10">
       <h2>ツールについて</h2>
-      <p>このツールは、ブラウザに搭載された機械学習モデル（ONNX Runtime / Transformers.js）を利用し、画像内の要素（人物、壁、空、地面、建物など）を自動で認識して切り抜くツールです。すべての処理はあなたのブラウザの中だけで高速に行われるため、画像のアップロード不要で安全にお使いいただけます。</p>
+      <p>このツールは、<code>@imgly/background-removal</code> を利用して主な被写体のマスクを作り、画像を「被写体」と「背景」の2層に分けたPSDを生成します。選択した画像の分割処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデルと実行用ライブラリの取得には通信があります。</p>
       <h3>主な用途</h3>
       <ul>
         <li>画像から人物だけを切り抜いて別の背景に合成したい時</li>
-        <li>風景画像から空の部分だけを分離したい時</li>
-        <li>デザイン素材として細かくレイヤー分けされたPSDが欲しい時</li>
+        <li>デザイン素材として被写体と背景を分けたPSDが欲しい時</li>
+        <li>切り抜き後に編集ソフトで輪郭を手直ししたい時</li>
       </ul>
-      <p>初回の分割時にはモデルデータ（数十MB）のダウンロードが走るため少し時間がかかりますが、2回目以降はオフラインに近い速度でサクサク動作します。</p>
+      <p>元の制作レイヤーの復元、人物・空・建物などの意味単位での個別レイヤー化、隠れていた背景の生成は行いません。初回はAIモデルの取得で時間がかかることがあり、キャッシュの有無や端末環境によって以後の処理時間も変わります。</p>
     </article>
     
     <div class="mt-4">
@@ -99,13 +98,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     <div class="mt-8 border-t border-slate-200 pt-8">
       <details class="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <summary class="flex items-center justify-between p-5 font-bold text-slate-800 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
-          <span>AI レイヤー分割ツールについて（使い方・FAQ）</span>
+          <span>被写体・背景PSD分割について（使い方・FAQ）</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-open:-rotate-180 text-slate-500"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </summary>
         <div class="p-6 text-slate-600 space-y-6">
           <div class="prose prose-slate max-w-none">
-            <h3>AI レイヤー分割ツールについて</h3>
-            <p>写真やイラストをアップロードするだけで、AIが人物・背景・物体などを自動的に認識・分割し、各パーツを独立したレイヤーとして持つPSDファイルを生成します。Photoshopでの後加工が格段に楽になります。</p>
+            <h3>被写体・背景PSD分割について</h3>
+            <p>写真やイラストを読み込み、被写体と背景の2層に分けたPSDを生成します。元の制作レイヤーの復元、複数物体の個別分割、隠れた背景の補完はできません。</p>
 
             <h3>よくある質問 (FAQ)</h3>
 
@@ -113,10 +112,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             <p>A. Adobe Photoshopのネイティブファイル形式で、複数のレイヤー（重ね合わせた画像層）を保持できます。当ツールで生成したPSDはPhotoshopやGIMPなどの画像編集ソフトで開けます。</p>
 
             <h4>Q. どのような画像でもレイヤー分割できますか？</h4>
-            <p>A. AIが「意味のある領域」を自動認識するため、人物写真、風景写真、イラストなど幅広い画像に対応しています。ただし、非常にシンプルな画像や抽象的なパターンでは分割精度が低下する場合があります。</p>
+            <p>A. 主な被写体と背景を2層に分けます。髪、透明な物体、背景と近い色の被写体、複数の被写体が重なる画像では輪郭の手直しが必要になる場合があります。人物・空・建物などを個別の意味レイヤーに分ける機能ではありません。</p>
 
             <h4>Q. 画像はサーバーに送信されますか？</h4>
-            <p>A. いいえ、AI推論を含むすべての処理がブラウザ内で完結します。未公開のデザインデータでも安心です。</p>
+            <p>A. 選択した画像の分割処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。業務データを扱う場合は、所属組織のルール、端末環境、保存先も確認してください。</p>
           </div>
         </div>
       </details>
@@ -130,7 +129,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       "@graph": [
         {
           "@type": "SoftwareApplication",
-          "name": "AI 自動レイヤー分割＆PSD生成",
+          "name": "被写体・背景PSD分割",
           "operatingSystem": "All",
           "applicationCategory": "DesignApplication",
           "offers": {
@@ -138,7 +137,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
             "price": "0",
             "priceCurrency": "JPY"
           },
-          "description": "画像をAIが意味推論してパーツごとに自動分割し、レイヤー付きPSDファイルとして保存する無料ツールです。"
+          "description": "画像を被写体と背景の2層に分割し、レイヤー付きPSDファイルとして保存する無料ツールです。"
         },
         {
           "@type": "FAQPage",
@@ -156,7 +155,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "どのような画像でもレイヤー分割できますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "AIが「意味のある領域」を自動認識するため、人物写真、風景写真、イラストなど幅広い画像に対応しています。ただし、非常にシンプルな画像や抽象的なパターンでは分割精度が低下する場合があります。"
+                "text": "主な被写体と背景を2層に分けます。髪、透明な物体、背景と近い色の被写体、複数の被写体が重なる画像では輪郭の手直しが必要になる場合があります。人物・空・建物などを個別の意味レイヤーに分ける機能ではありません。"
               }
             },
             {
@@ -164,7 +163,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               "name": "画像はサーバーに送信されますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、AI推論を含むすべての処理がブラウザ内で完結します。未公開のデザインデータでも安心です。"
+                "text": "選択した画像の分割処理はブラウザ内で実行し、処理対象画像を外部サーバーへアップロードしません。AIモデル・ライブラリの取得には通信があります。業務データを扱う場合は、所属組織のルール、端末環境、保存先も確認してください。"
               }
             }
           ]
@@ -175,31 +174,33 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  import { requiredElement, canvasContext } from "../../../components/dom";
   import { writePsd } from 'ag-psd';
   import { removeBackground } from '@imgly/background-removal';
 
   // Elements
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('file-input');
-  const previewContainer = document.getElementById('preview-container');
-  const btnReset = document.getElementById('btn-reset');
-  const origCanvas = document.getElementById('orig-canvas') as HTMLCanvasElement;
-  const layerCanvasesContainer = document.getElementById('layer-canvases');
-  const controlsPanel = document.getElementById('controls-panel');
-  const btnSegment = document.getElementById('btn-segment');
+  const dropzone = requiredElement('dropzone', HTMLElement);
+  const fileInput = requiredElement('file-input', HTMLInputElement);
+  const previewContainer = requiredElement('preview-container', HTMLElement);
+  const btnReset = requiredElement('btn-reset', HTMLButtonElement);
+  const origCanvas = requiredElement('orig-canvas', HTMLCanvasElement);
+  const layerCanvasesContainer = requiredElement('layer-canvases', HTMLElement);
+  const controlsPanel = requiredElement('controls-panel', HTMLElement);
+  const btnSegment = requiredElement('btn-segment', HTMLButtonElement);
   
-  const progressContainer = document.getElementById('progress-container');
-  const progressStatus = document.getElementById('progress-status');
-  const progressBar = document.getElementById('progress-bar');
-  const progressDetail = document.getElementById('progress-detail');
+  const progressContainer = requiredElement('progress-container', HTMLElement);
+  const progressStatus = requiredElement('progress-status', HTMLElement);
+  const progressBar = requiredElement('progress-bar', HTMLElement);
+  const progressDetail = requiredElement('progress-detail', HTMLElement);
   
-  const layersList = document.getElementById('layers-list');
-  const btnExportPsd = document.getElementById('btn-export-psd');
-  const originalSizeLabel = document.getElementById('original-size');
+  const layersList = requiredElement('layers-list', HTMLElement);
+  const btnExportPsd = requiredElement('btn-export-psd', HTMLButtonElement);
+  const originalSizeLabel = requiredElement('original-size', HTMLElement);
 
-  let currentImageFile = null;
+  let currentImageFile: File | null = null;
   let originalImage = new Image();
-  let generatedLayers = []; 
+  type ImageLayer = { name: string; canvas: HTMLCanvasElement; visible: boolean };
+  let generatedLayers: ImageLayer[] = [];
   let isProcessing = false;
 
   // Handle Drag & Drop
@@ -207,7 +208,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     dropzone?.addEventListener(eventName, preventDefaults, false);
   });
 
-  function preventDefaults(e) {
+  function preventDefaults(e: Event) {
     e.preventDefault();
     e.stopPropagation();
   }
@@ -226,6 +227,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
   dropzone?.addEventListener('drop', (e) => {
     const dt = e.dataTransfer;
+    if (!dt) return;
     const files = dt.files;
     handleFiles(files);
   }, false);
@@ -238,7 +240,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     if (this.files) handleFiles(this.files);
   });
 
-  function handleFiles(files) {
+  function handleFiles(files: FileList) {
     if (files.length === 0) return;
     const file = files[0];
     if (!file.type.startsWith('image/')) {
@@ -250,12 +252,12 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      loadImageForPreview(e.target?.result);
+      if (typeof e.target?.result === 'string') loadImageForPreview(e.target.result);
     };
     reader.readAsDataURL(file);
   }
 
-  function loadImageForPreview(src) {
+  function loadImageForPreview(src: string) {
     originalImage.onload = () => {
       // Show Preview & Controls
       dropzone.classList.add('hidden');
@@ -268,14 +270,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
       origCanvas.width = width;
       origCanvas.height = height;
-      const ctx = origCanvas.getContext('2d');
+      const ctx = canvasContext(origCanvas);
       ctx.drawImage(originalImage, 0, 0);
 
       // Reset previous layers
       layerCanvasesContainer.innerHTML = '';
       generatedLayers = [];
       btnSegment.disabled = false;
-      btnSegment.innerHTML = 'AIで要素ごとに分割';
+      btnSegment.innerHTML = '被写体と背景に分割';
       progressContainer.classList.add('hidden');
       btnExportPsd.style.display = 'none';
       origCanvas.style.opacity = '1';
@@ -315,7 +317,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
              progressBar.style.width = `${percent}%`;
              progressDetail.textContent = percent + '%';
              if (key.includes('model_')) {
-                progressStatus.textContent = `ONNXモデルをロード中...`;
+                progressStatus.textContent = `AIモデルをロード中...`;
              } else if (key.includes('compute')) {
                 progressStatus.textContent = `推論を実行中...`;
              }
@@ -335,7 +337,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         fgImg.src = fgUrl;
 
     } catch(err) {
-        alert(`エラーが発生しました: ${err.message}`);
+        alert(`エラーが発生しました: ${err instanceof Error ? err.message : String(err)}`);
         isProcessing = false;
         btnSegment.disabled = false;
         btnSegment.innerHTML = '再試行する';
@@ -344,7 +346,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     }
   });
 
-  function processSegmentationResult(fgImg) {
+  function processSegmentationResult(fgImg: HTMLImageElement) {
     origCanvas.style.opacity = '0.05'; 
     layerCanvasesContainer.innerHTML = '';
     layersList.innerHTML = '';
@@ -353,14 +355,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = originalImage.width;
     tempCanvas.height = originalImage.height;
-    const ctx = tempCanvas.getContext('2d');
+    const ctx = canvasContext(tempCanvas);
     ctx.drawImage(originalImage, 0, 0);
     const origData = ctx.getImageData(0, 0, originalImage.width, originalImage.height);
 
     const fgCanvasSource = document.createElement('canvas');
     fgCanvasSource.width = originalImage.width;
     fgCanvasSource.height = originalImage.height;
-    const fgCtx = fgCanvasSource.getContext('2d');
+    const fgCtx = canvasContext(fgCanvasSource);
     fgCtx.drawImage(fgImg, 0, 0, originalImage.width, originalImage.height);
     const resolvedFgData = fgCtx.getImageData(0, 0, originalImage.width, originalImage.height);
     
@@ -388,7 +390,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     bgCanvas.width = originalImage.width;
     bgCanvas.height = originalImage.height;
     bgCanvas.className = 'absolute inset-0 w-full h-full object-contain';
-    bgCanvas.getContext('2d').putImageData(bgImageData, 0, 0);
+    canvasContext(bgCanvas).putImageData(bgImageData, 0, 0);
     layerCanvasesContainer.appendChild(bgCanvas);
     const bgObj = { name: '背景 (Background)', canvas: bgCanvas, visible: true };
     generatedLayers.push(bgObj);
@@ -399,7 +401,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     fgCanvas.width = originalImage.width;
     fgCanvas.height = originalImage.height;
     fgCanvas.className = 'absolute inset-0 w-full h-full object-contain';
-    fgCanvas.getContext('2d').putImageData(fgImageData, 0, 0);
+    canvasContext(fgCanvas).putImageData(fgImageData, 0, 0);
     layerCanvasesContainer.appendChild(fgCanvas);
     const fgObj = { name: '主役 (Foreground)', canvas: fgCanvas, visible: true };
     generatedLayers.push(fgObj);
@@ -414,7 +416,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     btnExportPsd.style.display = 'flex';
   }
 
-  function addLayerUIControl(layerObj) {
+  function addLayerUIControl(layerObj: ImageLayer) {
     const wrap = document.createElement('div');
     wrap.className = 'flex items-center justify-between p-2 rounded bg-white border border-slate-100 hover:bg-slate-50 transition-colors shadow-sm';
     
@@ -425,8 +427,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
     const eyeOnIcon = eyeBtn.innerHTML;
 
+    eyeBtn.setAttribute('aria-label', `${layerObj.name}の表示切り替え`);
+    eyeBtn.setAttribute('aria-pressed', String(layerObj.visible));
     eyeBtn.onclick = () => {
         layerObj.visible = !layerObj.visible;
+        eyeBtn.setAttribute('aria-pressed', String(layerObj.visible));
         layerObj.canvas.style.opacity = layerObj.visible ? '1' : '0';
         eyeBtn.innerHTML = layerObj.visible ? eyeOnIcon : eyeOffIcon;
         eyeBtn.classList.toggle('text-slate-300', !layerObj.visible);
@@ -441,7 +446,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     
     // thumbnail scale down for performance
     const thumbCanvas = document.createElement('canvas');
-    const tbCtx = thumbCanvas.getContext('2d');
+    const tbCtx = canvasContext(thumbCanvas);
     thumbCanvas.width = 120;
     thumbCanvas.height = 120;
     const sRatio = Math.min(120 / layerObj.canvas.width, 120 / layerObj.canvas.height);
@@ -489,7 +494,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
               setTimeout(() => { URL.revokeObjectURL(url); }, 1000);
           } catch (e) {
               console.error(e);
-              alert('PSDの生成に失敗しました: ' + e.message);
+              alert('PSDの生成に失敗しました: ' + (e instanceof Error ? e.message : String(e)));
           } finally {
               btnExportPsd.innerHTML = originalBtnText;
               btnExportPsd.disabled = false;

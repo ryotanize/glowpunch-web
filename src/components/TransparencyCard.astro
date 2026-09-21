@@ -1,92 +1,14 @@
 ---
-export interface Props {
-  fileUpload?: boolean;
-  apiSend?: boolean;
-  analytics?: boolean;
-  ads?: boolean;
-  processingLocation?: string;
-}
-
-const { 
-  fileUpload = false, 
-  apiSend = false, 
-  analytics = true, 
-  ads = true,
-  processingLocation = "お使いのブラウザ内"
-} = Astro.props;
+interface Props { fileUpload?: boolean; apiSend?: boolean; analytics?: boolean; ads?: boolean; processingLocation?: string; }
+const { fileUpload = false, apiSend = false, processingLocation = 'お使いのブラウザ内' } = Astro.props;
 ---
-<div class="glass-panel p-6 border-2 border-slate-100 bg-white/80 rounded-2xl" id="transparency-card">
-  <div class="flex items-center gap-3 mb-4 cursor-pointer select-none group" id="transparency-toggle">
-    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 group-hover:bg-sky-50 transition-colors">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600 group-hover:text-sky-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-    </div>
-    <div class="flex-grow">
-      <h3 class="font-bold text-slate-800 flex items-center justify-between">
-        このツールのプライバシー宣言
-        <svg id="transparency-chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 transition-transform"><polyline points="6 9 12 15 18 9"/></svg>
-      </h3>
-      <p class="text-xs text-slate-500 mt-0.5">ファイルは安全に処理されます</p>
-    </div>
-  </div>
-
-  <div id="transparency-details" class="hidden">
-    <div class="space-y-3 pt-2 pb-4 border-b border-slate-100 font-medium text-sm">
-      <div class="flex items-center justify-between">
-        <span class="text-slate-600">ファイルのアップロード</span>
-        {fileUpload ? (
-          <span class="text-amber-600 font-bold px-2 py-0.5 bg-amber-50 rounded border border-amber-100">あり</span>
-        ) : (
-          <span class="flex items-center gap-1.5 text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
-             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-             なし
-          </span>
-        )}
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-slate-600">外部APIへの送信</span>
-        {apiSend ? (
-          <span class="text-amber-600 font-bold px-2 py-0.5 bg-amber-50 rounded border border-amber-100">あり</span>
-        ) : (
-          <span class="flex items-center gap-1.5 text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
-             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-             なし
-          </span>
-        )}
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-slate-600">アクセス解析</span>
-        {analytics ? (
-          <span class="text-amber-600 font-bold px-2 py-0.5 bg-amber-50 rounded border border-amber-100">あり</span>
-        ) : (
-          <span class="text-slate-500 font-bold px-2 py-0.5">なし</span>
-        )}
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-slate-600">広告表示</span>
-        {ads ? (
-          <span class="text-amber-600 font-bold px-2 py-0.5 bg-amber-50 rounded border border-amber-100">あり</span>
-        ) : (
-          <span class="text-slate-500 font-bold px-2 py-0.5">なし</span>
-        )}
-      </div>
-      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-        <span class="text-slate-600">処理場所</span>
-        <span class="text-sky-600 font-bold px-2 py-0.5 bg-sky-50 rounded border border-sky-100">{processingLocation}</span>
-      </div>
-    </div>
-    <p class="text-[11px] text-slate-400 mt-3 leading-relaxed">
-      この表示はGlowPunch開発チームによるツールの仕様宣言です。あなたのプライバシーを守るため、ファイルがどのように扱われるかを明記しています。
-    </p>
-  </div>
-</div>
-
-<script>
-  const toggle = document.getElementById('transparency-toggle');
-  const details = document.getElementById('transparency-details');
-  const chevron = document.getElementById('transparency-chevron');
-
-  toggle?.addEventListener('click', () => {
-    details?.classList.toggle('hidden');
-    chevron?.classList.toggle('rotate-180');
-  });
-</script>
+<details class="glass-panel p-5">
+  <summary class="font-bold cursor-pointer">ファイルの処理場所と外部通信について</summary>
+  <dl class="grid gap-3 mt-4 text-sm">
+    <div><dt class="font-bold">処理場所</dt><dd>{processingLocation}</dd></div>
+    <div><dt class="font-bold">処理対象ファイルのアップロード</dt><dd>{fileUpload ? 'あり' : 'なし'}</dd></div>
+    <div><dt class="font-bold">処理対象データの外部APIへの送信</dt><dd>{apiSend ? 'あり' : 'なし'}</dd></div>
+  </dl>
+  <p class="text-sm leading-relaxed mt-4">サイトの表示やAIモデル・ライブラリの取得には通信があります。アクセス解析や広告は設定に応じて読み込まれ、IPアドレスや閲覧情報が各サービスに伝わる場合があります。ファイルの内容や入力本文を解析イベントに含める実装はしていません。</p>
+  <a class="text-sm underline text-sky-800 mt-3 inline-block" href="/privacy-policy/">通信先とプライバシーポリシー</a>
+</details>

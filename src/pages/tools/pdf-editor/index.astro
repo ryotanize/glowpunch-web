@@ -6,7 +6,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
 
 <BaseLayout
   title="PDF分割・結合・編集ツール - GlowPunch"
-  description="PDF内の全ページを見ながら、不要なページを削除したり、順番を並べ替えて一つに結合できるブラウザ完結型の安全なツールです。"
+  description="PDF内の全ページを見ながら、不要なページを削除・並べ替え・結合できるブラウザ内処理ツールです。処理対象PDFは外部サーバーへアップロードしません。"
 >
   <div class="flex flex-col gap-6">
 
@@ -16,7 +16,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         PDFの<span class="text-red-500">ページ編集・結合</span>ツール
       </h1>
       <p class="text-slate-600 text-lg">
-        複数のPDFを読み込み、ページ単位で表示します。ドラッグ＆ドロップでの並べ替えや不要なページの削除を行い、1つのPDFとしてエクスポートできます。すべてブラウザ内で完結するため安全です。
+        複数のPDFを読み込み、ページ単位で表示します。ドラッグ＆ドロップでの並べ替えや不要なページの削除を行い、1つのPDFとしてエクスポートできます。処理対象PDFは外部サーバーへアップロードしません。
       </p>
     </div>
 
@@ -107,12 +107,12 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
         <div class="p-6 text-slate-600 space-y-6">
           <div class="prose prose-slate max-w-none">
             <h3>PDF結合・分割ツールについて</h3>
-            <p>複数のPDFファイルを1つに結合したり、不要なページを削除したり、ページ順を入れ替えたりする作業を、ブラウザだけで完結させる無料ツールです。機密書類でも安心してお使いいただけます。</p>
+            <p>複数のPDFファイルを1つに結合し、不要なページを削除したりページ順を入れ替えたりできる無料ツールです。処理対象PDFは外部サーバーへアップロードしません。</p>
 
             <h3>よくある質問 (FAQ)</h3>
 
             <h4>Q. PDFファイルはサーバーにアップロードされますか？</h4>
-            <p>A. いいえ、すべての処理はブラウザ内で完結します。PDFデータが外部のサーバーに送信・保存されることは一切ないため、契約書や社内資料など機密性の高い文書でも安心です。</p>
+            <p>A. いいえ、すべての処理はブラウザ内で完結します。処理対象PDFは外部サーバーへアップロードしません。契約書や社内資料などの機密文書は、組織の利用規則も確認してください。</p>
 
             <h4>Q. 何ページまで結合できますか？</h4>
             <p>A. ブラウザのメモリに依存しますが、通常のPCであれば数百ページ程度の結合は問題なく行えます。非常に大きなファイル（100MB超）の場合はメモリ不足になる可能性があります。</p>
@@ -150,7 +150,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
               "name": "PDFファイルはサーバーにアップロードされますか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "いいえ、すべての処理はブラウザ内で完結します。PDFデータが外部のサーバーに送信・保存されることは一切ないため、契約書や社内資料など機密性の高い文書でも安心です。"
+                "text": "いいえ、すべての処理はブラウザ内で完結します。処理対象PDFは外部サーバーへアップロードしません。契約書や社内資料などの機密文書は、組織の利用規則も確認してください。"
               }
             },
             {
@@ -483,7 +483,7 @@ import ProcessStepLog from '../../../components/ProcessStepLog.astro';
          logger.addStep('generate', 'PDFファイルを生成しています', 'running');
       }
 
-      const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(finalPdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

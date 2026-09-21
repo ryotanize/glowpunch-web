@@ -1,0 +1,18 @@
+---
+import { tools, categories } from '../data/tools';
+---
+<section id="tools" aria-labelledby="tools-heading" class="scroll-mt-28">
+  <h2 id="tools-heading" class="text-3xl font-bold mb-4">作業からツールを選ぶ</h2>
+  <nav aria-label="ツールのカテゴリ" class="flex flex-wrap gap-3 mb-8">
+    {categories.map((category, i) => <a href={`#category-${i}`} class="rounded-xl border border-slate-300 bg-white px-4 py-3 hover:border-sky-600">{category}</a>)}
+  </nav>
+  {categories.map((category, i) => <section id={`category-${i}`} class="mb-10 scroll-mt-28" aria-labelledby={`category-heading-${i}`}>
+    <h3 id={`category-heading-${i}`} class="text-2xl font-bold mb-4">{category}</h3>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {tools.filter(tool => tool.category === category).map(tool => <a href={`/tools/${tool.id}/`} class="glass-panel p-6 hover:border-sky-500 block">
+        <h4 class="font-bold text-lg text-sky-800 mb-2">{tool.name}</h4>
+        <p class="text-sm leading-relaxed">{tool.description}</p>
+      </a>)}
+    </div>
+  </section>)}
+</section>
